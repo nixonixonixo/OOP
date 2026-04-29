@@ -46,14 +46,9 @@ Il sistema implementa diversi vincoli, tra cui:
 - calcolo automatico del costo del noleggio
 - aggiornamento dello stato dell’auto
 
-## Stato del progetto
-In sviluppo (Homework 1)
-
 ## Gruppo di lavoro
-- Nome Cognome (matricola)
-- Nome Cognome (matricola)
+- Nicola Ragozzini (DE1000042)
+- Gaetano Russo (DE1000051)
 
 ## Repository
 https://github.com/nixonixonixo/OOP
-- storico dettagliato dei noleggi
-```
