@@ -1,14 +1,15 @@
 package model;
 
 public class Operatore  extends Utente{
-
+    //costruttore
     public Operatore(int idUtente, String nome,String cognome, String email,Ruolo ruolo){
         super(idUtente,nome,cognome,email);
         this.ruolo=ruolo;
     }
-
+    //attributo Operatore
     private  Ruolo ruolo;
 
+    //enumerazione ruoli
     public enum Ruolo{
         ADMIN,
         ADDETTONOLEGGIO,
@@ -18,7 +19,6 @@ public class Operatore  extends Utente{
 
     //metodi Operatore
     @Override
-    public String toString(){
-        return super.toString() + " " + ruolo;
-    }
+    public String toString(){return super.toString() + " " + ruolo;}
+
 }
