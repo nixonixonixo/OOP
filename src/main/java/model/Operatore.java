@@ -18,7 +18,6 @@ public class Operatore  extends Utente{
     //attributi Operatore
     private Ruolo ruolo;
 
-
     //metodi Operatore
     @Override
     public String toString(){

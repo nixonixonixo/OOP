@@ -20,9 +20,6 @@ public class Noleggio {
 
     //metodi Noleggio
     @Override
-    public String toString(){return super.toString() + " " + idNoleggio+ "" + dataRestituzione +  "" +dataRitiro + "" + costoTot  ;}
-
-
-
+    public String toString(){return super.toString() + " " + idNoleggio+ " " + dataRestituzione +  " " +dataRitiro + " " + costoTot;}
 
 }
