@@ -14,8 +14,34 @@ public class Cliente extends Utente {
     private double credito;
 
     //metodi Cliente
+    public void ricaricaCredito(double importo) {
+        if (importo <= 0) {
+            throw new IllegalArgumentException("Importo non valido");
+        }
+        credito += importo;
+    }
+
+    public void scalaCredito(double importo) {
+        if (importo <= 0) {
+            throw new IllegalArgumentException("Importo non valido");
+        }
+        if (credito < importo) {
+            throw new IllegalArgumentException("Credito insufficiente");
+        }
+        credito -= importo;
+    }
+
+    public double getCredito(){
+        return credito;
+    }
+
+    public String getPatente() {
+        return patente;
+    }
+
     @Override
     public String toString() {
-       return super.toString() + " " + patente + " " + credito;
+        return super.toString() + " " + patente + " " + credito;
     }
+
 }
