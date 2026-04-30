@@ -6,14 +6,14 @@ public class Noleggio {
 
     //costruttore Noleggio
     public Noleggio(int idNoleggio, Date dataRitiro, Date dataRestituzione, double costoTot){
-        this.costoTot=costoTot;
-        this.idNoleggio=idNoleggio;
-        this.dataRestituzione=dataRestituzione;
-        this.dataRitiro=dataRitiro;
+        this.costoTot = costoTot;
+        this.idNoleggio = idNoleggio;
+        this.dataRestituzione = dataRestituzione;
+        this.dataRitiro = dataRitiro;
     }
 
     //attributi Noleggio
-    private  int idNoleggio;
+    private int idNoleggio;
     private Date dataRitiro;
     private Date dataRestituzione;
     private double costoTot;

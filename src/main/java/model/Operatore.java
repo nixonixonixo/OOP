@@ -5,7 +5,7 @@ public class Operatore  extends Utente{
     //costruttore Operatore
     public Operatore(int idUtente, String nome,String cognome, String email,Ruolo ruolo){
         super(idUtente,nome,cognome,email);
-        this.ruolo=ruolo;
+        this.ruolo = ruolo;
     }
 
     //enum Operatore
@@ -16,7 +16,7 @@ public class Operatore  extends Utente{
     }
 
     //attributi Operatore
-    private  Ruolo ruolo;
+    private Ruolo ruolo;
 
 
     //metodi Operatore
