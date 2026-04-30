@@ -5,6 +5,12 @@ public class Cliente extends Utente {
     //costruttore Cliente
     public Cliente(int idUtente,String nome, String cognome, String email,String patente, double credito){
         super(idUtente,nome,cognome,email);
+        if (patente == null || patente.isBlank()) {
+            throw new IllegalArgumentException("Patente non valida");
+        }
+        if (credito < 0) {
+            throw new IllegalArgumentException("Credito non valido");
+        }
         this.patente=patente;
         this.credito=credito;
     }
