@@ -17,5 +17,8 @@ public class Utente {
     protected String email;
 
     //metodi Utente
-
+    @Override
+    public String toString() {
+        return idUtente + " " + nome + " " + cognome  + " " + email;
+    }
 }
