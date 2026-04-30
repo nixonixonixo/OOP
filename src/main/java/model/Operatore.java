@@ -13,7 +13,6 @@ public class Operatore  extends Utente{
         ADMIN,
         ADDETTONOLEGGIO,
         MANUTENTORE
-
     }
 
     //attributi Operatore
