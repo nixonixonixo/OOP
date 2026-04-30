@@ -18,4 +18,5 @@ public class Cliente extends Utente {
     public String toString() {
        return super.toString() + " " + patente + " " + credito;
     }
+
 }
