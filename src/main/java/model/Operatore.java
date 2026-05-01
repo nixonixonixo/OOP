@@ -10,8 +10,8 @@ public class Operatore  extends Utente{
     }
 
     //costruttore Operatore
-    public Operatore(int idUtente, String nome,String cognome, String email,Ruolo ruolo){
-        super(idUtente,nome,cognome,email);
+    public Operatore(int idUtente, String username, String password, String nome, String cognome, String email,Ruolo ruolo){
+        super(idUtente,username,password,nome,cognome,email);
         if (ruolo == null) {
             throw new IllegalArgumentException("Ruolo non valido");
         }

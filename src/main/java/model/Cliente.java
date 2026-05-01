@@ -3,8 +3,8 @@ package model;
 public class Cliente extends Utente {
 
     //costruttore Cliente
-    public Cliente(int idUtente,String nome, String cognome, String email,String patente, double credito){
-        super(idUtente,nome,cognome,email);
+    public Cliente(int idUtente, String username, String password, String nome, String cognome, String email,String patente, double credito){
+        super(idUtente,username,password,nome,cognome,email);
         if (patente == null || patente.isBlank()) {
             throw new IllegalArgumentException("Patente non valida");
         }
@@ -16,7 +16,7 @@ public class Cliente extends Utente {
     }
 
     //attributi Cliente
-    private String patente;
+    private final String patente;
     private double credito;
 
     //metodi Cliente
