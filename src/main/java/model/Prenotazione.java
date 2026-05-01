@@ -12,7 +12,7 @@ public class Prenotazione {
     }
 
     //costruttore Prenotazione
-    public Prenotazione(int idPrenotazione, Date dataInizio, Date dataFine, StatoPren stato){
+    public Prenotazione(int idPrenotazione, Date dataInizio, Date dataFine, StatoPren stato, Cliente cliente, Auto auto) {
         if (dataInizio == null || dataFine == null || stato == null) {
             throw new IllegalArgumentException("Parametri non validi");
         }
@@ -23,6 +23,8 @@ public class Prenotazione {
         this.dataInizio = dataInizio;
         this.dataFine = dataFine;
         this.stato = stato;
+        this.cliente = cliente;
+        this.auto = auto;
     }
 
     //attributi Prenotazione
@@ -30,6 +32,10 @@ public class Prenotazione {
     private Date dataInizio;
     private Date dataFine;
     private StatoPren stato;
+
+    //associazioni Prenotazione
+    private Cliente cliente;
+    private Auto auto;
 
     //metodi Prenotazione
     public int getIdPrenotazione() {
@@ -46,6 +52,14 @@ public class Prenotazione {
 
     public StatoPren getStato() {
         return stato;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public Auto getAuto() {
+        return auto;
     }
 
     public void conferma() {
@@ -71,6 +85,7 @@ public class Prenotazione {
 
     @Override
     public String toString() {
-        return idPrenotazione + " " + dataInizio + " " + dataFine  + " " + stato;
+        return idPrenotazione + " " + dataInizio + " " + dataFine  + " " + stato + " " + cliente.getCognome()
+                + " " + auto.getTarga();
     }
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 public class Noleggio {
 
     //costruttore Noleggio
-    public Noleggio(int idNoleggio, Date dataRitiro){
+    public Noleggio(int idNoleggio, Date dataRitiro, Prenotazione prenotazione) {
         if (dataRitiro == null) {
             throw new IllegalArgumentException("Data ritiro non valida");
         }
@@ -14,6 +14,7 @@ public class Noleggio {
         this.dataRitiro = dataRitiro;
         this.dataRestituzione = null;
         this.costoTot = 0;
+        this.prenotazione = prenotazione;
     }
 
     //attributi Noleggio
@@ -21,6 +22,9 @@ public class Noleggio {
     private Date dataRitiro;
     private Date dataRestituzione;
     private double costoTot;
+
+    //associazioni Noleggio
+    private Prenotazione prenotazione;
 
     //metodi Noleggio
     public int getIdNoleggio() {
@@ -37,6 +41,10 @@ public class Noleggio {
 
     public double getCostoTot() {
         return costoTot;
+    }
+
+    public Prenotazione getPrenotazione() {
+        return prenotazione;
     }
 
     public void chiudiNoleggio(Date dataRestituzione, double costoGiornaliero) {
@@ -60,6 +68,9 @@ public class Noleggio {
     }
 
     @Override
-    public String toString(){return idNoleggio+ " " + dataRestituzione +  " " +dataRitiro + " " + costoTot;}
+    public String toString(){
+        return idNoleggio+ " " + dataRestituzione +  " " +dataRitiro + " " + costoTot
+        + " " + prenotazione.getIdPrenotazione();
+    }
 
 }

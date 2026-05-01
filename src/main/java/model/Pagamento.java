@@ -3,7 +3,7 @@ package model;
 public class Pagamento {
 
     //costruttore Pagamento
-    public Pagamento(int idPagamento, double importo, StatoPagamento stato){
+    public Pagamento(int idPagamento, double importo, StatoPagamento stato, Noleggio noleggio){
         if (importo <= 0) {
             throw new IllegalArgumentException("Importo non valido");
         }
@@ -13,6 +13,7 @@ public class Pagamento {
         this.idPagamento = idPagamento;
         this.importo = importo;
         this.stato = stato;
+        this.noleggio = noleggio;
     }
 
     //enum Pagamento
@@ -28,6 +29,9 @@ public class Pagamento {
     private double importo;
     private StatoPagamento stato;
 
+    //associazioni Pagamento
+    private Noleggio noleggio;
+
     //metodi Pagamento
     public int getIdPagamento() {
         return idPagamento;
@@ -39,6 +43,10 @@ public class Pagamento {
 
     public StatoPagamento getStato() {
         return stato;
+    }
+
+    public Noleggio getNoleggio() {
+        return noleggio;
     }
 
     public void completa() {
@@ -64,6 +72,6 @@ public class Pagamento {
 
     @Override
     public String toString(){
-        return idPagamento + " " + importo + " " + stato;
+        return idPagamento + " " + importo + " " + stato + " " + noleggio.getIdNoleggio();
     }
 }
