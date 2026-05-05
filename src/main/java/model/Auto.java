@@ -1,5 +1,7 @@
 package model;
 
+import java.math.BigDecimal;
+
 public class Auto {
 
     //enum Auto
@@ -12,18 +14,18 @@ public class Auto {
     }
 
     //costruttore Auto
-    public Auto(int idAuto, String targa, String modello, StatoAuto stato,double costodaily){
+    public Auto(int idAuto, String targa, String modello, StatoAuto stato,BigDecimal costoDaily){
         if (targa == null || modello == null || stato == null) {
             throw new IllegalArgumentException("Parametri non validi");
         }
-        if (costodaily <= 0) {
+        if (costoDaily == null || costoDaily.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Costo giornaliero non valido");
         }
         this.idAuto = idAuto;
         this.targa = targa;
         this.modello = modello;
         this.stato = stato;
-        this.costodaily = costodaily;
+        this.costoDaily = costoDaily;
     }
 
     //attributi Auto
@@ -31,7 +33,7 @@ public class Auto {
     private String targa;
     private String modello;
     private StatoAuto stato;
-    private double costodaily;
+    private BigDecimal costoDaily;
 
     //metodi Auto
     public int getIdAuto() {

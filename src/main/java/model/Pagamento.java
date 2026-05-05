@@ -1,10 +1,12 @@
 package model;
 
+import java.math.BigDecimal;
+
 public class Pagamento {
 
     //costruttore Pagamento
-    public Pagamento(int idPagamento, double importo, StatoPagamento stato, Noleggio noleggio){
-        if (importo <= 0) {
+    public Pagamento(int idPagamento, BigDecimal importo, StatoPagamento stato, Noleggio noleggio){
+        if (importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Importo non valido");
         }
         if (stato == null) {
@@ -26,7 +28,7 @@ public class Pagamento {
 
     //attributi Pagamento
     private int idPagamento;
-    private double importo;
+    private BigDecimal importo;
     private StatoPagamento stato;
 
     //associazioni Pagamento
@@ -37,7 +39,7 @@ public class Pagamento {
         return idPagamento;
     }
 
-    public double getImporto() {
+    public BigDecimal getImporto() {
         return importo;
     }
 

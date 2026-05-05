@@ -1,5 +1,6 @@
 package model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -13,7 +14,7 @@ public class Noleggio {
         this.idNoleggio = idNoleggio;
         this.dataRitiro = dataRitiro;
         this.dataRestituzione = null;
-        this.costoTot = 0;
+        this.costoTot = new BigDecimal("0");
         this.prenotazione = prenotazione;
     }
 
@@ -21,7 +22,7 @@ public class Noleggio {
     private int idNoleggio;
     private Date dataRitiro;
     private Date dataRestituzione;
-    private double costoTot;
+    private BigDecimal costoTot;
 
     //associazioni Noleggio
     private Prenotazione prenotazione;
@@ -39,7 +40,7 @@ public class Noleggio {
         return dataRestituzione;
     }
 
-    public double getCostoTot() {
+    public BigDecimal getCostoTot() {
         return costoTot;
     }
 
@@ -47,7 +48,7 @@ public class Noleggio {
         return prenotazione;
     }
 
-    public void chiudiNoleggio(Date dataRestituzione, double costoGiornaliero) {
+    public void chiudiNoleggio(Date dataRestituzione, BigDecimal costoGiornaliero) {
         if (dataRestituzione == null) {
             throw new IllegalArgumentException("Data restituzione non valida");
         }
@@ -56,7 +57,7 @@ public class Noleggio {
         }
         this.dataRestituzione = dataRestituzione;
         int giorni = calcolaDurataGiorni();
-        this.costoTot = giorni * costoGiornaliero;
+        this.costoTot = costoGiornaliero.multiply(BigDecimal.valueOf(giorni));
     }
 
     public int calcolaDurataGiorni() {

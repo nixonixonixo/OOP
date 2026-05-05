@@ -1,15 +1,17 @@
 package model;
 
+import java.math.BigDecimal;
+
 public class Cliente extends Utente {
 
     //costruttore Cliente
-    public Cliente(int idUtente, String username, String password, String nome, String cognome, String email,String patente, double credito){
+    public Cliente(int idUtente, String username, String password, String nome, String cognome, String email,String patente, BigDecimal credito){
         super(idUtente,username,password,nome,cognome,email);
         if (patente == null || patente.isBlank()) {
             throw new IllegalArgumentException("Patente non valida");
         }
-        if (credito < 0) {
-            throw new IllegalArgumentException("Credito non valido");
+        if (credito.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Costo giornaliero non valido");
         }
         this.patente=patente;
         this.credito=credito;
@@ -17,27 +19,27 @@ public class Cliente extends Utente {
 
     //attributi Cliente
     private final String patente;
-    private double credito;
+    private BigDecimal credito;
 
     //metodi Cliente
-    public void ricaricaCredito(double importo) {
-        if (importo <= 0) {
+    public void ricaricaCredito(BigDecimal importo) {
+        if (importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Importo non valido");
         }
-        credito += importo;
+        credito = credito.add(importo);
     }
 
-    public void scalaCredito(double importo) {
-        if (importo <= 0) {
+    public void scalaCredito(BigDecimal importo) {
+        if (importo == null || importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Importo non valido");
         }
-        if (credito < importo) {
+        if (credito.compareTo(importo) < 0) {
             throw new IllegalArgumentException("Credito insufficiente");
         }
-        credito -= importo;
+        credito = credito.subtract(importo);
     }
 
-    public double getCredito(){
+    public BigDecimal getCredito(){
         return credito;
     }
 
