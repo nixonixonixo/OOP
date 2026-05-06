@@ -1,4 +1,4 @@
-package Database;
+package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,16 +9,16 @@ public class ConnessioneDatabase {
 	// ATTRIBUTI
 	private static ConnessioneDatabase instance;
 	public Connection connection = null;
-	private String nome = "postgres";
-	private String password = "password";
-	private String url = "jdbc:postgresql://localhost:5433/Borsa";
+	private String user = "postgres";
+	private String password = "Nick_2006!";
+	private String url = "jdbc:postgresql://localhost:5432/noleggio_auto";
 	private String driver = "org.postgresql.Driver";
 
 	// COSTRUTTORE
 	private ConnessioneDatabase() throws SQLException {
 		try {
 			Class.forName(driver);
-			connection = DriverManager.getConnection(url, nome, password);
+			connection = DriverManager.getConnection(url, user, password);
 
 		} catch (ClassNotFoundException ex) {
 			System.out.println("Database Connection Creation Failed : " + ex.getMessage());
