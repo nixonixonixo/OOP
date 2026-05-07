@@ -12,7 +12,6 @@ public class ImpAutoDAO implements AutoDAO {
 
     @Override
     public void salvaAuto(Auto auto) throws SQLException {
-        // Usiamo i nomi delle colonne definiti nel tuo schema logico
         String sql = "INSERT INTO AUTO (id_auto, targa, modello, stato, costo_daily) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
