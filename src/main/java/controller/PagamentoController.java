@@ -3,6 +3,7 @@ package controller;
 import model.*;
 import dao.*;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 
 public class PagamentoController {
 
@@ -12,7 +13,7 @@ public class PagamentoController {
         this.pagamentoDAO = pagamentoDAO;
     }
 
-    public Pagamento effettuaPagamento(Noleggio n, Cliente c) {
+    public Pagamento effettuaPagamento(Noleggio n, Cliente c) throws SQLException {
 
         BigDecimal importo = n.getCostoTot();
 
@@ -26,7 +27,7 @@ public class PagamentoController {
 
         p.completa();
 
-        pagamentoDAO.save(p);
+        pagamentoDAO.salvaPagamento(p);
         return p;
     }
 }

@@ -2,6 +2,8 @@ package controller;
 
 import model.*;
 import dao.*;
+
+import java.sql.SQLException;
 import java.util.Date;
 import java.math.BigDecimal;
 
@@ -13,7 +15,7 @@ public class NoleggioController {
         this.noleggioDAO = noleggioDAO;
     }
 
-    public Noleggio avviaNoleggio(Prenotazione p) {
+    public Noleggio avviaNoleggio(Prenotazione p) throws SQLException {
 
         if (p.getStato() != Prenotazione.StatoPren.CONFERMATA) {
             throw new IllegalStateException("Prenotazione non confermata");
@@ -22,19 +24,19 @@ public class NoleggioController {
         Noleggio n = new Noleggio(0, new Date(), p);
         p.getAuto().cambiaStato(Auto.StatoAuto.NOLEGGIATA);
 
-        noleggioDAO.save(n);
+        noleggioDAO.salvaNoleggio(n);
         return n;
     }
 
-    public void chiudiNoleggio(Noleggio n, Date restituzione) {
+    public void chiudiNoleggio(Noleggio n, Date restituzione) throws SQLException {
 
         Auto auto = n.getPrenotazione().getAuto();
-        BigDecimal costoGiornaliero = auto.getCostoGiornaliero();
+        BigDecimal costoGiornaliero = auto.getCostoDaily();
 
         n.chiudiNoleggio(restituzione, costoGiornaliero);
 
         auto.cambiaStato(Auto.StatoAuto.DISPONIBILE);
 
-        noleggioDAO.update(n);
+        noleggioDAO.aggiornaNoleggio(n);
     }
 }

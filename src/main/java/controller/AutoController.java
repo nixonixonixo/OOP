@@ -2,6 +2,8 @@ package controller;
 
 import model.*;
 import dao.*;
+
+import java.sql.SQLException;
 import java.util.List;
 
 public class AutoController {
@@ -12,12 +14,12 @@ public class AutoController {
         this.autoDAO = autoDAO;
     }
 
-    public List<Auto> getAutoDisponibili() {
-        return autoDAO.findDisponibili();
+    public List<Auto> getAutoDisponibili() throws SQLException {
+        return autoDAO.trovaAutoDisponibili();
     }
 
-    public void aggiornaStatoAuto(Auto auto, Auto.StatoAuto stato) {
+    public void aggiornaStatoAuto(Auto auto, Auto.StatoAuto stato) throws SQLException {
         auto.cambiaStato(stato);
-        autoDAO.update(auto);
+        autoDAO.aggiornaAuto(auto);
     }
 }
