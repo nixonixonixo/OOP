@@ -3,6 +3,8 @@ package controller;
 import model.Utente;
 import dao.UtenteDAO;
 
+import java.sql.SQLException;
+
 public class AuthController {
 
     private UtenteDAO utenteDAO;
@@ -11,11 +13,16 @@ public class AuthController {
         this.utenteDAO = utenteDAO;
     }
 
-    public Utente login(String username, String password) {
-        Utente u = utenteDAO.findByUsername(username);
+    public Utente login(String username, String password) throws SQLException {
+
+        Utente u =
+                utenteDAO.trovaUtentePerUsername(username);
 
         if (u == null || !u.verificaPassword(password)) {
-            throw new IllegalArgumentException("Credenziali non valide");
+
+            throw new IllegalArgumentException(
+                    "Credenziali non valide"
+            );
         }
 
         return u;

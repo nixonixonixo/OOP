@@ -53,6 +53,10 @@ public class Utente {
         }
     }
 
+    public boolean verificaPassword(String password) {
+        return passwordHash.equals(createHash(password));
+    }
+
     public int getIdUtente(){
         return idUtente;
     }
