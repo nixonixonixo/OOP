@@ -1,5 +1,5 @@
-import implementazionePostgresDAO.ImplementazionePostgresUtenteDAO;
-import implementazionePostgresDAO.ImplementazionePostgresClienteDAO;
+import implementazionePostgresDAO.ImpUtenteDAO;
+import implementazionePostgresDAO.ImpClienteDAO;
 
 import model.Cliente;
 import model.Utente;
@@ -31,11 +31,9 @@ public class Main {
             // DAO
             // =========================
 
-            ImplementazionePostgresUtenteDAO utenteDAO =
-                    new ImplementazionePostgresUtenteDAO();
+            ImpUtenteDAO utenteDAO = new ImpUtenteDAO();
 
-            ImplementazionePostgresClienteDAO clienteDAO =
-                    new ImplementazionePostgresClienteDAO();
+            ImpClienteDAO clienteDAO = new ImpClienteDAO();
 
             // =========================
             // SALVATAGGIO
