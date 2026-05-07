@@ -17,13 +17,13 @@ public class Main {
             // =========================
 
             Cliente cliente = new Cliente(
-                    100,
-                    "mario123",
-                    "hashPassword",
-                    "Mario",
-                    "Rossi",
-                    "mario.rossi@email.com",
-                    "PAT99999",
+                    1000,
+                    "loffrypasq",
+                    "lollo",
+                    "Passquale",
+                    "Russo",
+                    "pasq_l_23@gmail.com",
+                    "PAT104",
                     new BigDecimal("500")
             );
 
