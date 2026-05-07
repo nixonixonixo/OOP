@@ -51,6 +51,10 @@ public class Pagamento {
         return noleggio;
     }
 
+    public void setStato(StatoPagamento stato){
+        this.stato = stato;
+    }
+
     public void completa() {
         if (stato != StatoPagamento.IN_ATTESA) {
             throw new IllegalStateException("Pagamento non completabile");
