@@ -140,4 +140,18 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 auto
         );
     }
+
+    @Override
+    public Prenotazione trovaPrenotazionePerAuto(int idAuto) throws SQLException {
+        String sql = "SELECT * FROM PRENOTAZIONE WHERE id_auto = ? AND stato != 'ANNULLATA' LIMIT 1";
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idAuto);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mappaResultSetInPrenotazione(rs);
+            }
+        }
+        return null;
+    }
 }

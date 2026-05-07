@@ -62,6 +62,10 @@ public class Prenotazione {
         return auto;
     }
 
+    public void setStato(StatoPren stato){
+        this.stato = stato;
+    }
+
     public void conferma() {
         if (stato == StatoPren.ANNULLATA) {
             throw new IllegalStateException("Prenotazione annullata");

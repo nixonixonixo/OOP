@@ -5,7 +5,6 @@ import dao.*;
 
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 
 public class PrenotazioneController {
 
@@ -17,37 +16,36 @@ public class PrenotazioneController {
         this.autoDAO = autoDAO;
     }
 
-    public Prenotazione creaPrenotazione(Cliente cliente, int idAuto, Date inizio, Date fine) throws SQLException {
-
+    public Prenotazione creaPrenotazione(int idPren, Cliente cliente, int idAuto, Date inizio, Date fine) throws SQLException {
         Auto auto = autoDAO.trovaAutoPerId(idAuto);
-
         if (auto == null || !auto.isDisponibile()) {
             throw new IllegalArgumentException("Auto non disponibile");
         }
 
-        List<Prenotazione> prenotazioni = prenotazioneDAO.trovaPrenotazionePerAuto(idAuto);
+        Prenotazione pEsistente = prenotazioneDAO.trovaPrenotazionePerAuto(idAuto);
+        Prenotazione nuova = new Prenotazione(idPren, inizio, fine, Prenotazione.StatoPren.IN_ATTESA, cliente, auto);
 
-        Prenotazione nuova = new Prenotazione(0, cliente, auto, inizio, fine, Prenotazione.StatoPren.IN_ATTESA);
-
-        for (Prenotazione p : prenotazioni) {
-            if (p.isSovrapposta(nuova) && p.isValida()) {
-                throw new IllegalArgumentException("Date non disponibili");
+        if (pEsistente != null) {
+            if (pEsistente.isSovrapposta(nuova)) {
+                throw new IllegalArgumentException("L'auto è già impegnata per queste date");
             }
         }
 
-        prenotazioneDAO.save(nuova);
+        prenotazioneDAO.salvaPrenotazione(nuova);
         return nuova;
     }
 
-    public void confermaPrenotazione(Prenotazione p) {
-        p.conferma();
-        p.getAuto().cambiaStato(Auto.StatoAuto.PRENOTATA);
-        prenotazioneDAO.update(p);
+    public void confermaPrenotazione(Prenotazione p) throws SQLException {
+        p.setStato(Prenotazione.StatoPren.CONFERMATA);
+        p.getAuto().setStato(Auto.StatoAuto.PRENOTATA);
+        prenotazioneDAO.aggiornaPrenotazione(p);
+        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.PRENOTATA);
     }
 
-    public void annullaPrenotazione(Prenotazione p) {
-        p.annulla();
-        p.getAuto().cambiaStato(Auto.StatoAuto.DISPONIBILE);
-        prenotazioneDAO.update(p);
+    public void annullaPrenotazione(Prenotazione p) throws SQLException {
+        p.setStato(Prenotazione.StatoPren.ANNULLATA);
+        p.getAuto().setStato(Auto.StatoAuto.DISPONIBILE);
+        prenotazioneDAO.aggiornaPrenotazione(p);
+        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.DISPONIBILE);
     }
 }
