@@ -13,6 +13,9 @@ public interface PrenotazioneDAO {
     Prenotazione trovaPrenotazionePerId(int idPrenotazione)
             throws SQLException;
 
+    Prenotazione trovaPrenotazionePerAuto(int idAuto)
+            throws SQLException;
+
     List<Prenotazione> trovaPrenotazioniCliente(int idCliente)
             throws SQLException;
 

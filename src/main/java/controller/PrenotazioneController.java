@@ -2,6 +2,8 @@ package controller;
 
 import model.*;
 import dao.*;
+
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -15,16 +17,15 @@ public class PrenotazioneController {
         this.autoDAO = autoDAO;
     }
 
-    public Prenotazione creaPrenotazione(Cliente cliente, int idAuto, Date inizio, Date fine) {
+    public Prenotazione creaPrenotazione(Cliente cliente, int idAuto, Date inizio, Date fine) throws SQLException {
 
-        Auto auto = autoDAO.findById(idAuto);
+        Auto auto = autoDAO.trovaAutoPerId(idAuto);
 
         if (auto == null || !auto.isDisponibile()) {
             throw new IllegalArgumentException("Auto non disponibile");
         }
 
-        // controllo sovrapposizioni
-        List<Prenotazione> prenotazioni = prenotazioneDAO.findByAuto(idAuto);
+        List<Prenotazione> prenotazioni = prenotazioneDAO.trovaPrenotazionePerAuto(idAuto);
 
         Prenotazione nuova = new Prenotazione(0, cliente, auto, inizio, fine, Prenotazione.StatoPren.IN_ATTESA);
 
