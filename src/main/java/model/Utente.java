@@ -61,6 +61,10 @@ public class Utente {
         return username;
     }
 
+    public String getPasswordHash(){
+        return passwordHash;
+    }
+
     public String getNome() {
         return nome;
     }
