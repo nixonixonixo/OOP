@@ -63,6 +63,10 @@ public class Auto {
         this.stato = nuovoStato;
     }
 
+    public boolean isDisponibile() {
+        return this.stato == StatoAuto.DISPONIBILE;
+    }
+
     @Override
     public String toString(){
         return idAuto + " " + targa + " " + modello + " " + stato;
