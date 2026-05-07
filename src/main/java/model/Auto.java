@@ -52,6 +52,10 @@ public class Auto {
         return stato;
     }
 
+    public BigDecimal getCostoDaily(){
+        return costoDaily;
+    }
+
     public void cambiaStato(StatoAuto nuovoStato) {
         if (nuovoStato == null) {
             throw new IllegalArgumentException("Stato non valido");
