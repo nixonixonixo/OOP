@@ -10,38 +10,31 @@ import java.awt.*;
 public class DashboardFrame extends JFrame {
 
     public DashboardFrame(Utente utente) {
-
-        setTitle("Dashboard - " + (utente instanceof Operatore ? "Operatore" : "Cliente"));
-        setSize(1000, 700); // Leggermente più grande per contenere le tabelle
+        setTitle("Dashboard Noleggio - " + utente.getNome());
+        setSize(1000, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JLabel benvenuto = new JLabel("Benvenuto, " + utente.getNome() + " " + utente.getCognome());
-        benvenuto.setFont(new Font("Arial", Font.BOLD, 14));
-        benvenuto.setHorizontalAlignment(SwingConstants.CENTER);
-        benvenuto.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        JLabel lblBenvenuto = new JLabel("Accesso effettuato come: " + utente.getUsername());
+        lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
+        lblBenvenuto.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JTabbedPane tabs = new JTabbedPane();
 
-        if (utente instanceof Cliente cliente) {
-            tabs.addTab("Catalogo Auto", new AutoPanel());
-
-            tabs.addTab("Le Mie Prenotazioni", new PrenotazionePanel(cliente));
-
-            tabs.addTab("I Miei Noleggi", new NoleggioPanel());
-            tabs.addTab("Pagamenti", new PagamentoPanel());
-        }
-
         if (utente instanceof Operatore operatore) {
             tabs.addTab("Gestione Parco Auto", new AutoPanel());
-
-            tabs.addTab("Gestione Prenotazioni", new PrenotazionePanel(null));
-
-            tabs.addTab("Monitoraggio Operatore", new OperatorePanel());
+            tabs.addTab("Pannello Operativo", new OperatorePanel());
+            tabs.addTab("Tutte le Prenotazioni", new PrenotazionePanel(null));
+        }
+        else if (utente instanceof Cliente cliente) {
+            tabs.addTab("Catalogo Auto", new AutoPanel());
+            tabs.addTab("Le Mie Prenotazioni", new PrenotazionePanel(cliente));
+            tabs.addTab("Il Mio Profilo", new ClientePanel(cliente));
+            tabs.addTab("I Miei Pagamenti", new PagamentoPanel());
         }
 
         setLayout(new BorderLayout());
-        add(benvenuto, BorderLayout.NORTH);
+        add(lblBenvenuto, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
 
         setVisible(true);
