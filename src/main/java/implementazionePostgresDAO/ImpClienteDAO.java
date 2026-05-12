@@ -165,4 +165,30 @@ public class ImpClienteDAO implements ClienteDAO {
             ps.executeUpdate();
         }
     }
+
+    @Override
+    public void aggiornaCredito(int idUtente, java.math.BigDecimal nuovoCredito) throws SQLException {
+
+        String sql = """
+                UPDATE CLIENTE
+                SET credito = ?
+                WHERE idUtente = ?
+                """;
+
+        try (
+                Connection conn = ConnessioneDatabase.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setBigDecimal(1, nuovoCredito);
+            ps.setInt(2, idUtente);
+
+            int rowsAffected = ps.executeUpdate();
+
+            // Opzionale: un piccolo controllo di sicurezza
+            if (rowsAffected == 0) {
+                throw new SQLException("Aggiornamento fallito: Cliente non trovato.");
+            }
+        }
+    }
 }

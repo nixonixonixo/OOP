@@ -47,6 +47,10 @@ public class Cliente extends Utente {
         return patente;
     }
 
+    public void setCredito(BigDecimal credito){
+        this.credito = credito;
+    }
+
     @Override
     public String toString() {
         return super.toString() + " " + patente + " " + credito;
