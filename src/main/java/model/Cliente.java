@@ -10,8 +10,8 @@ public class Cliente extends Utente {
         if (patente == null || patente.isBlank()) {
             throw new IllegalArgumentException("Patente non valida");
         }
-        if (credito.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Costo giornaliero non valido");
+        if (credito.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Credito non valido");
         }
         this.patente=patente;
         this.credito=credito;
