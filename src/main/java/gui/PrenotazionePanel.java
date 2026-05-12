@@ -5,6 +5,7 @@ import dao.PrenotazioneDAO;
 import implementazionePostgresDAO.ImpAutoDAO;
 import implementazionePostgresDAO.ImpPrenotazioneDAO;
 import model.Auto;
+import model.Cliente;
 import model.Prenotazione;
 
 import javax.swing.*;
@@ -16,14 +17,22 @@ public class PrenotazionePanel
 
     private JComboBox<Auto> autoComboBox;
 
-    public PrenotazionePanel() {
+    private Cliente cliente;
 
-        setLayout(new GridLayout(
-                5,
-                2,
-                10,
-                10
-        ));
+    public PrenotazionePanel(
+            Cliente cliente
+    ) {
+
+        this.cliente = cliente;
+
+        setLayout(
+                new GridLayout(
+                        5,
+                        2,
+                        10,
+                        10
+                )
+        );
 
         JLabel autoLabel =
                 new JLabel("Auto");
@@ -54,10 +63,13 @@ public class PrenotazionePanel
             AutoDAO dao =
                     new ImpAutoDAO();
 
-            for (Auto auto :
-                    dao.trovaAutoDisponibili()) {
+            for (
+                    Auto auto :
+                    dao.trovaAutoDisponibili()
+            ) {
 
-                autoComboBox.addItem(auto);
+                autoComboBox
+                        .addItem(auto);
             }
 
         } catch (Exception e) {
@@ -95,7 +107,9 @@ public class PrenotazionePanel
                             ),
                             Prenotazione
                                     .StatoPren
-                                    .IN_ATTESA
+                                    .IN_ATTESA,
+                            cliente,
+                            auto
                     );
 
             PrenotazioneDAO dao =

@@ -1,5 +1,7 @@
 package gui;
 
+import model.Cliente;
+import model.Operatore;
 import model.Utente;
 
 import javax.swing.*;
@@ -14,6 +16,7 @@ public class DashboardFrame
 
         setTitle("Dashboard");
         setSize(900, 600);
+
         setDefaultCloseOperation(
                 EXIT_ON_CLOSE
         );
@@ -33,27 +36,49 @@ public class DashboardFrame
         JTabbedPane tabs =
                 new JTabbedPane();
 
+        // visibile a tutti
         tabs.addTab(
                 "Auto",
                 new AutoPanel()
         );
 
-        tabs.addTab(
-                "Prenotazioni",
-                new PrenotazionePanel()
-        );
+        // solo cliente
+        if (utente instanceof Cliente cliente) {
 
-        tabs.addTab(
-                "Noleggi",
-                new NoleggioPanel()
-        );
+            tabs.addTab(
+                    "Prenotazioni",
+                    new PrenotazionePanel(
+                            cliente
+                    )
+            );
 
-        tabs.addTab(
-                "Pagamenti",
-                new PagamentoPanel()
-        );
+            tabs.addTab(
+                    "Noleggi",
+                    new NoleggioPanel()
+            );
 
-        setLayout(new BorderLayout());
+            tabs.addTab(
+                    "Pagamenti",
+                    new PagamentoPanel()
+            );
+        }
+
+        if (utente instanceof Operatore) {
+
+            tabs.addTab(
+                    "Gestione Auto",
+                    new AutoPanel()
+            );
+
+            tabs.addTab(
+                    "Prenotazioni",
+                    new PrenotazionePanel()
+            );
+        }
+
+        setLayout(
+                new BorderLayout()
+        );
 
         add(
                 benvenuto,
