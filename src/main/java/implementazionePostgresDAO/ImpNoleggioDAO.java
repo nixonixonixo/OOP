@@ -4,6 +4,7 @@ import dao.NoleggioDAO;
 import database.ConnessioneDatabase;
 import model.Noleggio;
 import model.Prenotazione;
+import model.Auto;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,22 +14,15 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public void salvaNoleggio(Noleggio noleggio) throws SQLException {
-        String sql = "INSERT INTO NOLEGGIO (idnoleggio, dataritiro, datarestituzione, costototale, idprenotazione) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO NOLEGGIO (idnoleggio, dataritiro, costototale, idprenotazione) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, noleggio.getIdNoleggio());
             ps.setDate(2, new java.sql.Date(noleggio.getDataRitiro().getTime()));
-
-            if (noleggio.getDataRestituzione() != null) {
-                ps.setDate(3, new java.sql.Date(noleggio.getDataRestituzione().getTime()));
-            } else {
-                ps.setNull(3, Types.DATE);
-            }
-
-            ps.setBigDecimal(4, noleggio.getCostoTot());
-            ps.setInt(5, noleggio.getPrenotazione().getIdPrenotazione());
+            ps.setBigDecimal(3, noleggio.getCostoTot());
+            ps.setInt(4, noleggio.getPrenotazione().getIdPrenotazione());
 
             ps.executeUpdate();
         }
@@ -36,7 +30,15 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public Noleggio trovaNoleggioPerId(int idNoleggio) throws SQLException {
-        String sql = "SELECT * FROM NOLEGGIO WHERE idnoleggio = ?";
+        String sql = """
+            SELECT n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale, n.idprenotazione,
+                   p.datainizio, p.datafine, p.stato as stato_pren,
+                   a.idauto, a.targa, a.modello, a.stato as stato_auto, a.costogiornaliero
+            FROM NOLEGGIO n
+            JOIN PRENOTAZIONE p ON n.idprenotazione = p.idprenotazione
+            JOIN AUTO a ON p.idauto = a.idauto
+            WHERE n.idnoleggio = ?
+            """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -54,12 +56,19 @@ public class ImpNoleggioDAO implements NoleggioDAO {
     @Override
     public List<Noleggio> trovaTuttiNoleggi() throws SQLException {
         List<Noleggio> noleggi = new ArrayList<>();
-        String sql = "SELECT * FROM NOLEGGIO";
+        String sql = """
+            SELECT n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale, n.idprenotazione,
+                   p.datainizio, p.datafine, p.stato as stato_pren,
+                   a.idauto, a.targa, a.modello, a.stato as stato_auto, a.costogiornaliero
+            FROM NOLEGGIO n
+            JOIN PRENOTAZIONE p ON n.idprenotazione = p.idprenotazione
+            JOIN AUTO a ON p.idauto = a.idauto
+            """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
-            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 noleggi.add(mappaResultSetInNoleggio(rs));
             }
@@ -102,18 +111,23 @@ public class ImpNoleggioDAO implements NoleggioDAO {
     }
 
     private Noleggio mappaResultSetInNoleggio(ResultSet rs) throws SQLException {
-        int idPren = rs.getInt("idprenotazione");
+        Auto.StatoAuto statoAuto = Auto.StatoAuto.valueOf(rs.getString("stato_auto").toUpperCase());
+        Auto auto = new Auto(
+                rs.getInt("idauto"),
+                rs.getString("targa"),
+                rs.getString("modello"),
+                statoAuto,
+                rs.getBigDecimal("costogiornaliero")
+        );
 
-        model.Cliente clienteDummy = new model.Cliente(0, "Utente", "", "", "", "", "", java.math.BigDecimal.ZERO);
-        model.Auto autoDummy = new model.Auto(0, "TARGA", "MODELLO", model.Auto.StatoAuto.DISPONIBILE, java.math.BigDecimal.ZERO);
-
+        Prenotazione.StatoPren statoPren = Prenotazione.StatoPren.valueOf(rs.getString("stato_pren").toUpperCase());
         Prenotazione prenotazione = new Prenotazione(
-                idPren,
-                new java.util.Date(),
-                new java.util.Date(),
-                Prenotazione.StatoPren.CONFERMATA,
-                clienteDummy,
-                autoDummy
+                rs.getInt("idprenotazione"),
+                rs.getDate("datainizio"),
+                rs.getDate("datafine"),
+                statoPren,
+                null,
+                auto
         );
 
         Noleggio noleggio = new Noleggio(

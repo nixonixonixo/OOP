@@ -31,7 +31,7 @@ public class OperatorePanel extends JPanel {
         titolo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(titolo, BorderLayout.NORTH);
 
-        String[] colonne = {"ID", "Targa", "Modello", "Stato", "Costo Daily"};
+        String[] colonne = {"ID", "Targa", "Modello", "Stato", "Costo Giornaliero"};
         tableModel = new DefaultTableModel(colonne, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
