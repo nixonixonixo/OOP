@@ -14,7 +14,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public void salvaPrenotazione(Prenotazione p) throws SQLException {
-        // Specifichiamo le colonne come da schema logico [cite: 167, 178, 179]
         String sql = "INSERT INTO PRENOTAZIONE (id_pren, data_inizio, data_fine, stato, id_cliente, id_auto) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -130,7 +129,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 new java.math.BigDecimal("1.00")
         );
 
-        // 3. Creazione Prenotazione
         return new Prenotazione(
                 rs.getInt("id_pren"),
                 rs.getDate("data_inizio"),
