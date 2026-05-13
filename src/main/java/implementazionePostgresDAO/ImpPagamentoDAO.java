@@ -13,7 +13,7 @@ public class ImpPagamentoDAO implements PagamentoDAO {
 
     @Override
     public void salvaPagamento(Pagamento p) throws SQLException {
-        String sql = "INSERT INTO PAGAMENTO (id_pag, importo, stato, id_noleggio) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO PAGAMENTO (idpagamento, importo, stato, idnoleggio) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -21,7 +21,6 @@ public class ImpPagamentoDAO implements PagamentoDAO {
             ps.setInt(1, p.getIdPagamento());
             ps.setBigDecimal(2, p.getImporto());
             ps.setString(3, p.getStato().toString());
-            // Assumiamo che Pagamento abbia un riferimento all'oggetto Noleggio
             ps.setInt(4, p.getNoleggio().getIdNoleggio());
 
             ps.executeUpdate();
@@ -30,7 +29,7 @@ public class ImpPagamentoDAO implements PagamentoDAO {
 
     @Override
     public Pagamento trovaPagamentoPerId(int idPagamento) throws SQLException {
-        String sql = "SELECT * FROM PAGAMENTO WHERE id_pag = ?";
+        String sql = "SELECT * FROM PAGAMENTO WHERE idpagamento = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -48,7 +47,7 @@ public class ImpPagamentoDAO implements PagamentoDAO {
     @Override
     public List<Pagamento> trovaPagamentiNoleggio(int idNoleggio) throws SQLException {
         List<Pagamento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM PAGAMENTO WHERE id_noleggio = ?";
+        String sql = "SELECT * FROM PAGAMENTO WHERE idnoleggio = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -81,7 +80,7 @@ public class ImpPagamentoDAO implements PagamentoDAO {
 
     @Override
     public void aggiornaPagamento(Pagamento p) throws SQLException {
-        String sql = "UPDATE PAGAMENTO SET importo = ?, stato = ? WHERE id_pag = ?";
+        String sql = "UPDATE PAGAMENTO SET importo = ?, stato = ? WHERE idpagamento = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -96,7 +95,7 @@ public class ImpPagamentoDAO implements PagamentoDAO {
 
     @Override
     public void eliminaPagamento(int idPagamento) throws SQLException {
-        String sql = "DELETE FROM PAGAMENTO WHERE id_pag = ?";
+        String sql = "DELETE FROM PAGAMENTO WHERE idpagamento = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -107,13 +106,15 @@ public class ImpPagamentoDAO implements PagamentoDAO {
     }
 
     private Pagamento mappaResultSetInPagamento(ResultSet rs) throws SQLException {
-        // Creazione placeholder per il noleggio associato
-        Noleggio noleggioPlaceholder = new Noleggio(rs.getInt("id_noleggio"), null, null);
+        Noleggio noleggioPlaceholder = new Noleggio(rs.getInt("idnoleggio"), null, null);
+
+        String statoStr = rs.getString("stato");
+        Pagamento.StatoPagamento statoEnum = Pagamento.StatoPagamento.valueOf(statoStr.toUpperCase());
 
         return new Pagamento(
-                rs.getInt("id_pag"),
+                rs.getInt("idpagamento"),
                 rs.getBigDecimal("importo"),
-                Pagamento.StatoPagamento.valueOf(rs.getString("stato")),
+                statoEnum,
                 noleggioPlaceholder
         );
     }

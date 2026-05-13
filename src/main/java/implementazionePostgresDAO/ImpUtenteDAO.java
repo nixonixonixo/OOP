@@ -12,17 +12,10 @@ public class ImpUtenteDAO implements UtenteDAO {
 
     @Override
     public void salvaUtente(Utente utente) throws SQLException {
+        String sql = "INSERT INTO UTENTE (idutente, username, passwordhash, nome, cognome, email) VALUES (?, ?, ?, ?, ?, ?)";
 
-        String sql =
-                "INSERT INTO UTENTE VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (
-                Connection conn =
-                        ConnessioneDatabase.getConnection();
-
-                PreparedStatement ps =
-                        conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, utente.getIdUtente());
             ps.setString(2, utente.getUsername());
@@ -36,37 +29,26 @@ public class ImpUtenteDAO implements UtenteDAO {
     }
 
     @Override
-    public Utente trovaUtentePerId(int idUtente)
-            throws SQLException {
+    public Utente trovaUtentePerId(int idUtente) throws SQLException {
+        String sql = "SELECT * FROM UTENTE WHERE idutente = ?";
 
-        String sql =
-                "SELECT * FROM UTENTE WHERE idUtente = ?";
-
-        try (
-                Connection conn =
-                        ConnessioneDatabase.getConnection();
-
-                PreparedStatement ps =
-                        conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idUtente);
-
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
                 return new Utente(
-                        rs.getInt("idUtente"),
+                        rs.getInt("idutente"),
                         rs.getString("username"),
-                        rs.getString("passwordHash"),
+                        rs.getString("passwordhash"),
                         rs.getString("nome"),
                         rs.getString("cognome"),
                         rs.getString("email")
                 );
             }
         }
-
         return null;
     }
 
@@ -75,10 +57,10 @@ public class ImpUtenteDAO implements UtenteDAO {
         String sql = """
             SELECT u.*, 
                    c.patente, c.credito, 
-                   o.ruolo as ruolo_op, o.idUtente as id_op
+                   o.ruolo as ruolo_op, o.idutente as id_op
             FROM UTENTE u
-            LEFT JOIN CLIENTE c ON u.idUtente = c.idUtente
-            LEFT JOIN OPERATORE o ON u.idUtente = o.idUtente
+            LEFT JOIN CLIENTE c ON u.idutente = c.idutente
+            LEFT JOIN OPERATORE o ON u.idutente = o.idutente
             WHERE u.username = ?
             """;
 
@@ -89,9 +71,9 @@ public class ImpUtenteDAO implements UtenteDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                int id = rs.getInt("idUtente");
+                int id = rs.getInt("idutente");
                 String user = rs.getString("username");
-                String pass = rs.getString("passwordHash");
+                String pass = rs.getString("passwordhash");
                 String nome = rs.getString("nome");
                 String cognome = rs.getString("cognome");
                 String email = rs.getString("email");
@@ -120,62 +102,42 @@ public class ImpUtenteDAO implements UtenteDAO {
     }
 
     @Override
-    public List<Utente> trovaTuttiUtenti()
-            throws SQLException {
-
+    public List<Utente> trovaTuttiUtenti() throws SQLException {
         List<Utente> utenti = new ArrayList<>();
-
         String sql = "SELECT * FROM UTENTE";
 
-        try (
-                Connection conn =
-                        ConnessioneDatabase.getConnection();
-
-                PreparedStatement ps =
-                        conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ResultSet rs = ps.executeQuery();
-
             while (rs.next()) {
-
-                utenti.add(
-                        new Utente(
-                                rs.getInt("idUtente"),
-                                rs.getString("username"),
-                                rs.getString("passwordHash"),
-                                rs.getString("nome"),
-                                rs.getString("cognome"),
-                                rs.getString("email")
-                        )
-                );
+                utenti.add(new Utente(
+                        rs.getInt("idutente"),
+                        rs.getString("username"),
+                        rs.getString("passwordhash"),
+                        rs.getString("nome"),
+                        rs.getString("cognome"),
+                        rs.getString("email")
+                ));
             }
         }
-
         return utenti;
     }
 
     @Override
-    public void aggiornaUtente(Utente utente)
-            throws SQLException {
-
+    public void aggiornaUtente(Utente utente) throws SQLException {
         String sql = """
                 UPDATE UTENTE
                 SET username = ?,
-                    passwordHash = ?,
+                    passwordhash = ?,
                     nome = ?,
                     cognome = ?,
                     email = ?
-                WHERE idUtente = ?
+                WHERE idutente = ?
                 """;
 
-        try (
-                Connection conn =
-                        ConnessioneDatabase.getConnection();
-
-                PreparedStatement ps =
-                        conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, utente.getUsername());
             ps.setString(2, utente.getPasswordHash());
@@ -189,22 +151,13 @@ public class ImpUtenteDAO implements UtenteDAO {
     }
 
     @Override
-    public void eliminaUtente(int idUtente)
-            throws SQLException {
+    public void eliminaUtente(int idUtente) throws SQLException {
+        String sql = "DELETE FROM UTENTE WHERE idutente = ?";
 
-        String sql =
-                "DELETE FROM UTENTE WHERE idUtente = ?";
-
-        try (
-                Connection conn =
-                        ConnessioneDatabase.getConnection();
-
-                PreparedStatement ps =
-                        conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idUtente);
-
             ps.executeUpdate();
         }
     }
