@@ -71,37 +71,51 @@ public class ImpUtenteDAO implements UtenteDAO {
     }
 
     @Override
-    public Utente trovaUtentePerUsername(String username)
-            throws SQLException {
+    public Utente trovaUtentePerUsername(String username) throws SQLException {
+        String sql = """
+            SELECT u.*, 
+                   c.patente, c.credito, 
+                   o.ruolo as ruolo_op, o.idUtente as id_op
+            FROM UTENTE u
+            LEFT JOIN CLIENTE c ON u.idUtente = c.idUtente
+            LEFT JOIN OPERATORE o ON u.idUtente = o.idUtente
+            WHERE u.username = ?
+            """;
 
-        String sql =
-                "SELECT * FROM UTENTE WHERE username = ?";
-
-        try (
-                Connection conn =
-                        ConnessioneDatabase.getConnection();
-
-                PreparedStatement ps =
-                        conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
-
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                int id = rs.getInt("idUtente");
+                String user = rs.getString("username");
+                String pass = rs.getString("passwordHash");
+                String nome = rs.getString("nome");
+                String cognome = rs.getString("cognome");
+                String email = rs.getString("email");
 
-                return new Utente(
-                        rs.getInt("idUtente"),
-                        rs.getString("username"),
-                        rs.getString("passwordHash"),
-                        rs.getString("nome"),
-                        rs.getString("cognome"),
-                        rs.getString("email")
-                );
+                if (rs.getObject("id_op") != null) {
+                    String ruoloString = rs.getString("ruolo_op");
+                    model.Operatore.Ruolo ruoloEnum = model.Operatore.Ruolo.valueOf(ruoloString.toUpperCase());
+
+                    return new model.Operatore(
+                            id, user, pass, nome, cognome, email, ruoloEnum
+                    );
+                }
+
+                if (rs.getString("patente") != null) {
+                    return new model.Cliente(
+                            id, user, pass, nome, cognome, email,
+                            rs.getString("patente"),
+                            rs.getBigDecimal("credito")
+                    );
+                }
+
+                return new Utente(id, user, pass, nome, cognome, email);
             }
         }
-
         return null;
     }
 
