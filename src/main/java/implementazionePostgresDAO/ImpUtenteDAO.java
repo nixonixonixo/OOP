@@ -55,14 +55,14 @@ public class ImpUtenteDAO implements UtenteDAO {
     @Override
     public Utente trovaUtentePerUsername(String username) throws SQLException {
         String sql = """
-            SELECT u.*, 
-                   c.patente, c.credito, 
-                   o.ruolo as ruolo_op, o.idutente as id_op
-            FROM UTENTE u
-            LEFT JOIN CLIENTE c ON u.idutente = c.idutente
-            LEFT JOIN OPERATORE o ON u.idutente = o.idutente
-            WHERE u.username = ?
-            """;
+        SELECT u.idutente, u.username, u.passwordhash, u.nome, u.cognome, u.email, 
+               c.patente, c.credito, 
+               o.ruolo as ruolo_op, o.idutente as id_op
+        FROM UTENTE u
+        LEFT JOIN CLIENTE c ON u.idutente = c.idutente
+        LEFT JOIN OPERATORE o ON u.idutente = o.idutente
+        WHERE u.username = ?
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -81,10 +81,7 @@ public class ImpUtenteDAO implements UtenteDAO {
                 if (rs.getObject("id_op") != null) {
                     String ruoloString = rs.getString("ruolo_op");
                     model.Operatore.Ruolo ruoloEnum = model.Operatore.Ruolo.valueOf(ruoloString.toUpperCase());
-
-                    return new model.Operatore(
-                            id, user, pass, nome, cognome, email, ruoloEnum
-                    );
+                    return new model.Operatore(id, user, pass, nome, cognome, email, ruoloEnum);
                 }
 
                 if (rs.getString("patente") != null) {

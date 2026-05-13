@@ -18,7 +18,7 @@ public class Auto {
         if (targa == null || modello == null || stato == null) {
             throw new IllegalArgumentException("Parametri non validi");
         }
-        if (costoDaily == null || costoDaily.compareTo(BigDecimal.ZERO) <= 0) {
+        if (costoDaily == null || costoDaily.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Costo giornaliero non valido");
         }
         this.idAuto = idAuto;

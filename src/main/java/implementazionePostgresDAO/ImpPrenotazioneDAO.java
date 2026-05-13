@@ -111,31 +111,32 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
     }
 
     private Prenotazione mappaResultSetInPrenotazione(ResultSet rs) throws SQLException {
+        int idUtenteRecuperato = rs.getInt("idcliente");
+
         Cliente cliente = new Cliente(
-                rs.getInt("idutente"),
+                idUtenteRecuperato,
                 "placeholder",
                 "placeholder",
                 "placeholder",
                 "placeholder",
                 "placeholder",
                 "SCONOSCIUTA",
-                new java.math.BigDecimal("1.00")
+                java.math.BigDecimal.ZERO
         );
 
-        // idauto è la chiave dell'auto nel DB
         Auto auto = new Auto(
                 rs.getInt("idauto"),
                 "PROVVISORIA",
                 "MOD_GENERICO",
                 Auto.StatoAuto.DISPONIBILE,
-                new java.math.BigDecimal("1.00")
+                java.math.BigDecimal.ZERO
         );
 
         return new Prenotazione(
                 rs.getInt("idprenotazione"),
                 rs.getDate("data_inizio"),
                 rs.getDate("data_fine"),
-                Prenotazione.StatoPren.valueOf(rs.getString("stato")),
+                Prenotazione.StatoPren.valueOf(rs.getString("stato").toUpperCase()),
                 cliente,
                 auto
         );
