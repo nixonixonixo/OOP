@@ -155,4 +155,18 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         }
         return null;
     }
+
+    @Override
+    public void aggiornaStatoPrenotazione(int idPrenotazione, Prenotazione.StatoPren nuovoStato) throws SQLException {
+        String sql = "UPDATE PRENOTAZIONE SET stato = ? WHERE idprenotazione = ?";
+
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, nuovoStato.toString());
+            ps.setInt(2, idPrenotazione);
+
+            ps.executeUpdate();
+        }
+    }
 }

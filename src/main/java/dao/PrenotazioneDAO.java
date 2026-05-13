@@ -27,4 +27,7 @@ public interface PrenotazioneDAO {
 
     void eliminaPrenotazione(int idPrenotazione)
             throws SQLException;
+
+     void aggiornaStatoPrenotazione(int idPrenotazione, Prenotazione.StatoPren nuovoStato)
+        throws SQLException;
 }
