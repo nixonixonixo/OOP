@@ -19,7 +19,7 @@ import java.util.Date;
 
 public class ClientePanel extends JPanel {
 
-    private Cliente cliente
+    private Cliente cliente;
 
     private ClienteDAO clienteDAO;
     private PrenotazioneDAO prenotazioneDAO;
