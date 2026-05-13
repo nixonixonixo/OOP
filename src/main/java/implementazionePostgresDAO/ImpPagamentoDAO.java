@@ -65,7 +65,11 @@ public class ImpPagamentoDAO implements PagamentoDAO {
     @Override
     public List<Pagamento> trovaTuttiPagamenti() throws SQLException {
         List<Pagamento> lista = new ArrayList<>();
-        String sql = "SELECT * FROM PAGAMENTO";
+        String sql = """
+        SELECT p.*, n.dataritiro, n.idprenotazione 
+        FROM PAGAMENTO p
+        JOIN NOLEGGIO n ON p.idnoleggio = n.idnoleggio
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              Statement st = conn.createStatement();
@@ -106,7 +110,13 @@ public class ImpPagamentoDAO implements PagamentoDAO {
     }
 
     private Pagamento mappaResultSetInPagamento(ResultSet rs) throws SQLException {
-        Noleggio noleggioPlaceholder = new Noleggio(rs.getInt("idnoleggio"), null, null);
+        Date dataR = rs.getDate("dataritiro");
+
+        Noleggio noleggio = new Noleggio(
+                rs.getInt("idnoleggio"),
+                dataR,
+                null
+        );
 
         String statoStr = rs.getString("stato");
         Pagamento.StatoPagamento statoEnum = Pagamento.StatoPagamento.valueOf(statoStr.toUpperCase());
@@ -115,7 +125,7 @@ public class ImpPagamentoDAO implements PagamentoDAO {
                 rs.getInt("idpagamento"),
                 rs.getBigDecimal("importo"),
                 statoEnum,
-                noleggioPlaceholder
+                noleggio
         );
     }
 }

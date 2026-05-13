@@ -102,13 +102,18 @@ public class ImpNoleggioDAO implements NoleggioDAO {
     }
 
     private Noleggio mappaResultSetInNoleggio(ResultSet rs) throws SQLException {
+        int idPren = rs.getInt("idprenotazione");
+
+        model.Cliente clienteDummy = new model.Cliente(0, "Utente", "", "", "", "", "", java.math.BigDecimal.ZERO);
+        model.Auto autoDummy = new model.Auto(0, "TARGA", "MODELLO", model.Auto.StatoAuto.DISPONIBILE, java.math.BigDecimal.ZERO);
+
         Prenotazione prenotazione = new Prenotazione(
-                rs.getInt("idprenotazione"),
+                idPren,
                 new java.util.Date(),
                 new java.util.Date(),
                 Prenotazione.StatoPren.CONFERMATA,
-                null,
-                null
+                clienteDummy,
+                autoDummy
         );
 
         Noleggio noleggio = new Noleggio(
