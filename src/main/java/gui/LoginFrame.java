@@ -8,7 +8,6 @@ import java.awt.*;
 public class LoginFrame extends JFrame {
     private final UtenteService utenteService;
     private final ClienteService clienteService;
-    // Teniamo i riferimenti per passarli alla Dashboard dopo il login
     private final AutoService autoService;
     private final PrenotazioneService prenotazioneService;
     private final NoleggioService noleggioService;
@@ -38,7 +37,10 @@ public class LoginFrame extends JFrame {
     }
 
     private void initUI() {
+        // Ho aggiunto un po' di padding per estetica
         JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
         usernameField = new JTextField();
         passwordField = new JPasswordField();
 
@@ -60,19 +62,35 @@ public class LoginFrame extends JFrame {
             String username = usernameField.getText().trim();
             String password = new String(passwordField.getPassword());
 
-            Utente utente = utenteService.login(username, password);
-            JOptionPane.showMessageDialog(this, "Benvenuto " + utente.getUsername());
+            if (username.isEmpty() || password.isEmpty()) {
+                throw new IllegalArgumentException("Inserisci credenziali valide");
+            }
 
-            dispose();
-            // Qui apriresti la Dashboard passandogli i service necessari
-            // new DashboardFrame(utente, autoService, ...);
+            // Effettua il login tramite il service
+            Utente utente = utenteService.login(username, password);
+
+            // Se arriviamo qui, il login ha avuto successo
+            JOptionPane.showMessageDialog(this, "Benvenuto " + utente.getNome());
+
+            // CHIUDI il login
+            this.dispose();
+
+            // APRI la Dashboard passando l'utente loggato e TUTTI i service
+            new DashboardFrame(
+                    utente,
+                    autoService,
+                    prenotazioneService,
+                    noleggioService,
+                    pagamentoService,
+                    clienteService
+            );
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Errore di accesso", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void openRegistration() {
-        // Passiamo i service necessari alla registrazione
         new RegistrazioneFrame(utenteService, clienteService);
     }
 }
