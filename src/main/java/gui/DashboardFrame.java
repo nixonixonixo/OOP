@@ -15,9 +15,30 @@ public class DashboardFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JLabel lblBenvenuto = new JLabel("Accesso effettuato come: " + utente.getUsername());
-        lblBenvenuto.setHorizontalAlignment(SwingConstants.RIGHT);
-        lblBenvenuto.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel pnlHeader = new JPanel(new BorderLayout());
+        pnlHeader.setBackground(new Color(240, 240, 240));
+        pnlHeader.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        JLabel lblBenvenuto = new JLabel("Accesso effettuato come: " + utente.getUsername() + " (" + utente.getClass().getSimpleName() + ")");
+
+        JButton btnLogout = new JButton("Logout");
+        btnLogout.setFocusable(false);
+        btnLogout.setBackground(new Color(220, 53, 69));
+        btnLogout.setForeground(Color.WHITE); // Testo bianco
+
+        btnLogout.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Vuoi davvero uscire?", "Conferma Logout",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                this.dispose();
+                new LoginFrame();
+            }
+        });
+
+        pnlHeader.add(lblBenvenuto, BorderLayout.WEST);
+        pnlHeader.add(btnLogout, BorderLayout.EAST);
 
         JTabbedPane tabs = new JTabbedPane();
 
@@ -34,7 +55,7 @@ public class DashboardFrame extends JFrame {
         }
 
         setLayout(new BorderLayout());
-        add(lblBenvenuto, BorderLayout.NORTH);
+        add(pnlHeader, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
 
         setVisible(true);
