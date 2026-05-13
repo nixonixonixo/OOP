@@ -6,6 +6,7 @@ import model.Utente;
 import model.Cliente;
 import model.Operatore;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,38 +16,31 @@ public class ImpUtenteDAO implements UtenteDAO {
     @Override
     public void salvaUtente(Utente utente) throws SQLException {
         String sql = "INSERT INTO UTENTE (idutente, username, passwordhash, nome, cognome, email) VALUES (?, ?, ?, ?, ?, ?)";
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, utente.getIdUtente());
             ps.setString(2, utente.getUsername());
             ps.setString(3, utente.getPasswordHash());
             ps.setString(4, utente.getNome());
             ps.setString(5, utente.getCognome());
             ps.setString(6, utente.getEmail());
-
             ps.executeUpdate();
         }
     }
 
     @Override
     public Utente trovaUtentePerId(int idUtente) throws SQLException {
-        // Uso la stessa logica di trovaUtentePerUsername per caricare Cliente/Operatore correttamente
         String sql = """
-            SELECT u.*, c.patente, c.credito, o.ruolo as ruolo_op, o.idutente as id_op
+            SELECT u.*, c.patente, c.credito, o.ruolo
             FROM UTENTE u
             LEFT JOIN CLIENTE c ON u.idutente = c.idutente
             LEFT JOIN OPERATORE o ON u.idutente = o.idutente
             WHERE u.idutente = ?
             """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, idUtente);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
                 return mappaResultSetInUtente(rs);
             }
@@ -59,19 +53,16 @@ public class ImpUtenteDAO implements UtenteDAO {
         String sql = """
             SELECT u.idutente, u.username, u.passwordhash, u.nome, u.cognome, u.email, 
                    c.patente, c.credito, 
-                   o.ruolo as ruolo_op, o.idutente as id_op
+                   o.ruolo
             FROM UTENTE u
             LEFT JOIN CLIENTE c ON u.idutente = c.idutente
             LEFT JOIN OPERATORE o ON u.idutente = o.idutente
             WHERE u.username = ?
             """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
                 return mappaResultSetInUtente(rs);
             }
@@ -87,16 +78,21 @@ public class ImpUtenteDAO implements UtenteDAO {
         String cognome = rs.getString("cognome");
         String email = rs.getString("email");
 
-        rs.getInt("id_op");
-        if (!rs.wasNull()) {
-            String ruoloString = rs.getString("ruolo_op");
-            Operatore.Ruolo ruoloEnum = Operatore.Ruolo.valueOf(ruoloString.toUpperCase());
-            return new Operatore(id, user, pass, nome, cognome, email, ruoloEnum);
+        String ruoloStr = rs.getString("ruolo");
+        if (ruoloStr != null && !ruoloStr.isBlank()) {
+            try {
+                Operatore.Ruolo ruoloEnum = Operatore.Ruolo.valueOf(ruoloStr.toUpperCase().trim());
+                return new Operatore(id, user, pass, nome, cognome, email, ruoloEnum);
+            } catch (IllegalArgumentException e) {
+                return new Operatore(id, user, pass, nome, cognome, email, Operatore.Ruolo.ADDETTO_NOLEGGIO);
+            }
         }
 
         String patente = rs.getString("patente");
-        if (patente != null || rs.getBigDecimal("credito") != null) {
-            return new Cliente(id, user, pass, nome, cognome, email, patente, rs.getBigDecimal("credito"));
+        if (patente != null) {
+            BigDecimal credito = rs.getBigDecimal("credito");
+            if (credito == null) credito = BigDecimal.ZERO;
+            return new Cliente(id, user, pass, nome, cognome, email, patente, credito);
         }
 
         return new Utente(id, user, pass, nome, cognome, email);
@@ -106,11 +102,9 @@ public class ImpUtenteDAO implements UtenteDAO {
     public List<Utente> trovaTuttiUtenti() throws SQLException {
         List<Utente> utenti = new ArrayList<>();
         String sql = "SELECT * FROM UTENTE";
-
         try (Connection conn = ConnessioneDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ResultSet rs = ps.executeQuery();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 utenti.add(new Utente(
                         rs.getInt("idutente"),
@@ -128,17 +122,14 @@ public class ImpUtenteDAO implements UtenteDAO {
     @Override
     public void aggiornaUtente(Utente utente) throws SQLException {
         String sql = "UPDATE UTENTE SET username = ?, passwordhash = ?, nome = ?, cognome = ?, email = ? WHERE idutente = ?";
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, utente.getUsername());
             ps.setString(2, utente.getPasswordHash());
             ps.setString(3, utente.getNome());
             ps.setString(4, utente.getCognome());
             ps.setString(5, utente.getEmail());
             ps.setInt(6, utente.getIdUtente());
-
             ps.executeUpdate();
         }
     }
@@ -146,10 +137,8 @@ public class ImpUtenteDAO implements UtenteDAO {
     @Override
     public void eliminaUtente(int idUtente) throws SQLException {
         String sql = "DELETE FROM UTENTE WHERE idutente = ?";
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, idUtente);
             ps.executeUpdate();
         }
