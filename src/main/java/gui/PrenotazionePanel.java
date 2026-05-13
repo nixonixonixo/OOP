@@ -1,9 +1,8 @@
 package gui;
 
-import dao.PrenotazioneDAO;
-import implementazionePostgresDAO.ImpPrenotazioneDAO;
 import model.Cliente;
 import model.Prenotazione;
+import service.PrenotazioneService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,68 +16,67 @@ public class PrenotazionePanel extends JPanel {
     private DefaultTableModel tableModel;
     private JButton btnConferma;
     private JButton btnAnnulla;
-    private PrenotazioneDAO prenotazioneDAO;
+
+    private final PrenotazioneService prenotazioneService;
     private Cliente clienteLoggato;
 
-    public PrenotazionePanel(Cliente cliente) {
+    public PrenotazionePanel(Cliente cliente, PrenotazioneService service) {
+
         this.clienteLoggato = cliente;
-        this.prenotazioneDAO = new ImpPrenotazioneDAO();
+        this.prenotazioneService = service;
 
         setLayout(new BorderLayout());
 
         String[] colonne = {"ID", "Data Inizio", "Data Fine", "Stato", "Auto", "Cliente"};
+
         tableModel = new DefaultTableModel(colonne, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(int r, int c) {
                 return false;
             }
         };
-        tabella = new JTable(tableModel);
-        tabella.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        tabella = new JTable(tableModel);
         add(new JScrollPane(tabella), BorderLayout.CENTER);
 
         if (clienteLoggato == null) {
             add(creaToolbarOperatore(), BorderLayout.SOUTH);
         }
 
-        tabella.getSelectionModel().addListSelectionListener(e -> gestisciStatoBottoni());
-
         caricaDati();
     }
 
     private JPanel creaToolbarOperatore() {
-        JPanel pnlAzioni = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        btnConferma = new JButton("Conferma Prenotazione");
-        btnAnnulla = new JButton("Annulla Prenotazione");
+        JPanel pnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        btnConferma = new JButton("Conferma");
+        btnAnnulla = new JButton("Annulla");
 
         btnConferma.setEnabled(false);
         btnAnnulla.setEnabled(false);
-        btnConferma.setBackground(new Color(40, 167, 69));
-        btnConferma.setForeground(Color.WHITE);
-        btnAnnulla.setBackground(new Color(220, 53, 69));
-        btnAnnulla.setForeground(Color.WHITE);
 
-        btnConferma.addActionListener(e -> aggiornaStato(Prenotazione.StatoPren.CONFERMATA));
-        btnAnnulla.addActionListener(e -> aggiornaStato(Prenotazione.StatoPren.ANNULLATA));
+        btnConferma.addActionListener(e -> confermaPrenotazione());
+        btnAnnulla.addActionListener(e -> annullaPrenotazione());
 
-        pnlAzioni.add(new JLabel("Azioni Operatore: "));
-        pnlAzioni.add(btnConferma);
-        pnlAzioni.add(btnAnnulla);
+        pnl.add(btnConferma);
+        pnl.add(btnAnnulla);
 
-        return pnlAzioni;
+        return pnl;
     }
 
     private void caricaDati() {
         try {
+
             tableModel.setRowCount(0);
+
             List<Prenotazione> lista;
 
             if (clienteLoggato != null) {
-                lista = prenotazioneDAO.trovaPrenotazioniCliente(clienteLoggato.getIdUtente());
+                lista = prenotazioneService
+                        .getPrenotazioniCliente(clienteLoggato.getIdUtente());
             } else {
-                lista = prenotazioneDAO.trovaTuttePrenotazioni();
+                lista = prenotazioneService.getTuttePrenotazioni();
             }
 
             for (Prenotazione p : lista) {
@@ -91,65 +89,37 @@ public class PrenotazionePanel extends JPanel {
                         p.getCliente().getIdUtente()
                 });
             }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }
+
+    private void confermaPrenotazione() {
+        int row = tabella.getSelectedRow();
+        if (row == -1) return;
+
+        int id = (int) tableModel.getValueAt(row, 0);
+
+        try {
+            prenotazioneService.confermaPrenotazione(id);
+            caricaDati();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Errore nel caricamento: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
 
-    private void gestisciStatoBottoni() {
-        if (clienteLoggato != null) return;
+    private void annullaPrenotazione() {
+        int row = tabella.getSelectedRow();
+        if (row == -1) return;
 
-        int riga = tabella.getSelectedRow();
-        if (riga != -1) {
-            String stato = tabella.getValueAt(riga, 3).toString();
-            boolean inAttesa = stato.equalsIgnoreCase("IN_ATTESA");
-            btnConferma.setEnabled(inAttesa);
-            btnAnnulla.setEnabled(inAttesa);
-        } else {
-            btnConferma.setEnabled(false);
-            btnAnnulla.setEnabled(false);
-        }
-    }
+        int id = (int) tableModel.getValueAt(row, 0);
 
-    private void aggiornaStatoAuto(Prenotazione.StatoPren nuovoStato) {
-        int riga = tabella.getSelectedRow();
-        if (riga != -1) {
-            int id = (int) tabella.getValueAt(riga, 0);
-            try {
-                prenotazioneDAO.aggiornaStatoPrenotazione(id, nuovoStato);
-                JOptionPane.showMessageDialog(this, "Stato aggiornato correttamente in: " + nuovoStato);
-                caricaDati();
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Errore durante l'aggiornamento: " + ex.getMessage());
-            }
-        }
-    }
-
-    private void aggiornaStato(Prenotazione.StatoPren nuovoStato) {
-        int riga = tabella.getSelectedRow();
-        if (riga != -1) {
-            int idPrenotazione = (int) tabella.getValueAt(riga, 0);
-
-            try {
-                Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
-
-                if (p != null) {
-                    prenotazioneDAO.aggiornaStatoPrenotazione(idPrenotazione, nuovoStato);
-
-                    if (nuovoStato == Prenotazione.StatoPren.CONFERMATA) {
-                        dao.AutoDAO autoDAO = new implementazionePostgresDAO.ImpAutoDAO();
-                        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), model.Auto.StatoAuto.NOLEGGIATA);
-                        JOptionPane.showMessageDialog(this, "Prenotazione confermata e auto impostata su NOLEGGIATA!");
-                    }
-                    else if (nuovoStato == Prenotazione.StatoPren.ANNULLATA) {
-                        JOptionPane.showMessageDialog(this, "Prenotazione annullata.");
-                    }
-
-                    caricaDati();
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Errore durante l'operazione: " + ex.getMessage());
-            }
+        try {
+            prenotazioneService.annullaPrenotazione(id);
+            caricaDati();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
 }
