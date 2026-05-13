@@ -165,8 +165,8 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
         Cliente cliente = new Cliente(
                 rs.getInt("idcliente"),
-                null,
-                null,
+                "utente_temp",
+                "password_temp",
                 rs.getString("nome"),
                 rs.getString("cognome"),
                 rs.getString("email"),
