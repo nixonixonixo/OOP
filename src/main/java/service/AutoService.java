@@ -14,15 +14,15 @@ public class AutoService {
         this.autoDAO = autoDAO;
     }
 
+    public List<Auto> getTutte() throws SQLException {
+        return autoDAO.trovaTutteAuto();
+    }
+
     public List<Auto> getAutoDisponibili() throws SQLException {
         return autoDAO.trovaAutoDisponibili();
     }
 
-    public List<Auto> getTutteAuto() throws SQLException {
-        return autoDAO.trovaTutteAuto();
-    }
-
-    public void aggiornaStato(int idAuto, Auto.StatoAuto stato) throws SQLException {
+    public void cambiaStato(int idAuto, Auto.StatoAuto stato) throws SQLException {
         autoDAO.aggiornaStatoAuto(idAuto, stato);
     }
 }

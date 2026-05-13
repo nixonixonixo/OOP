@@ -5,7 +5,6 @@ import model.Cliente;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
 
 public class ClienteService {
 
@@ -15,15 +14,11 @@ public class ClienteService {
         this.clienteDAO = clienteDAO;
     }
 
-    public List<Cliente> getTuttiClienti() throws SQLException {
-        return clienteDAO.trovaTuttiClienti();
-    }
-
-    public Cliente getCliente(int id) throws SQLException {
+    public Cliente getClienteById(int id) throws SQLException {
         return clienteDAO.trovaClientePerId(id);
     }
 
-    public void aggiornaCredito(int id, BigDecimal nuovoCredito) throws SQLException {
-        clienteDAO.aggiornaCredito(id, nuovoCredito);
+    public void ricaricaCredito(int id, BigDecimal importo) throws SQLException {
+        clienteDAO.aggiornaCredito(id, importo);
     }
 }

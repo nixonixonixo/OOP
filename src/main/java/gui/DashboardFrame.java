@@ -15,10 +15,13 @@ public class DashboardFrame extends JFrame {
             AutoService autoService,
             PrenotazioneService prenotazioneService,
             NoleggioService noleggioService,
-            PagamentoService pagamentoService
+            PagamentoService pagamentoService,
+            ClienteService clienteService
     ) {
 
-        setTitle("Sistema Noleggio Auto - " + utente.getNome() + " " + utente.getCognome());
+        setTitle("Sistema Noleggio Auto - " +
+                utente.getNome() + " " + utente.getCognome());
+
         setSize(1100, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -36,7 +39,7 @@ public class DashboardFrame extends JFrame {
         JButton logout = new JButton("Logout");
         logout.addActionListener(e -> {
             dispose();
-            new LoginFrame();
+            // LoginFrame va costruito con service reale dal MAIN
         });
 
         header.add(lbl, BorderLayout.WEST);
@@ -60,11 +63,14 @@ public class DashboardFrame extends JFrame {
 
         } else if (utente instanceof Cliente cliente) {
 
-            tabs.addTab("Prenota Auto",
+            tabs.addTab("Auto disponibili",
                     new AutoPanel(autoService));
 
-            tabs.addTab("Le mie prenotazioni",
+            tabs.addTab("Prenotazioni",
                     new PrenotazionePanel(cliente, prenotazioneService));
+
+            tabs.addTab("Cliente",
+                    new ClientePanel(cliente, clienteService));
 
             tabs.addTab("Pagamenti",
                     new PagamentoPanel(pagamentoService));

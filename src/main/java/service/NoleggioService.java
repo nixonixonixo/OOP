@@ -1,14 +1,12 @@
 package service;
 
-import dao.NoleggioDAO;
 import dao.AutoDAO;
+import dao.NoleggioDAO;
 import model.Noleggio;
-import model.Prenotazione;
-import model.Auto;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 public class NoleggioService {
 
@@ -20,30 +18,14 @@ public class NoleggioService {
         this.autoDAO = autoDAO;
     }
 
-    public Noleggio avviaNoleggio(Prenotazione p) throws SQLException {
-
-        if (p.getStato() != Prenotazione.StatoPren.CONFERMATA) {
-            throw new IllegalStateException("Prenotazione non confermata");
-        }
-
-        Noleggio n = new Noleggio(0, new Date(), p);
-
-        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
-
-        noleggioDAO.salvaNoleggio(n);
-
-        return n;
+    public List<Noleggio> getTuttiNoleggi() throws SQLException {
+        return noleggioDAO.trovaTuttiNoleggi();
     }
 
-    public void chiudiNoleggio(Noleggio n, Date restituzione) throws SQLException {
+    public void chiudiNoleggio(int idNoleggio, Date dataRestituzione) throws SQLException {
+        Noleggio n = noleggioDAO.trovaNoleggioPerId(idNoleggio);
 
-        Auto auto = n.getPrenotazione().getAuto();
-        BigDecimal costo = auto.getCostoDaily();
-
-        n.chiudiNoleggio(restituzione, costo);
-
-        autoDAO.aggiornaStatoAuto(auto.getIdAuto(), Auto.StatoAuto.DISPONIBILE);
-
+        n.setDataRestituzione(dataRestituzione);
         noleggioDAO.aggiornaNoleggio(n);
     }
 }
