@@ -17,6 +17,13 @@ public class Cliente extends Utente {
         this.credito=credito;
     }
 
+    //costruttore per DAO
+    public Cliente(int idUtente, String username, String passwordHash, String nome, String cognome, String email, String patente, BigDecimal credito, boolean isAlreadyHashed) {
+        super(idUtente, username, passwordHash, nome, cognome, email, isAlreadyHashed);
+        this.patente = patente;
+        this.credito = credito;
+    }
+
     //attributi Cliente
     private final String patente;
     private BigDecimal credito;

@@ -138,31 +138,35 @@ public class ImpUtenteDAO implements UtenteDAO {
 
         int id = rs.getInt("idutente");
         String username = rs.getString("username");
-        String password = rs.getString("passwordhash");
+        String passwordHash = rs.getString("passwordhash");
         String nome = rs.getString("nome");
         String cognome = rs.getString("cognome");
         String email = rs.getString("email");
 
+        // Gestione OPERATORE
         String ruoloStr = rs.getString("ruolo");
-
         if (ruoloStr != null) {
+            Operatore.Ruolo ruolo;
             try {
-                Operatore.Ruolo ruolo = Operatore.Ruolo.valueOf(ruoloStr.toUpperCase());
-                return new Operatore(id, username, password, nome, cognome, email, ruolo);
-            } catch (Exception ignored) {
-                return new Operatore(id, username, password, nome, cognome, email, Operatore.Ruolo.ADDETTO_NOLEGGIO);
+                ruolo = Operatore.Ruolo.valueOf(ruoloStr.toUpperCase());
+            } catch (Exception e) {
+                ruolo = Operatore.Ruolo.ADDETTO_NOLEGGIO;
             }
+            // Usiamo il costruttore con isAlreadyHashed = true
+            return new Operatore(id, username, passwordHash, nome, cognome, email, ruolo, true);
         }
 
+        // Gestione CLIENTE
         String patente = rs.getString("patente");
-
         if (patente != null) {
             BigDecimal credito = rs.getBigDecimal("credito");
             if (credito == null) credito = BigDecimal.ZERO;
-
-            return new Cliente(id, username, password, nome, cognome, email, patente, credito);
+            // Usiamo il costruttore con isAlreadyHashed = true
+            return new Cliente(id, username, passwordHash, nome, cognome, email, patente, credito, true);
         }
 
-        return new Utente(id, username, password, nome, cognome, email);
+        // Gestione UTENTE GENERICO
+        // Usiamo il costruttore con isAlreadyHashed = true
+        return new Utente(id, username, passwordHash, nome, cognome, email, true);
     }
 }

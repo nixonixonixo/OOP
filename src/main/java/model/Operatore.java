@@ -18,6 +18,12 @@ public class Operatore  extends Utente{
         this.ruolo = ruolo;
     }
 
+    //costruttore per DAO
+    public Operatore(int idUtente, String username, String passwordHash, String nome, String cognome, String email, Ruolo ruolo, boolean isAlreadyHashed) {
+        super(idUtente, username, passwordHash, nome, cognome, email, isAlreadyHashed);
+        this.ruolo = ruolo;
+    }
+
     //attributi Operatore
     private Ruolo ruolo;
 

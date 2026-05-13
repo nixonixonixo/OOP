@@ -53,6 +53,16 @@ public class Utente {
         }
     }
 
+    //costruttore DAO
+    public Utente(int idUtente, String username, String passwordHash, String nome, String cognome, String email, boolean isAlreadyHashed) {
+        this.idUtente = idUtente;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.nome = nome;
+        this.cognome = cognome;
+        this.email = email;
+    }
+
     public boolean verificaPassword(String password) {
         return passwordHash.equals(createHash(password));
     }

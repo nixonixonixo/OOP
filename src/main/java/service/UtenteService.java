@@ -34,7 +34,7 @@ public class UtenteService {
         return u;
     }
 
-    // REGISTRAZIONE CLIENTE (UNICO METODO CORRETTO)
+    // REGISTRAZIONE CLIENTE
     public void registraCliente(Cliente cliente) throws SQLException {
         utenteDAO.salvaUtente(cliente);
         clienteDAO.salvaCliente(cliente);
