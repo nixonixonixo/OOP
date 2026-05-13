@@ -139,7 +139,7 @@ public class PrenotazionePanel extends JPanel {
                     if (nuovoStato == Prenotazione.StatoPren.CONFERMATA) {
                         dao.AutoDAO autoDAO = new implementazionePostgresDAO.ImpAutoDAO();
                         autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), model.Auto.StatoAuto.NOLEGGIATA);
-                        JOptionPane.showMessageDialog(this, "Prenotazione confermata e auto impostata su IN_USO!");
+                        JOptionPane.showMessageDialog(this, "Prenotazione confermata e auto impostata su NOLEGGIATA!");
                     }
                     else if (nuovoStato == Prenotazione.StatoPren.ANNULLATA) {
                         JOptionPane.showMessageDialog(this, "Prenotazione annullata.");
