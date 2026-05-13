@@ -12,7 +12,7 @@ public class ImpAutoDAO implements AutoDAO {
 
     @Override
     public void salvaAuto(Auto auto) throws SQLException {
-        String sql = "INSERT INTO AUTO (id_auto, targa, modello, stato, costo_daily) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO AUTO (idauto, targa, modello, stato, costo_daily) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -20,7 +20,7 @@ public class ImpAutoDAO implements AutoDAO {
             ps.setInt(1, auto.getIdAuto());
             ps.setString(2, auto.getTarga());
             ps.setString(3, auto.getModello());
-            ps.setString(4, auto.getStato().toString()); // Converte Enum in Stringa
+            ps.setString(4, auto.getStato().toString());
             ps.setBigDecimal(5, auto.getCostoDaily());
 
             ps.executeUpdate();
@@ -29,7 +29,7 @@ public class ImpAutoDAO implements AutoDAO {
 
     @Override
     public Auto trovaAutoPerId(int idAuto) throws SQLException {
-        String sql = "SELECT * FROM AUTO WHERE id_auto = ?";
+        String sql = "SELECT * FROM AUTO WHERE idauto = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -63,7 +63,6 @@ public class ImpAutoDAO implements AutoDAO {
     @Override
     public List<Auto> trovaAutoDisponibili() throws SQLException {
         List<Auto> lista = new ArrayList<>();
-        // Filtriamo per lo stato 'DISPONIBILE' come richiesto dalle regole di business
         String sql = "SELECT * FROM AUTO WHERE stato = 'DISPONIBILE'";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -79,7 +78,7 @@ public class ImpAutoDAO implements AutoDAO {
 
     @Override
     public void aggiornaAuto(Auto auto) throws SQLException {
-        String sql = "UPDATE AUTO SET targa = ?, modello = ?, stato = ?, costo_daily = ? WHERE id_auto = ?";
+        String sql = "UPDATE AUTO SET targa = ?, modello = ?, stato = ?, costo_daily = ? WHERE idauto = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -96,7 +95,7 @@ public class ImpAutoDAO implements AutoDAO {
 
     @Override
     public void aggiornaStatoAuto(int idAuto, Auto.StatoAuto stato) throws SQLException {
-        String sql = "UPDATE AUTO SET stato = ? WHERE id_auto = ?";
+        String sql = "UPDATE AUTO SET stato = ? WHERE idauto = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,7 +109,7 @@ public class ImpAutoDAO implements AutoDAO {
 
     @Override
     public void eliminaAuto(int idAuto) throws SQLException {
-        String sql = "DELETE FROM AUTO WHERE id_auto = ?";
+        String sql = "DELETE FROM AUTO WHERE idauto = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -121,11 +120,16 @@ public class ImpAutoDAO implements AutoDAO {
     }
 
     private Auto mappaResultSetInAuto(ResultSet rs) throws SQLException {
+        String statoString = rs.getString("stato");
+        Auto.StatoAuto statoEnum = (statoString != null) ?
+                Auto.StatoAuto.valueOf(statoString.toUpperCase()) :
+                Auto.StatoAuto.DISPONIBILE;
+
         return new Auto(
-                rs.getInt("id_auto"),
+                rs.getInt("idauto"),
                 rs.getString("targa"),
                 rs.getString("modello"),
-                Auto.StatoAuto.valueOf(rs.getString("stato")),
+                statoEnum,
                 rs.getBigDecimal("costo_daily")
         );
     }

@@ -14,7 +14,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public void salvaPrenotazione(Prenotazione p) throws SQLException {
-        String sql = "INSERT INTO PRENOTAZIONE (id_pren, data_inizio, data_fine, stato, id_cliente, id_auto) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO PRENOTAZIONE (idprenotazione, data_inizio, data_fine, stato, idutente, idauto) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -32,7 +32,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public Prenotazione trovaPrenotazionePerId(int idPrenotazione) throws SQLException {
-        String sql = "SELECT * FROM PRENOTAZIONE WHERE id_pren = ?";
+        String sql = "SELECT * FROM PRENOTAZIONE WHERE idprenotazione = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -50,7 +50,8 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
     @Override
     public List<Prenotazione> trovaPrenotazioniCliente(int idCliente) throws SQLException {
         List<Prenotazione> lista = new ArrayList<>();
-        String sql = "SELECT * FROM PRENOTAZIONE WHERE id_cliente = ?";
+        // Chiave esterna verso cliente è idutente
+        String sql = "SELECT * FROM PRENOTAZIONE WHERE idutente = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -83,7 +84,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public void aggiornaPrenotazione(Prenotazione p) throws SQLException {
-        String sql = "UPDATE PRENOTAZIONE SET data_inizio = ?, data_fine = ?, stato = ? WHERE id_pren = ?";
+        String sql = "UPDATE PRENOTAZIONE SET data_inizio = ?, data_fine = ?, stato = ? WHERE idprenotazione = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -99,7 +100,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public void eliminaPrenotazione(int idPrenotazione) throws SQLException {
-        String sql = "DELETE FROM PRENOTAZIONE WHERE id_pren = ?";
+        String sql = "DELETE FROM PRENOTAZIONE WHERE idprenotazione = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -111,7 +112,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     private Prenotazione mappaResultSetInPrenotazione(ResultSet rs) throws SQLException {
         Cliente cliente = new Cliente(
-                rs.getInt("id_cliente"),
+                rs.getInt("idutente"),
                 "placeholder",
                 "placeholder",
                 "placeholder",
@@ -121,8 +122,9 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 new java.math.BigDecimal("1.00")
         );
 
+        // idauto è la chiave dell'auto nel DB
         Auto auto = new Auto(
-                rs.getInt("id_auto"),
+                rs.getInt("idauto"),
                 "PROVVISORIA",
                 "MOD_GENERICO",
                 Auto.StatoAuto.DISPONIBILE,
@@ -130,7 +132,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         );
 
         return new Prenotazione(
-                rs.getInt("id_pren"),
+                rs.getInt("idprenotazione"),
                 rs.getDate("data_inizio"),
                 rs.getDate("data_fine"),
                 Prenotazione.StatoPren.valueOf(rs.getString("stato")),
@@ -141,7 +143,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public Prenotazione trovaPrenotazionePerAuto(int idAuto) throws SQLException {
-        String sql = "SELECT * FROM PRENOTAZIONE WHERE id_auto = ? AND stato != 'ANNULLATA' LIMIT 1";
+        String sql = "SELECT * FROM PRENOTAZIONE WHERE idauto = ? AND stato != 'ANNULLATA' LIMIT 1";
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idAuto);

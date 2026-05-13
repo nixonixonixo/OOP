@@ -48,6 +48,14 @@ public class Noleggio {
         return prenotazione;
     }
 
+    public void setDataRestituzione(Date dataRestituzione){
+        this.dataRestituzione = dataRestituzione;
+    }
+
+    public void setCostoTot(BigDecimal costoTot){
+        this.costoTot = costoTot;
+    }
+
     public void chiudiNoleggio(Date dataRestituzione, BigDecimal costoGiornaliero) {
         if (dataRestituzione == null) {
             throw new IllegalArgumentException("Data restituzione non valida");
