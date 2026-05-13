@@ -1,13 +1,12 @@
 package service;
 
-import dao.AutoDAO;
 import dao.PrenotazioneDAO;
-import model.Auto;
-import model.Cliente;
+import dao.AutoDAO;
 import model.Prenotazione;
+import model.Auto;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.util.List;
 
 public class PrenotazioneService {
 
@@ -19,67 +18,28 @@ public class PrenotazioneService {
         this.autoDAO = autoDAO;
     }
 
-    public Prenotazione creaPrenotazione(int idPren, Cliente cliente, int idAuto, Date inizio, Date fine)
-            throws SQLException {
-
-        Auto auto = autoDAO.trovaAutoPerId(idAuto);
-
-        if (auto == null || auto.getStato() != Auto.StatoAuto.DISPONIBILE) {
-            throw new IllegalStateException("Auto non disponibile");
-        }
-
-        Prenotazione nuova = new Prenotazione(
-                idPren,
-                inizio,
-                fine,
-                Prenotazione.StatoPren.IN_ATTESA,
-                cliente,
-                auto
-        );
-
-        Prenotazione esistente = prenotazioneDAO.trovaPrenotazionePerAuto(idAuto);
-
-        if (esistente != null && esistente.isSovrapposta(nuova)) {
-            throw new IllegalArgumentException("Sovrapposizione prenotazioni");
-        }
-
-        prenotazioneDAO.salvaPrenotazione(nuova);
-        return nuova;
+    public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws SQLException {
+        return prenotazioneDAO.trovaPrenotazioniCliente(idCliente);
     }
 
-    public void confermaPrenotazione(int idPrenotazione) throws SQLException {
-
-        Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
-
-        if (p == null) {
-            throw new IllegalArgumentException("Prenotazione non trovata");
-        }
-
-        p.setStato(Prenotazione.StatoPren.CONFERMATA);
-
-        autoDAO.aggiornaStatoAuto(
-                p.getAuto().getIdAuto(),
-                Auto.StatoAuto.NOLEGGIATA
-        );
-
-        prenotazioneDAO.aggiornaPrenotazione(p);
+    public List<Prenotazione> getTuttePrenotazioni() throws SQLException {
+        return prenotazioneDAO.trovaTuttePrenotazioni();
     }
 
-    public void annullaPrenotazione(int idPrenotazione) throws SQLException {
+    public Prenotazione creaPrenotazione(Prenotazione p) throws SQLException {
+        prenotazioneDAO.salvaPrenotazione(p);
+        return p;
+    }
 
-        Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
+    public void confermaPrenotazione(int idPren) throws SQLException {
+        prenotazioneDAO.aggiornaStatoPrenotazione(idPren, Prenotazione.StatoPren.CONFERMATA);
+    }
 
-        if (p == null) {
-            throw new IllegalArgumentException("Prenotazione non trovata");
-        }
+    public void annullaPrenotazione(int idPren) throws SQLException {
+        prenotazioneDAO.aggiornaStatoPrenotazione(idPren, Prenotazione.StatoPren.ANNULLATA);
+    }
 
-        p.setStato(Prenotazione.StatoPren.ANNULLATA);
-
-        autoDAO.aggiornaStatoAuto(
-                p.getAuto().getIdAuto(),
-                Auto.StatoAuto.DISPONIBILE
-        );
-
-        prenotazioneDAO.aggiornaPrenotazione(p);
+    public void aggiornaAuto(Prenotazione p, Auto.StatoAuto stato) throws SQLException {
+        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), stato);
     }
 }

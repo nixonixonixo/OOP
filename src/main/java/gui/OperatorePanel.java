@@ -1,11 +1,7 @@
 package gui;
 
-import dao.AutoDAO;
-import dao.PrenotazioneDAO;
-import implementazionePostgresDAO.ImpAutoDAO;
-import implementazionePostgresDAO.ImpPrenotazioneDAO;
 import model.Auto;
-import model.Prenotazione;
+import service.AutoService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,52 +13,56 @@ public class OperatorePanel extends JPanel {
 
     private JTable tabellaAuto;
     private DefaultTableModel tableModel;
-    private AutoDAO autoDAO;
-    private PrenotazioneDAO prenotazioneDAO;
+    private final AutoService autoService;
 
-    public OperatorePanel() {
-        this.autoDAO = new ImpAutoDAO();
-        this.prenotazioneDAO = new ImpPrenotazioneDAO();
+    public OperatorePanel(AutoService autoService) {
+
+        this.autoService = autoService;
 
         setLayout(new BorderLayout(10, 10));
 
-        JLabel titolo = new JLabel("Pannello Gestione Operatore - Monitoraggio Parco Auto");
+        JLabel titolo = new JLabel("Pannello Operatore - Gestione Auto");
         titolo.setFont(new Font("Arial", Font.BOLD, 16));
         titolo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(titolo, BorderLayout.NORTH);
 
         String[] colonne = {"ID", "Targa", "Modello", "Stato", "Costo Giornaliero"};
+
         tableModel = new DefaultTableModel(colonne, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) { return false; }
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
+
         tabellaAuto = new JTable(tableModel);
         add(new JScrollPane(tabellaAuto), BorderLayout.CENTER);
 
         JPanel azioniPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JButton btnManutenzione = new JButton("Invia in Manutenzione");
-        JButton btnRendiDisponibile = new JButton("Rendi Disponibile");
-        JButton btnAggiorna = new JButton("Aggiorna Lista");
+        JButton btnManutenzione = new JButton("Manutenzione");
+        JButton btnDisponibile = new JButton("Disponibile");
+        JButton btnAggiorna = new JButton("Aggiorna");
 
         azioniPanel.add(btnManutenzione);
-        azioniPanel.add(btnRendiDisponibile);
+        azioniPanel.add(btnDisponibile);
         azioniPanel.add(btnAggiorna);
+
         add(azioniPanel, BorderLayout.SOUTH);
 
         btnAggiorna.addActionListener(e -> caricaDati());
-
-        btnManutenzione.addActionListener(e -> cambiaStatoSelezionato(Auto.StatoAuto.IN_MANUTENZIONE));
-
-        btnRendiDisponibile.addActionListener(e -> cambiaStatoSelezionato(Auto.StatoAuto.DISPONIBILE));
+        btnManutenzione.addActionListener(e -> cambiaStato(Auto.StatoAuto.IN_MANUTENZIONE));
+        btnDisponibile.addActionListener(e -> cambiaStato(Auto.StatoAuto.DISPONIBILE));
 
         caricaDati();
     }
 
     private void caricaDati() {
         try {
-            tableModel.setRowCount(0); // Pulisce la tabella
-            List<Auto> autoList = autoDAO.trovaTutteAuto();
+            tableModel.setRowCount(0);
+
+            List<Auto> autoList = autoService.getTutte();
+
             for (Auto a : autoList) {
                 tableModel.addRow(new Object[]{
                         a.getIdAuto(),
@@ -72,25 +72,36 @@ public class OperatorePanel extends JPanel {
                         a.getCostoDaily()
                 });
             }
+
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Errore caricamento dati: " + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    "Errore caricamento auto: " + e.getMessage(),
+                    "Errore",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void cambiaStatoSelezionato(Auto.StatoAuto nuovoStato) {
+    private void cambiaStato(Auto.StatoAuto nuovoStato) {
+
         int riga = tabellaAuto.getSelectedRow();
+
         if (riga == -1) {
-            JOptionPane.showMessageDialog(this, "Seleziona un'auto dalla tabella!");
+            JOptionPane.showMessageDialog(this, "Seleziona un'auto");
             return;
         }
 
         int idAuto = (int) tableModel.getValueAt(riga, 0);
+
         try {
-            autoDAO.aggiornaStatoAuto(idAuto, nuovoStato);
-            JOptionPane.showMessageDialog(this, "Stato aggiornato con successo!");
-            caricaDati(); // Refresh
+            autoService.cambiaStato(idAuto, nuovoStato);
+            JOptionPane.showMessageDialog(this, "Stato aggiornato");
+            caricaDati();
+
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Errore durante l'aggiornamento: " + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    "Errore aggiornamento: " + e.getMessage(),
+                    "Errore",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }

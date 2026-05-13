@@ -5,6 +5,7 @@ import database.ConnessioneDatabase;
 import model.Auto;
 
 import java.sql.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ImpAutoDAO implements AutoDAO {
             ps.setInt(1, auto.getIdAuto());
             ps.setString(2, auto.getTarga());
             ps.setString(3, auto.getModello());
-            ps.setString(4, auto.getStato().toString());
+            ps.setString(4, auto.getStato().name());
             ps.setBigDecimal(5, auto.getCostoDaily());
 
             ps.executeUpdate();
@@ -35,12 +36,14 @@ public class ImpAutoDAO implements AutoDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idAuto);
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return mappaResultSetInAuto(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mappaResultSetInAuto(rs);
+                }
             }
         }
+
         return null;
     }
 
@@ -57,6 +60,7 @@ public class ImpAutoDAO implements AutoDAO {
                 lista.add(mappaResultSetInAuto(rs));
             }
         }
+
         return lista;
     }
 
@@ -73,6 +77,7 @@ public class ImpAutoDAO implements AutoDAO {
                 lista.add(mappaResultSetInAuto(rs));
             }
         }
+
         return lista;
     }
 
@@ -85,7 +90,7 @@ public class ImpAutoDAO implements AutoDAO {
 
             ps.setString(1, auto.getTarga());
             ps.setString(2, auto.getModello());
-            ps.setString(3, auto.getStato().toString());
+            ps.setString(3, auto.getStato().name());
             ps.setBigDecimal(4, auto.getCostoDaily());
             ps.setInt(5, auto.getIdAuto());
 
@@ -100,7 +105,7 @@ public class ImpAutoDAO implements AutoDAO {
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, stato.toString());
+            ps.setString(1, stato.name());
             ps.setInt(2, idAuto);
 
             ps.executeUpdate();
@@ -120,16 +125,12 @@ public class ImpAutoDAO implements AutoDAO {
     }
 
     private Auto mappaResultSetInAuto(ResultSet rs) throws SQLException {
-        String statoString = rs.getString("stato");
-        Auto.StatoAuto statoEnum = (statoString != null) ?
-                Auto.StatoAuto.valueOf(statoString.toUpperCase()) :
-                Auto.StatoAuto.DISPONIBILE;
 
         return new Auto(
                 rs.getInt("idauto"),
                 rs.getString("targa"),
                 rs.getString("modello"),
-                statoEnum,
+                Auto.StatoAuto.valueOf(rs.getString("stato")),
                 rs.getBigDecimal("costogiornaliero")
         );
     }

@@ -1,10 +1,10 @@
 package service;
 
 import dao.PagamentoDAO;
-import model.*;
+import model.Pagamento;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.List;
 
 public class PagamentoService {
 
@@ -14,29 +14,15 @@ public class PagamentoService {
         this.pagamentoDAO = pagamentoDAO;
     }
 
-    public Pagamento effettuaPagamento(Noleggio n, Cliente c) throws SQLException {
-
-        BigDecimal importo = n.getCostoTot();
-
-        if (importo == null || importo.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalStateException("Importo non valido");
-        }
-
-        if (c.getCredito().compareTo(importo) < 0) {
-            throw new IllegalArgumentException("Credito insufficiente");
-        }
-
-        c.scalaCredito(importo);
-
-        Pagamento p = new Pagamento(
-                0,
-                importo,
-                Pagamento.StatoPagamento.COMPLETATO,
-                n
-        );
-
+    public void salva(Pagamento p) throws SQLException {
         pagamentoDAO.salvaPagamento(p);
+    }
 
-        return p;
+    public List<Pagamento> getTuttiPagamenti() throws SQLException {
+        return pagamentoDAO.trovaTuttiPagamenti();
+    }
+
+    public void aggiorna(Pagamento p) throws SQLException {
+        pagamentoDAO.aggiornaPagamento(p);
     }
 }

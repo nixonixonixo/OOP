@@ -1,69 +1,49 @@
 package service;
 
 import dao.NoleggioDAO;
-import dao.PrenotazioneDAO;
-import model.*;
+import dao.AutoDAO;
+import model.Noleggio;
+import model.Prenotazione;
+import model.Auto;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class NoleggioService {
 
     private final NoleggioDAO noleggioDAO;
-    private final PrenotazioneDAO prenotazioneDAO;
+    private final AutoDAO autoDAO;
 
-    public NoleggioService(NoleggioDAO noleggioDAO, PrenotazioneDAO prenotazioneDAO) {
+    public NoleggioService(NoleggioDAO noleggioDAO, AutoDAO autoDAO) {
         this.noleggioDAO = noleggioDAO;
-        this.prenotazioneDAO = prenotazioneDAO;
+        this.autoDAO = autoDAO;
     }
 
-    public Noleggio avviaNoleggio(int idPrenotazione) throws SQLException {
+    public Noleggio avviaNoleggio(Prenotazione p) throws SQLException {
 
-        Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
-
-        if (p == null || p.getStato() != Prenotazione.StatoPren.CONFERMATA) {
-            throw new IllegalStateException("Prenotazione non valida");
+        if (p.getStato() != Prenotazione.StatoPren.CONFERMATA) {
+            throw new IllegalStateException("Prenotazione non confermata");
         }
 
-        Noleggio n = new Noleggio(
-                0,
-                new Date(),
-                p
-        );
+        Noleggio n = new Noleggio(0, new Date(), p);
+
+        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
 
         noleggioDAO.salvaNoleggio(n);
 
         return n;
     }
 
-    public Noleggio chiudiNoleggio(int idNoleggio) throws SQLException {
+    public void chiudiNoleggio(Noleggio n, Date restituzione) throws SQLException {
 
-        Noleggio n = noleggioDAO.trovaNoleggioPerId(idNoleggio);
+        Auto auto = n.getPrenotazione().getAuto();
+        BigDecimal costo = auto.getCostoDaily();
 
-        if (n == null) {
-            throw new IllegalArgumentException("Noleggio non trovato");
-        }
+        n.chiudiNoleggio(restituzione, costo);
 
-        Date oggi = new Date();
-
-        long giorni = TimeUnit.DAYS.convert(
-                Math.abs(oggi.getTime() - n.getDataRitiro().getTime()),
-                TimeUnit.MILLISECONDS
-        );
-
-        if (giorni <= 0) giorni = 1;
-
-        BigDecimal costo = n.getPrenotazione()
-                .getAuto()
-                .getCostoDaily()
-                .multiply(BigDecimal.valueOf(giorni));
-
-        n.chiudiNoleggio(oggi, costo);
+        autoDAO.aggiornaStatoAuto(auto.getIdAuto(), Auto.StatoAuto.DISPONIBILE);
 
         noleggioDAO.aggiornaNoleggio(n);
-
-        return n;
     }
 }

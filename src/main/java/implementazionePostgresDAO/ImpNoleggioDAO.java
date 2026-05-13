@@ -14,7 +14,10 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public void salvaNoleggio(Noleggio noleggio) throws SQLException {
-        String sql = "INSERT INTO NOLEGGIO (idnoleggio, dataritiro, costototale, idprenotazione) VALUES (?, ?, ?, ?)";
+        String sql = """
+            INSERT INTO NOLEGGIO (idnoleggio, dataritiro, costototale, idprenotazione)
+            VALUES (?, ?, ?, ?)
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -30,15 +33,18 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public Noleggio trovaNoleggioPerId(int idNoleggio) throws SQLException {
+
         String sql = """
-            SELECT n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale, n.idprenotazione,
-                   p.datainizio, p.datafine, p.stato as stato_pren,
-                   a.idauto, a.targa, a.modello, a.stato as stato_auto, a.costogiornaliero
+            SELECT 
+                n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
+                n.idprenotazione,
+                p.datainizio, p.datafine, p.stato AS stato_pren,
+                a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero
             FROM NOLEGGIO n
             JOIN PRENOTAZIONE p ON n.idprenotazione = p.idprenotazione
             JOIN AUTO a ON p.idauto = a.idauto
             WHERE n.idnoleggio = ?
-            """;
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -50,35 +56,46 @@ public class ImpNoleggioDAO implements NoleggioDAO {
                 return mappaResultSetInNoleggio(rs);
             }
         }
+
         return null;
     }
 
     @Override
     public List<Noleggio> trovaTuttiNoleggi() throws SQLException {
-        List<Noleggio> noleggi = new ArrayList<>();
+
+        List<Noleggio> lista = new ArrayList<>();
+
         String sql = """
-            SELECT n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale, n.idprenotazione,
-                   p.datainizio, p.datafine, p.stato as stato_pren,
-                   a.idauto, a.targa, a.modello, a.stato as stato_auto, a.costogiornaliero
+            SELECT 
+                n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
+                n.idprenotazione,
+                p.datainizio, p.datafine, p.stato AS stato_pren,
+                a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero
             FROM NOLEGGIO n
             JOIN PRENOTAZIONE p ON n.idprenotazione = p.idprenotazione
             JOIN AUTO a ON p.idauto = a.idauto
-            """;
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                noleggi.add(mappaResultSetInNoleggio(rs));
+                lista.add(mappaResultSetInNoleggio(rs));
             }
         }
-        return noleggi;
+
+        return lista;
     }
 
     @Override
     public void aggiornaNoleggio(Noleggio noleggio) throws SQLException {
-        String sql = "UPDATE NOLEGGIO SET dataritiro = ?, datarestituzione = ?, costototale = ? WHERE idnoleggio = ?";
+
+        String sql = """
+            UPDATE NOLEGGIO
+            SET dataritiro = ?, datarestituzione = ?, costototale = ?
+            WHERE idnoleggio = ?
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -100,6 +117,7 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public void eliminaNoleggio(int idNoleggio) throws SQLException {
+
         String sql = "DELETE FROM NOLEGGIO WHERE idnoleggio = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -111,7 +129,11 @@ public class ImpNoleggioDAO implements NoleggioDAO {
     }
 
     private Noleggio mappaResultSetInNoleggio(ResultSet rs) throws SQLException {
-        Auto.StatoAuto statoAuto = Auto.StatoAuto.valueOf(rs.getString("stato_auto").toUpperCase());
+
+        Auto.StatoAuto statoAuto = Auto.StatoAuto.valueOf(
+                rs.getString("stato_auto").toUpperCase()
+        );
+
         Auto auto = new Auto(
                 rs.getInt("idauto"),
                 rs.getString("targa"),
@@ -120,7 +142,10 @@ public class ImpNoleggioDAO implements NoleggioDAO {
                 rs.getBigDecimal("costogiornaliero")
         );
 
-        Prenotazione.StatoPren statoPren = Prenotazione.StatoPren.valueOf(rs.getString("stato_pren").toUpperCase());
+        Prenotazione.StatoPren statoPren = Prenotazione.StatoPren.valueOf(
+                rs.getString("stato_pren").toUpperCase()
+        );
+
         Prenotazione prenotazione = new Prenotazione(
                 rs.getInt("idprenotazione"),
                 rs.getDate("datainizio"),
@@ -130,15 +155,15 @@ public class ImpNoleggioDAO implements NoleggioDAO {
                 auto
         );
 
-        Noleggio noleggio = new Noleggio(
+        Noleggio n = new Noleggio(
                 rs.getInt("idnoleggio"),
                 rs.getDate("dataritiro"),
                 prenotazione
         );
 
-        noleggio.setDataRestituzione(rs.getDate("datarestituzione"));
-        noleggio.setCostoTot(rs.getBigDecimal("costototale"));
+        n.setDataRestituzione(rs.getDate("datarestituzione"));
+        n.setCostoTot(rs.getBigDecimal("costototale"));
 
-        return noleggio;
+        return n;
     }
 }

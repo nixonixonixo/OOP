@@ -1,17 +1,14 @@
 package gui;
 
-import dao.ClienteDAO;
-import dao.UtenteDAO;
-import implementazionePostgresDAO.ImpClienteDAO;
-import implementazionePostgresDAO.ImpUtenteDAO;
 import model.Cliente;
+import service.UtenteService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 
-public class RegistrazioneFrame
-        extends JFrame {
+public class RegistrazioneFrame extends JFrame {
 
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -20,36 +17,27 @@ public class RegistrazioneFrame
     private JTextField emailField;
     private JTextField patenteField;
 
-    public RegistrazioneFrame() {
+    private final UtenteService utenteService;
+
+    public RegistrazioneFrame(UtenteService utenteService) {
+
+        this.utenteService = utenteService;
 
         setTitle("Registrazione");
         setSize(450, 350);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(
-                DISPOSE_ON_CLOSE
-        );
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        JPanel panel =
-                new JPanel(
-                        new GridLayout(
-                                7,
-                                2,
-                                10,
-                                10
-                        )
-                );
+        JPanel panel = new JPanel(new GridLayout(7, 2, 10, 10));
 
         usernameField = new JTextField();
-        passwordField =
-                new JPasswordField();
-
+        passwordField = new JPasswordField();
         nomeField = new JTextField();
         cognomeField = new JTextField();
         emailField = new JTextField();
         patenteField = new JTextField();
 
-        JButton registratiButton =
-                new JButton("Registrati");
+        JButton registratiButton = new JButton("Registrati");
 
         panel.add(new JLabel("Username"));
         panel.add(usernameField);
@@ -74,9 +62,7 @@ public class RegistrazioneFrame
 
         add(panel);
 
-        registratiButton.addActionListener(
-                e -> registrazione()
-        );
+        registratiButton.addActionListener(e -> registrazione());
 
         setVisible(true);
     }
@@ -84,40 +70,35 @@ public class RegistrazioneFrame
     private void registrazione() {
 
         try {
+            Cliente cliente = new Cliente(
+                    generaId(),
+                    usernameField.getText(),
+                    new String(passwordField.getPassword()),
+                    nomeField.getText(),
+                    cognomeField.getText(),
+                    emailField.getText(),
+                    patenteField.getText(),
+                    BigDecimal.ZERO
+            );
 
-            Cliente cliente =
-                    new Cliente(
-                            generaId(),
-                            usernameField.getText(),
-                            new String(
-                                    passwordField
-                                            .getPassword()
-                            ),
-                            nomeField.getText(),
-                            cognomeField.getText(),
-                            emailField.getText(),
-                            patenteField.getText(),
-                            BigDecimal.ZERO
-                    );
-
-            UtenteDAO utenteDAO =
-                    new ImpUtenteDAO();
-
-            ClienteDAO clienteDAO =
-                    new ImpClienteDAO();
-
-            utenteDAO.salvaUtente(cliente);
-            clienteDAO.salvaCliente(cliente);
+            utenteService.registraCliente(cliente);
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Registrazione completata!"
+                    "Registrazione completata"
             );
 
             dispose();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Errore database: " + e.getMessage(),
+                    "Errore",
+                    JOptionPane.ERROR_MESSAGE
+            );
 
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,
                     e.getMessage(),
@@ -128,8 +109,6 @@ public class RegistrazioneFrame
     }
 
     private int generaId() {
-
-        return (int)
-                (Math.random() * 100000);
+        return (int) (Math.random() * 100000);
     }
 }

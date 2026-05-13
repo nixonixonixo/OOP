@@ -1,8 +1,7 @@
 package gui;
 
-import dao.PagamentoDAO;
-import implementazionePostgresDAO.ImpPagamentoDAO;
 import model.Pagamento;
+import service.PagamentoService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,10 +12,12 @@ public class PagamentoPanel extends JPanel {
 
     private JTable table;
     private DefaultTableModel model;
-    private PagamentoDAO pagamentoDAO;
 
-    public PagamentoPanel() {
-        this.pagamentoDAO = new ImpPagamentoDAO();
+    private final PagamentoService pagamentoService;
+
+    public PagamentoPanel(PagamentoService pagamentoService) {
+
+        this.pagamentoService = pagamentoService;
 
         setLayout(new BorderLayout(10, 10));
 
@@ -35,37 +36,33 @@ public class PagamentoPanel extends JPanel {
         add(new JScrollPane(table), BorderLayout.CENTER);
 
         JButton btnAggiorna = new JButton("Aggiorna Pagamenti");
-        btnAggiorna.addActionListener(e -> caricaPagamenti());
+        btnAggiorna.addActionListener(e -> carica());
 
-        JPanel pnlSud = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        pnlSud.add(btnAggiorna);
-        add(pnlSud, BorderLayout.SOUTH);
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.add(btnAggiorna);
 
-        caricaPagamenti();
+        add(bottom, BorderLayout.SOUTH);
+
+        carica();
     }
 
-    private void caricaPagamenti() {
+    private void carica() {
         try {
             model.setRowCount(0);
 
-            List<Pagamento> pagamenti = pagamentoDAO.trovaTuttiPagamenti();
+            List<Pagamento> lista = pagamentoService.getTuttiPagamenti();
 
-            if (pagamenti != null) {
-                for (Pagamento p : pagamenti) {
-                    model.addRow(new Object[]{
-                            p.getIdPagamento(),
-                            p.getImporto() + " €",
-                            p.getStato()
-                    });
-                }
+            for (Pagamento p : lista) {
+                model.addRow(new Object[]{
+                        p.getIdPagamento(),
+                        p.getImporto() + " €",
+                        p.getStato()
+                });
             }
-
-            revalidate();
-            repaint();
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "Errore nel caricamento pagamenti: " + e.getMessage(),
+                    "Errore caricamento pagamenti: " + e.getMessage(),
                     "Errore",
                     JOptionPane.ERROR_MESSAGE);
         }

@@ -3,65 +3,78 @@ package gui;
 import model.Cliente;
 import model.Operatore;
 import model.Utente;
+import service.*;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class DashboardFrame extends JFrame {
 
-    public DashboardFrame(Utente utente) {
+    public DashboardFrame(
+            Utente utente,
+            AutoService autoService,
+            PrenotazioneService prenotazioneService,
+            NoleggioService noleggioService,
+            PagamentoService pagamentoService
+    ) {
+
         setTitle("Sistema Noleggio Auto - " + utente.getNome() + " " + utente.getCognome());
         setSize(1100, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel pnlHeader = new JPanel(new BorderLayout());
-        pnlHeader.setBackground(new Color(52, 73, 94)); // Blu scuro elegante
-        pnlHeader.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        // =========================
+        // HEADER
+        // =========================
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(new Color(52, 73, 94));
+        header.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        String infoUtente = utente.getUsername() + " [" + utente.getClass().getSimpleName().toUpperCase() + "]";
-        JLabel lblBenvenuto = new JLabel("Benvenuto, " + infoUtente);
-        lblBenvenuto.setForeground(Color.WHITE);
-        lblBenvenuto.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JLabel lbl = new JLabel("Benvenuto, " + utente.getUsername());
+        lbl.setForeground(Color.WHITE);
 
-        JButton btnLogout = new JButton("Logout");
-        btnLogout.setFocusable(false);
-        btnLogout.setBackground(new Color(192, 57, 43)); // Rosso scuro
-        btnLogout.setForeground(Color.WHITE);
-        btnLogout.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-
-        btnLogout.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Vuoi davvero uscire dal sistema?", "Conferma Logout",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                this.dispose();
-                new LoginFrame();
-            }
+        JButton logout = new JButton("Logout");
+        logout.addActionListener(e -> {
+            dispose();
+            new LoginFrame();
         });
 
-        pnlHeader.add(lblBenvenuto, BorderLayout.WEST);
-        pnlHeader.add(btnLogout, BorderLayout.EAST);
+        header.add(lbl, BorderLayout.WEST);
+        header.add(logout, BorderLayout.EAST);
 
+        // =========================
+        // TABS
+        // =========================
         JTabbedPane tabs = new JTabbedPane();
-        tabs.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
-        if (utente instanceof Operatore operatore) {
-            tabs.addTab("Gestione Auto", new AutoPanel());
-            tabs.addTab("Prenotazioni Clienti", new PrenotazionePanel(null)); // null = tutte
-            tabs.addTab("Gestione Noleggi Attivi", new NoleggioPanel()); // <--- AGGIUNTO QUI
-            tabs.addTab("Pannello Operativo", new OperatorePanel());
-        }
-        else if (utente instanceof Cliente cliente) {
-            tabs.addTab("Prenota Auto", new AutoPanel());
-            tabs.addTab("Le Mie Prenotazioni", new PrenotazionePanel(cliente));
-            tabs.addTab("I Miei Pagamenti", new PagamentoPanel());
-            tabs.addTab("Profilo e Saldo", new ClientePanel(cliente));
+        if (utente instanceof Operatore) {
+
+            tabs.addTab("Auto",
+                    new AutoPanel(autoService));
+
+            tabs.addTab("Prenotazioni",
+                    new PrenotazionePanel(null, prenotazioneService));
+
+            tabs.addTab("Noleggi",
+                    new NoleggioPanel(noleggioService));
+
+        } else if (utente instanceof Cliente cliente) {
+
+            tabs.addTab("Prenota Auto",
+                    new AutoPanel(autoService));
+
+            tabs.addTab("Le mie prenotazioni",
+                    new PrenotazionePanel(cliente, prenotazioneService));
+
+            tabs.addTab("Pagamenti",
+                    new PagamentoPanel(pagamentoService));
+
+            tabs.addTab("Noleggi",
+                    new NoleggioPanel(noleggioService));
         }
 
         setLayout(new BorderLayout());
-        add(pnlHeader, BorderLayout.NORTH);
+        add(header, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
 
         setVisible(true);

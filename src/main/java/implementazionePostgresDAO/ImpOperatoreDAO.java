@@ -12,7 +12,11 @@ public class ImpOperatoreDAO implements OperatoreDAO {
 
     @Override
     public void salvaOperatore(Operatore operatore) throws SQLException {
-        String sql = "INSERT INTO OPERATORE (idutente, ruolo) VALUES (?, ?)";
+
+        String sql = """
+            INSERT INTO OPERATORE (idutente, ruolo)
+            VALUES (?, ?)
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -26,49 +30,62 @@ public class ImpOperatoreDAO implements OperatoreDAO {
 
     @Override
     public Operatore trovaOperatorePerId(int idUtente) throws SQLException {
+
         String sql = """
-                SELECT u.*, o.ruolo
-                FROM UTENTE u
-                JOIN OPERATORE o ON u.idutente = o.idutente
-                WHERE u.idutente = ?
-                """;
+            SELECT u.idutente, u.username, u.passwordhash, u.nome, u.cognome, u.email,
+                   o.ruolo
+            FROM UTENTE u
+            JOIN OPERATORE o ON u.idutente = o.idutente
+            WHERE u.idutente = ?
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idUtente);
+
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 return mappaResultSetInOperatore(rs);
             }
         }
+
         return null;
     }
 
     @Override
     public List<Operatore> trovaTuttiOperatori() throws SQLException {
+
         List<Operatore> operatori = new ArrayList<>();
+
         String sql = """
-                SELECT u.*, o.ruolo
-                FROM UTENTE u
-                JOIN OPERATORE o ON u.idutente = o.idutente
-                """;
+            SELECT u.idutente, u.username, u.passwordhash, u.nome, u.cognome, u.email,
+                   o.ruolo
+            FROM UTENTE u
+            JOIN OPERATORE o ON u.idutente = o.idutente
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 operatori.add(mappaResultSetInOperatore(rs));
             }
         }
+
         return operatori;
     }
 
     @Override
     public void aggiornaOperatore(Operatore operatore) throws SQLException {
-        String sql = "UPDATE OPERATORE SET ruolo = ? WHERE idutente = ?";
+
+        String sql = """
+            UPDATE OPERATORE
+            SET ruolo = ?
+            WHERE idutente = ?
+        """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -82,6 +99,7 @@ public class ImpOperatoreDAO implements OperatoreDAO {
 
     @Override
     public void eliminaOperatore(int idUtente) throws SQLException {
+
         String sql = "DELETE FROM OPERATORE WHERE idutente = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -93,8 +111,10 @@ public class ImpOperatoreDAO implements OperatoreDAO {
     }
 
     private Operatore mappaResultSetInOperatore(ResultSet rs) throws SQLException {
-        String ruoloStr = rs.getString("ruolo");
-        Operatore.Ruolo ruoloEnum = Operatore.Ruolo.valueOf(ruoloStr.toUpperCase());
+
+        Operatore.Ruolo ruoloEnum = Operatore.Ruolo.valueOf(
+                rs.getString("ruolo").toUpperCase()
+        );
 
         return new Operatore(
                 rs.getInt("idutente"),

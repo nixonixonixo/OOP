@@ -1,431 +1,105 @@
 package gui;
 
-import dao.AutoDAO;
-import dao.ClienteDAO;
-import dao.PrenotazioneDAO;
-import implementazionePostgresDAO.ImpAutoDAO;
-import implementazionePostgresDAO.ImpClienteDAO;
-import implementazionePostgresDAO.ImpPrenotazioneDAO;
-import model.Auto;
 import model.Cliente;
-import model.Prenotazione;
+import service.ClienteService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
 
 public class ClientePanel extends JPanel {
 
-    private Cliente cliente;
+    private final ClienteService clienteService;
+    private final Cliente cliente;
 
-    private ClienteDAO clienteDAO;
-    private PrenotazioneDAO prenotazioneDAO;
-    private AutoDAO autoDAO;
-
+    private JLabel lblNome;
+    private JLabel lblEmail;
     private JLabel lblCredito;
-    private JLabel lblPatente;
 
-    private JComboBox<Auto> cmbAuto;
+    private JTextField txtRicarica;
+    private JButton btnRicarica;
 
-    public ClientePanel(
-            Cliente cliente
-    ) {
+    public ClientePanel(Cliente cliente, ClienteService service) {
 
         this.cliente = cliente;
+        this.clienteService = service;
 
-        this.clienteDAO =
-                new ImpClienteDAO();
+        setLayout(new BorderLayout(10, 10));
 
-        this.prenotazioneDAO =
-                new ImpPrenotazioneDAO();
+        // =========================
+        // INFO CLIENTE
+        // =========================
+        JPanel infoPanel = new JPanel(new GridLayout(3, 1, 5, 5));
 
-        this.autoDAO =
-                new ImpAutoDAO();
+        lblNome = new JLabel();
+        lblEmail = new JLabel();
+        lblCredito = new JLabel();
 
-        setLayout(
-                new BorderLayout(
-                        20,
-                        20
-                )
-        );
-
-        setBorder(
-                BorderFactory
-                        .createEmptyBorder(
-                                30,
-                                30,
-                                30,
-                                30
-                        )
-        );
-
-        // HEADER
-
-        JPanel headerPanel =
-                new JPanel(
-                        new GridLayout(
-                                2,
-                                1
-                        )
-                );
-
-        JLabel lblNome =
-                new JLabel(
-                        cliente.getNome()
-                                + " "
-                                + cliente.getCognome()
-                );
-
-        lblNome.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        24
-                )
-        );
-
-        JLabel lblUser =
-                new JLabel(
-                        "Username: "
-                                + cliente.getUsername()
-                );
-
-        headerPanel.add(lblNome);
-        headerPanel.add(lblUser);
-
-        // INFO ACCOUNT
-
-        JPanel infoPanel =
-                new JPanel(
-                        new GridLayout(
-                                2,
-                                1,
-                                10,
-                                10
-                        )
-                );
-
-        infoPanel.setBorder(
-                BorderFactory
-                        .createTitledBorder(
-                                "Dettagli Account"
-                        )
-        );
-
-        lblPatente =
-                new JLabel(
-                        "Patente: "
-                                + cliente.getPatente()
-                );
-
-        lblCredito =
-                new JLabel(
-                        "Credito Residuo: "
-                                + cliente.getCredito()
-                                + " €"
-                );
-
-        lblCredito.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        18
-                )
-        );
-
-        lblCredito.setForeground(
-                new Color(
-                        0,
-                        128,
-                        0
-                )
-        );
-
-        infoPanel.add(lblPatente);
+        infoPanel.add(lblNome);
+        infoPanel.add(lblEmail);
         infoPanel.add(lblCredito);
 
-        // RICARICA
+        add(infoPanel, BorderLayout.NORTH);
 
-        JPanel ricaricaPanel =
-                new JPanel(
-                        new FlowLayout(
-                                FlowLayout.LEFT
-                        )
-                );
+        // =========================
+        // RICARICA CREDITO
+        // =========================
+        JPanel ricaricaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        ricaricaPanel.setBorder(
-                BorderFactory
-                        .createTitledBorder(
-                                "Ricarica Credito"
-                        )
-        );
+        txtRicarica = new JTextField(10);
+        btnRicarica = new JButton("Ricarica credito");
 
-        JTextField txtRicarica =
-                new JTextField(10);
+        btnRicarica.addActionListener(e -> ricaricaCredito());
 
-        JButton btnRicarica =
-                new JButton(
-                        "Ricarica Ora"
-                );
+        ricaricaPanel.add(new JLabel("Importo:"));
+        ricaricaPanel.add(txtRicarica);
+        ricaricaPanel.add(btnRicarica);
 
-        ricaricaPanel.add(
-                new JLabel(
-                        "Importo (€):"
-                )
-        );
+        add(ricaricaPanel, BorderLayout.CENTER);
 
-        ricaricaPanel.add(
-                txtRicarica
-        );
-
-        ricaricaPanel.add(
-                btnRicarica
-        );
-
-        btnRicarica.addActionListener(
-                e -> {
-
-                    try {
-
-                        BigDecimal importo =
-                                new BigDecimal(
-                                        txtRicarica
-                                                .getText()
-                                );
-
-                        if (
-                                importo.compareTo(
-                                        BigDecimal.ZERO
-                                ) <= 0
-                        ) {
-
-                            throw new NumberFormatException();
-                        }
-
-                        BigDecimal nuovoCredito =
-                                cliente
-                                        .getCredito()
-                                        .add(importo);
-
-                        clienteDAO
-                                .aggiornaCredito(
-                                        cliente.getIdUtente(),
-                                        nuovoCredito
-                                );
-
-                        cliente.setCredito(
-                                nuovoCredito
-                        );
-
-                        lblCredito.setText(
-                                "Credito Residuo: "
-                                        + cliente.getCredito()
-                                        + " €"
-                        );
-
-                        txtRicarica.setText("");
-
-                        JOptionPane
-                                .showMessageDialog(
-                                        this,
-                                        "Ricarica effettuata!"
-                                );
-
-                    } catch (
-                            Exception ex
-                    ) {
-
-                        JOptionPane
-                                .showMessageDialog(
-                                        this,
-                                        "Importo non valido"
-                                );
-                    }
-                }
-        );
-
-        // PRENOTAZIONE
-
-        JPanel prenotazionePanel =
-                new JPanel(
-                        new GridLayout(
-                                3,
-                                2,
-                                10,
-                                10
-                        )
-                );
-
-        prenotazionePanel.setBorder(
-                BorderFactory
-                        .createTitledBorder(
-                                "Prenota Auto"
-                        )
-        );
-
-        cmbAuto =
-                new JComboBox<>();
-
-        caricaAutoDisponibili();
-
-        JButton btnPrenota =
-                new JButton(
-                        "Prenota"
-                );
-
-        prenotazionePanel.add(
-                new JLabel(
-                        "Auto disponibile:"
-                )
-        );
-
-        prenotazionePanel.add(
-                cmbAuto
-        );
-
-        prenotazionePanel.add(
-                new JLabel()
-        );
-
-        prenotazionePanel.add(
-                btnPrenota
-        );
-
-        btnPrenota
-                .addActionListener(
-                        e -> prenotaAuto()
-                );
-
-        JPanel centerPanel =
-                new JPanel(
-                        new BorderLayout()
-                );
-
-        centerPanel.add(
-                infoPanel,
-                BorderLayout.NORTH
-        );
-
-        centerPanel.add(
-                prenotazionePanel,
-                BorderLayout.CENTER
-        );
-
-        add(
-                headerPanel,
-                BorderLayout.NORTH
-        );
-
-        add(
-                centerPanel,
-                BorderLayout.CENTER
-        );
-
-        add(
-                ricaricaPanel,
-                BorderLayout.SOUTH
-        );
+        aggiornaDati();
     }
 
-    private void caricaAutoDisponibili() {
-
+    // =========================
+    // CARICAMENTO DATI CLIENTE
+    // =========================
+    private void aggiornaDati() {
         try {
+            Cliente aggiornato = clienteService.getClienteById(cliente.getIdUtente());
 
-            cmbAuto.removeAllItems();
-
-            for (
-                    Auto auto :
-                    autoDAO
-                            .trovaAutoDisponibili()
-            ) {
-
-                cmbAuto.addItem(auto);
-            }
+            lblNome.setText("Nome: " + aggiornato.getNome() + " " + aggiornato.getCognome());
+            lblEmail.setText("Email: " + aggiornato.getEmail());
+            lblCredito.setText("Credito: " + aggiornato.getCredito() + " €");
 
         } catch (Exception e) {
-
-            JOptionPane
-                    .showMessageDialog(
-                            this,
-                            e.getMessage()
-                    );
+            JOptionPane.showMessageDialog(this,
+                    "Errore caricamento cliente: " + e.getMessage());
         }
     }
 
-    private void prenotaAuto() {
-
+    // =========================
+    // RICARICA CREDITO
+    // =========================
+    private void ricaricaCredito() {
         try {
+            BigDecimal importo = new BigDecimal(txtRicarica.getText());
 
-            Auto auto =
-                    (Auto)
-                            cmbAuto
-                                    .getSelectedItem();
-
-            if (auto == null) {
-
-                JOptionPane
-                        .showMessageDialog(
-                                this,
-                                "Nessuna auto disponibile"
-                        );
-
-                return;
+            if (importo.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("Importo non valido");
             }
 
-            Date oggi =
-                    new Date();
+            clienteService.ricaricaCredito(cliente.getIdUtente(), importo);
 
-            Calendar calendar =
-                    Calendar.getInstance();
+            JOptionPane.showMessageDialog(this, "Ricarica effettuata");
 
-            calendar.add(
-                    Calendar.DAY_OF_MONTH,
-                    1
-            );
-
-            Date domani =
-                    calendar.getTime();
-
-            Prenotazione prenotazione =
-                    new Prenotazione(
-                            generaId(),
-                            oggi,
-                            domani,
-                            Prenotazione
-                                    .StatoPren
-                                    .IN_ATTESA,
-                            cliente,
-                            auto
-                    );
-
-            prenotazioneDAO
-                    .salvaPrenotazione(
-                            prenotazione
-                    );
-
-            JOptionPane
-                    .showMessageDialog(
-                            this,
-                            "Prenotazione effettuata!"
-                    );
+            aggiornaDati();
+            txtRicarica.setText("");
 
         } catch (Exception e) {
-
-            JOptionPane
-                    .showMessageDialog(
-                            this,
-                            e.getMessage()
-                    );
+            JOptionPane.showMessageDialog(this,
+                    "Errore: " + e.getMessage(),
+                    "Errore",
+                    JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private int generaId() {
-
-        return (int)
-                (Math.random()
-                        * 100000);
     }
 }

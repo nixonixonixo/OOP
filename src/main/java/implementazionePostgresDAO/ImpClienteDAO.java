@@ -5,6 +5,7 @@ import database.ConnessioneDatabase;
 import model.Cliente;
 
 import java.sql.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ImpClienteDAO implements ClienteDAO {
         String sql = """
                 SELECT u.*, c.patente, c.credito
                 FROM UTENTE u
-                JOIN CLIENTE c ON u.idutente = c.idutente
+                LEFT JOIN CLIENTE c ON u.idutente = c.idutente
                 WHERE u.idutente = ?
                 """;
 
@@ -38,32 +39,39 @@ public class ImpClienteDAO implements ClienteDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idUtente);
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return mappaResultSetInCliente(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mappaResultSetInCliente(rs);
+                }
             }
         }
+
         return null;
     }
 
     @Override
     public List<Cliente> trovaTuttiClienti() throws SQLException {
         List<Cliente> clienti = new ArrayList<>();
+
         String sql = """
                 SELECT u.*, c.patente, c.credito
                 FROM UTENTE u
-                JOIN CLIENTE c ON u.idutente = c.idutente
+                LEFT JOIN CLIENTE c ON u.idutente = c.idutente
                 """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                clienti.add(mappaResultSetInCliente(rs));
+                Cliente c = mappaResultSetInCliente(rs);
+                if (c.getPatente() != null) {
+                    clienti.add(c);
+                }
             }
         }
+
         return clienti;
     }
 
@@ -71,8 +79,7 @@ public class ImpClienteDAO implements ClienteDAO {
     public void aggiornaCliente(Cliente cliente) throws SQLException {
         String sql = """
                 UPDATE CLIENTE
-                SET patente = ?,
-                    credito = ?
+                SET patente = ?, credito = ?
                 WHERE idutente = ?
                 """;
 
@@ -100,7 +107,7 @@ public class ImpClienteDAO implements ClienteDAO {
     }
 
     @Override
-    public void aggiornaCredito(int idUtente, java.math.BigDecimal nuovoCredito) throws SQLException {
+    public void aggiornaCredito(int idUtente, BigDecimal nuovoCredito) throws SQLException {
         String sql = "UPDATE CLIENTE SET credito = ? WHERE idutente = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -110,12 +117,18 @@ public class ImpClienteDAO implements ClienteDAO {
             ps.setInt(2, idUtente);
 
             if (ps.executeUpdate() == 0) {
-                throw new SQLException("Aggiornamento fallito: Cliente non trovato.");
+                throw new SQLException("Cliente non trovato");
             }
         }
     }
 
     private Cliente mappaResultSetInCliente(ResultSet rs) throws SQLException {
+
+        BigDecimal credito = rs.getBigDecimal("credito");
+        if (credito == null) {
+            credito = BigDecimal.ZERO;
+        }
+
         return new Cliente(
                 rs.getInt("idutente"),
                 rs.getString("username"),
@@ -124,7 +137,7 @@ public class ImpClienteDAO implements ClienteDAO {
                 rs.getString("cognome"),
                 rs.getString("email"),
                 rs.getString("patente"),
-                rs.getBigDecimal("credito")
+                credito
         );
     }
 }

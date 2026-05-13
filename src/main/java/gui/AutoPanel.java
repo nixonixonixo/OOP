@@ -1,8 +1,7 @@
 package gui;
 
-import dao.AutoDAO;
-import implementazionePostgresDAO.ImpAutoDAO;
 import model.Auto;
+import service.AutoService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,11 +12,12 @@ public class AutoPanel extends JPanel {
 
     private JTable table;
     private DefaultTableModel model;
-    private AutoDAO autoDAO;
 
-    public AutoPanel() {
-        // Inizializzazione DAO
-        this.autoDAO = new ImpAutoDAO();
+    private final AutoService autoService;
+
+    public AutoPanel(AutoService autoService) {
+
+        this.autoService = autoService;
 
         setLayout(new BorderLayout(10, 10));
 
@@ -33,31 +33,29 @@ public class AutoPanel extends JPanel {
         table = new JTable(model);
         table.getTableHeader().setReorderingAllowed(false);
 
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
-        JButton aggiornaButton = new JButton("Aggiorna Catalogo");
-        aggiornaButton.setFont(new Font("Arial", Font.BOLD, 12));
+        JButton btnAggiorna = new JButton("Aggiorna Catalogo");
+        btnAggiorna.addActionListener(e -> carica());
 
-        aggiornaButton.addActionListener(e -> caricaAuto());
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.add(btnAggiorna);
 
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        southPanel.add(aggiornaButton);
-        add(southPanel, BorderLayout.SOUTH);
+        add(bottom, BorderLayout.SOUTH);
 
-        caricaAuto();
+        carica();
     }
 
-    public void caricaAuto() {
+    // =========================
+    // CARICAMENTO AUTO
+    // =========================
+    private void carica() {
         try {
             model.setRowCount(0);
-            List<Auto> listaAuto = autoDAO.trovaTutteAuto();
 
-            if (listaAuto.isEmpty()) {
-                System.out.println("Nessuna auto trovata nel database.");
-            }
+            List<Auto> lista = autoService.getAutoDisponibili();
 
-            for (Auto a : listaAuto) {
+            for (Auto a : lista) {
                 model.addRow(new Object[]{
                         a.getIdAuto(),
                         a.getTarga(),
@@ -67,14 +65,10 @@ public class AutoPanel extends JPanel {
                 });
             }
 
-            revalidate();
-            repaint();
-
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(this,
-                    "Errore durante il caricamento delle auto: " + e.getMessage(),
-                    "Errore Database",
+                    "Errore caricamento auto: " + e.getMessage(),
+                    "Errore",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
