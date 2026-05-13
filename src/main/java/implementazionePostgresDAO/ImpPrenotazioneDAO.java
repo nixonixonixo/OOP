@@ -134,8 +134,8 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
         return new Prenotazione(
                 rs.getInt("idprenotazione"),
-                rs.getDate("data_inizio"),
-                rs.getDate("data_fine"),
+                rs.getDate("datainizio"),
+                rs.getDate("datafine"),
                 Prenotazione.StatoPren.valueOf(rs.getString("stato").toUpperCase()),
                 cliente,
                 auto
