@@ -56,10 +56,6 @@ public class Auto {
         return costoDaily;
     }
 
-    public void setStato(StatoAuto stato){
-        this.stato = stato;
-    }
-
     public void cambiaStato(StatoAuto nuovoStato) {
         if (nuovoStato == null) {
             throw new IllegalArgumentException("Stato non valido");

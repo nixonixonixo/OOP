@@ -73,7 +73,7 @@ public class Noleggio {
             return 0;
         }
         long diff = dataRestituzione.getTime() - dataRitiro.getTime();
-        return (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        return (int) Math.ceil(diff / (1000.0 * 60 * 60 * 24));
     }
 
     @Override
