@@ -37,14 +37,14 @@ public class PrenotazioneController {
 
     public void confermaPrenotazione(Prenotazione p) throws SQLException {
         p.setStato(Prenotazione.StatoPren.CONFERMATA);
-        p.getAuto().setStato(Auto.StatoAuto.PRENOTATA);
+        p.getAuto().cambiaStato(Auto.StatoAuto.PRENOTATA);
         prenotazioneDAO.aggiornaPrenotazione(p);
         autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.PRENOTATA);
     }
 
     public void annullaPrenotazione(Prenotazione p) throws SQLException {
         p.setStato(Prenotazione.StatoPren.ANNULLATA);
-        p.getAuto().setStato(Auto.StatoAuto.DISPONIBILE);
+        p.getAuto().cambiaStato(Auto.StatoAuto.DISPONIBILE);
         prenotazioneDAO.aggiornaPrenotazione(p);
         autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.DISPONIBILE);
     }
