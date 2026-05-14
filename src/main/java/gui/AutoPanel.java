@@ -91,7 +91,7 @@ public class AutoPanel extends JPanel {
             return;
         }
 
-        // 1. CHIEDIAMO LA DATA DI FINE ALL'UTENTE
+
         String inputData = JOptionPane.showInputDialog(this,
                 "Inserisci la data di fine noleggio (AAAA-MM-GG):\n(Lascia vuoto se non sei ancora sicuro)",
                 "Data Fine Noleggio",
@@ -100,13 +100,12 @@ public class AutoPanel extends JPanel {
         try {
             int idAuto = (int) model.getValueAt(row, 0);
 
-            // Gestione della data scelta
+
             Date dataFineScelta = null;
             if (inputData != null && !inputData.trim().isEmpty()) {
                 try {
                     dataFineScelta = Date.valueOf(inputData.trim());
 
-                    // Controllo logico: la data di fine non può essere nel passato
                     if (dataFineScelta.before(new java.util.Date())) {
                         JOptionPane.showMessageDialog(this, "La data di fine non può essere precedente a oggi.");
                         return;
@@ -117,11 +116,9 @@ public class AutoPanel extends JPanel {
                 }
             }
 
-            // Creiamo l'oggetto Prenotazione da passare al service
-            // NOTA: Non settiamo l'ID perché lo genera il DB
             Prenotazione nuovaPrenotazione = new Prenotazione();
 
-            // Creiamo un oggetto Auto fittizio con solo l'ID (sufficiente per il DAO)
+
             Auto autoSelezionata = new Auto();
             autoSelezionata.setIdAuto(idAuto);
 
@@ -131,7 +128,7 @@ public class AutoPanel extends JPanel {
             nuovaPrenotazione.setDataFine(dataFineScelta);
             nuovaPrenotazione.setStato(Prenotazione.StatoPren.IN_ATTESA);
 
-            // Chiamata al metodo del service che usa il DAO aggiornato
+
             prenotazioneService.effettuaPrenotazione(nuovaPrenotazione);
 
             JOptionPane.showMessageDialog(this, "Prenotazione effettuata con successo!");

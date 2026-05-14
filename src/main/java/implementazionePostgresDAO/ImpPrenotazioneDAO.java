@@ -14,7 +14,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public void salvaPrenotazione(Prenotazione p) throws SQLException {
-        // L'idprenotazione NON è presente perché lo genera il DB (IDENTITY)
         String sql = """
             INSERT INTO PRENOTAZIONE (datainizio, datafine, stato, idcliente, idauto)
             VALUES (?, ?, ?, ?, ?)
@@ -25,7 +24,7 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
             ps.setDate(1, new java.sql.Date(p.getDataInizio().getTime()));
 
-            // Gestione datafine opzionale
+
             if (p.getDataFine() != null) {
                 ps.setDate(2, new java.sql.Date(p.getDataFine().getTime()));
             } else {

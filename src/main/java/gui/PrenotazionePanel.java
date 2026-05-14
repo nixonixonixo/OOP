@@ -47,7 +47,7 @@ public class PrenotazionePanel extends JPanel {
 
         add(new JScrollPane(tabella), BorderLayout.CENTER);
 
-        // Se l'utente è un operatore (clienteLoggato è null), mostriamo la toolbar
+
         if (clienteLoggato == null) {
             add(creaToolbarOperatore(), BorderLayout.SOUTH);
             tabella.getSelectionModel().addListSelectionListener(e -> {
@@ -69,18 +69,15 @@ public class PrenotazionePanel extends JPanel {
         btnConferma.setEnabled(false);
         btnAnnulla.setEnabled(false);
 
-        // Styling
         btnConferma.setBackground(new Color(40, 167, 69));
         btnConferma.setForeground(Color.WHITE);
         btnConferma.setOpaque(true);
         btnConferma.setBorderPainted(false);
-
         btnAnnulla.setBackground(new Color(220, 53, 69));
         btnAnnulla.setForeground(Color.WHITE);
         btnAnnulla.setOpaque(true);
         btnAnnulla.setBorderPainted(false);
 
-        // Listeners corretti dentro il metodo
         btnConferma.addActionListener(e -> aggiornaStato(Prenotazione.StatoPren.CONFERMATA));
         btnAnnulla.addActionListener(e -> aggiornaStato(Prenotazione.StatoPren.ANNULLATA));
 
@@ -128,7 +125,6 @@ public class PrenotazionePanel extends JPanel {
         }
 
         Object value = tableModel.getValueAt(row, 3);
-        // Controlliamo se lo stato è "IN_ATTESA" per abilitare i tasti
         String statoStr = value.toString();
         boolean inAttesa = statoStr.equalsIgnoreCase("IN_ATTESA");
 
@@ -151,7 +147,7 @@ public class PrenotazionePanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Prenotazione Annullata. L'auto è di nuovo disponibile.");
             }
 
-            caricaDati(); // Rinfresca la tabella
+            caricaDati();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Errore: " + ex.getMessage());
         }

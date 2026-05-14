@@ -14,7 +14,6 @@ public class ImpPagamentoDAO implements PagamentoDAO {
 
     @Override
     public void ricaricaSaldoCliente(int idCliente, java.math.BigDecimal importo) throws SQLException {
-        // CORREZIONE: Cambiato idcliente in idutente come suggerito dall'errore
         String sql = "UPDATE CLIENTE SET credito = credito + ? WHERE idutente = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -46,7 +45,7 @@ public class ImpPagamentoDAO implements PagamentoDAO {
     @Override
     public List<Pagamento> trovaPagamentiCliente(int idCliente) throws SQLException {
         List<Pagamento> lista = new ArrayList<>();
-        // Query corretta con JOIN per permettere il mapping del ResultSet
+
         String sql = """
             SELECT p.*, n.idnoleggio, n.dataritiro
             FROM PAGAMENTO p

@@ -14,7 +14,7 @@ public class PagamentoService {
         this.pagamentoDAO = pagamentoDAO;
     }
 
-    // NUOVO METODO PER LA RICARICA
+
     public void ricaricaConto(int idCliente, BigDecimal importo) throws SQLException {
         if (importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("L'importo deve essere positivo");
@@ -34,5 +34,5 @@ public class PagamentoService {
         return pagamentoDAO.trovaTuttiPagamenti();
     }
 
-    // ... gli altri metodi che avevi già rimangono uguali
+
 }

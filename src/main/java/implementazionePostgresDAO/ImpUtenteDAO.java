@@ -143,7 +143,7 @@ public class ImpUtenteDAO implements UtenteDAO {
         String cognome = rs.getString("cognome");
         String email = rs.getString("email");
 
-        // Gestione OPERATORE
+
         String ruoloStr = rs.getString("ruolo");
         if (ruoloStr != null) {
             Operatore.Ruolo ruolo;
@@ -152,21 +152,17 @@ public class ImpUtenteDAO implements UtenteDAO {
             } catch (Exception e) {
                 ruolo = Operatore.Ruolo.ADDETTO_NOLEGGIO;
             }
-            // Usiamo il costruttore con isAlreadyHashed = true
+
             return new Operatore(id, username, passwordHash, nome, cognome, email, ruolo, true);
         }
 
-        // Gestione CLIENTE
         String patente = rs.getString("patente");
         if (patente != null) {
             BigDecimal credito = rs.getBigDecimal("credito");
             if (credito == null) credito = BigDecimal.ZERO;
-            // Usiamo il costruttore con isAlreadyHashed = true
             return new Cliente(id, username, passwordHash, nome, cognome, email, patente, credito, true);
         }
 
-        // Gestione UTENTE GENERICO
-        // Usiamo il costruttore con isAlreadyHashed = true
         return new Utente(id, username, passwordHash, nome, cognome, email, true);
     }
 }

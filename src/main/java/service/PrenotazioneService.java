@@ -17,28 +17,26 @@ public class PrenotazioneService {
         this.autoDAO = autoDAO;
     }
 
-    // Quando un cliente prenota, l'auto deve diventare "PRENOTATA"
+
     public void effettuaPrenotazione(Prenotazione p) throws Exception {
         if (p == null || p.getCliente() == null || p.getAuto() == null) {
             throw new Exception("Dati incompleti");
         }
 
-        // 1. Salva la prenotazione nel DB
+
         prenotazioneDAO.salvaPrenotazione(p);
 
-        // 2. Cambia lo stato dell'auto in 'PRENOTATA' o 'OCCUPATA'
-        // così sparisce dalla lista delle auto disponibili
+
         autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
     }
 
-    // Quando l'operatore conferma la prenotazione
     public void confermaPrenotazione(int id) throws Exception {
         prenotazioneDAO.aggiornaStatoPrenotazione(id, Prenotazione.StatoPren.CONFERMATA);
     }
 
-    // Se l'operatore annulla, l'auto deve tornare "DISPONIBILE"
+
     public void annullaPrenotazione(int id) throws Exception {
-        // Recuperiamo la prenotazione per sapere quale auto liberare
+
         Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(id);
 
         prenotazioneDAO.aggiornaStatoPrenotazione(id, Prenotazione.StatoPren.ANNULLATA);

@@ -17,13 +17,13 @@ public class Prenotazione {
     private Cliente cliente;
     private Auto auto;
 
-    // Costruttore aggiornato: rimosso il vincolo null su dataFine
+
     public Prenotazione(int idPrenotazione, Date dataInizio, Date dataFine, StatoPren stato, Cliente cliente, Auto auto) {
         if (dataInizio == null || stato == null) {
             throw new IllegalArgumentException("Parametri obbligatori mancanti");
         }
 
-        // Controllo date solo se dataFine è presente
+
         if (dataFine != null && dataFine.before(dataInizio)) {
             throw new IllegalArgumentException("La data di fine non può essere precedente all'inizio");
         }
@@ -36,10 +36,8 @@ public class Prenotazione {
         this.auto = auto;
     }
 
-    // Costruttore vuoto (opzionale, utile per i form della GUI)
-    public Prenotazione() {}
 
-    // --- GETTER ---
+    public Prenotazione() {}
     public int getIdPrenotazione() { return idPrenotazione; }
     public Date getDataInizio() { return dataInizio; }
     public Date getDataFine() { return dataFine; }
@@ -47,7 +45,7 @@ public class Prenotazione {
     public Cliente getCliente() { return cliente; }
     public Auto getAuto() { return auto; }
 
-    // --- SETTER (Aggiunti e aggiornati) ---
+
     public void setAuto(Auto auto) {
         this.auto = auto;
     }
