@@ -14,18 +14,25 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public void salvaNoleggio(Noleggio noleggio) throws SQLException {
+        // FIX: Rimosso idnoleggio per permettere l'autoincremento sul DB
         String sql = """
-            INSERT INTO NOLEGGIO (idnoleggio, dataritiro, costototale, idprenotazione)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO NOLEGGIO (dataritiro, costototale, idprenotazione)
+            VALUES (?, ?, ?)
         """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, noleggio.getIdNoleggio());
-            ps.setDate(2, new java.sql.Date(noleggio.getDataRitiro().getTime()));
-            ps.setBigDecimal(3, noleggio.getCostoTot());
-            ps.setInt(4, noleggio.getPrenotazione().getIdPrenotazione());
+            ps.setDate(1, new java.sql.Date(noleggio.getDataRitiro().getTime()));
+
+            // Gestione costo totale (potrebbe essere null alla creazione)
+            if (noleggio.getCostoTot() != null) {
+                ps.setBigDecimal(2, noleggio.getCostoTot());
+            } else {
+                ps.setNull(2, Types.NUMERIC);
+            }
+
+            ps.setInt(3, noleggio.getPrenotazione().getIdPrenotazione());
 
             ps.executeUpdate();
         }
@@ -33,7 +40,6 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public Noleggio trovaNoleggioPerId(int idNoleggio) throws SQLException {
-
         String sql = """
             SELECT 
                 n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
@@ -50,21 +56,18 @@ public class ImpNoleggioDAO implements NoleggioDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idNoleggio);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mappaResultSetInNoleggio(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mappaResultSetInNoleggio(rs);
+                }
             }
         }
-
         return null;
     }
 
     @Override
     public List<Noleggio> trovaTuttiNoleggi() throws SQLException {
-
         List<Noleggio> lista = new ArrayList<>();
-
         String sql = """
             SELECT 
                 n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
@@ -84,13 +87,11 @@ public class ImpNoleggioDAO implements NoleggioDAO {
                 lista.add(mappaResultSetInNoleggio(rs));
             }
         }
-
         return lista;
     }
 
     @Override
     public void aggiornaNoleggio(Noleggio noleggio) throws SQLException {
-
         String sql = """
             UPDATE NOLEGGIO
             SET dataritiro = ?, datarestituzione = ?, costototale = ?
@@ -117,7 +118,6 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public void eliminaNoleggio(int idNoleggio) throws SQLException {
-
         String sql = "DELETE FROM NOLEGGIO WHERE idnoleggio = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -129,11 +129,8 @@ public class ImpNoleggioDAO implements NoleggioDAO {
     }
 
     private Noleggio mappaResultSetInNoleggio(ResultSet rs) throws SQLException {
-
-        Auto.StatoAuto statoAuto = Auto.StatoAuto.valueOf(
-                rs.getString("stato_auto").toUpperCase()
-        );
-
+        // Mappatura Auto
+        Auto.StatoAuto statoAuto = Auto.StatoAuto.valueOf(rs.getString("stato_auto").toUpperCase());
         Auto auto = new Auto(
                 rs.getInt("idauto"),
                 rs.getString("targa"),
@@ -142,19 +139,18 @@ public class ImpNoleggioDAO implements NoleggioDAO {
                 rs.getBigDecimal("costogiornaliero")
         );
 
-        Prenotazione.StatoPren statoPren = Prenotazione.StatoPren.valueOf(
-                rs.getString("stato_pren").toUpperCase()
-        );
-
+        // Mappatura Prenotazione
+        Prenotazione.StatoPren statoPren = Prenotazione.StatoPren.valueOf(rs.getString("stato_pren").toUpperCase());
         Prenotazione prenotazione = new Prenotazione(
                 rs.getInt("idprenotazione"),
                 rs.getDate("datainizio"),
                 rs.getDate("datafine"),
                 statoPren,
-                null,
+                null, // idcliente può restare null qui o essere mappato se necessario
                 auto
         );
 
+        // Mappatura Noleggio
         Noleggio n = new Noleggio(
                 rs.getInt("idnoleggio"),
                 rs.getDate("dataritiro"),

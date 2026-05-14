@@ -87,38 +87,28 @@ public class PagamentoPanel extends JPanel {
 
     private void pagaSelezionato() {
         int row = table.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Seleziona un pagamento dalla tabella");
-            return;
-        }
+        if (row == -1) return;
 
-        // Recuperiamo i dati dalla riga
         int idPagamento = (int) model.getValueAt(row, 0);
-        Pagamento.StatoPagamento stato = (Pagamento.StatoPagamento) model.getValueAt(row, 2);
 
-        // Controllo se è già pagato
-        if (stato != Pagamento.StatoPagamento.IN_ATTESA) {
-            JOptionPane.showMessageDialog(this, "Questo pagamento è già stato elaborato.");
-            return;
-        }
+        try {
+            // 1. Esegue il pagamento sul DB
+            pagamentoService.effettuaPagamento(idPagamento, cliente.getIdUtente());
 
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Confermi il pagamento? L'importo verrà scalato dal tuo saldo.",
-                "Conferma Pagamento", JOptionPane.YES_NO_OPTION);
+            // 2. RECUPERA IL SALDO AGGIORNATO DAL SERVICE
+            // Non serve il clienteDAO qui, chiediamo al service!
+            BigDecimal nuovoSaldo = pagamentoService.getSaldoAggiornato(cliente.getIdUtente());
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            try {
-                // Eseguiamo la transazione tramite il service
-                pagamentoService.effettuaPagamento(idPagamento, cliente.getIdUtente());
+            // 3. AGGIORNA L'OGGETTO CLIENTE LOCALE
+            cliente.setCredito(nuovoSaldo);
 
-                JOptionPane.showMessageDialog(this, "Pagamento completato con successo!");
+            JOptionPane.showMessageDialog(this, "Pagamento completato!");
 
-                // Aggiorniamo la vista
-                carica();
+            // 4. RICARICA LA TABELLA E LA LABEL
+            carica();
 
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Errore: " + e.getMessage());
-            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Errore: " + e.getMessage());
         }
     }
 }

@@ -31,13 +31,20 @@ public class ImpPagamentoDAO implements PagamentoDAO {
 
     @Override
     public void salvaPagamento(Pagamento p) throws SQLException {
-        String sql = "INSERT INTO PAGAMENTO (idpagamento, importo, stato, idnoleggio) VALUES (?, ?, ?, ?)";
+        // Rimosso idpagamento: il DB lo genererà da solo
+        String sql = "INSERT INTO PAGAMENTO (importo, stato, idnoleggio) VALUES (?, ?, ?)";
+
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, p.getIdPagamento());
-            ps.setBigDecimal(2, p.getImporto());
-            ps.setString(3, p.getStato().name());
-            ps.setInt(4, p.getNoleggio().getIdNoleggio());
+
+            ps.setBigDecimal(1, p.getImporto());
+
+            // Salviamo lo stato come stringa (es. "IN_ATTESA")
+            ps.setString(2, p.getStato().toString());
+
+            // Colleghiamo il pagamento al noleggio
+            ps.setInt(3, p.getNoleggio().getIdNoleggio());
+
             ps.executeUpdate();
         }
     }

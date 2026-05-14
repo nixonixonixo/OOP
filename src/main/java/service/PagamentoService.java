@@ -40,29 +40,25 @@ public class PagamentoService {
      * LOGICA DI PAGAMENTO: Il cliente paga un noleggio specifico usando il suo credito
      */
     public void effettuaPagamento(int idPagamento, int idCliente) throws Exception {
-        // 1. Recuperiamo il pagamento dal DB
         Pagamento p = pagamentoDAO.trovaPagamentoPerId(idPagamento);
         if (p == null) throw new Exception("Pagamento non trovato.");
 
         if (p.getStato() != Pagamento.StatoPagamento.IN_ATTESA) {
-            throw new Exception("Questo pagamento è già stato elaborato (Stato: " + p.getStato() + ")");
+            throw new Exception("Pagamento già effettuato.");
         }
 
-        // 2. Recuperiamo il cliente per controllare il saldo attuale
-        // Nota: Assumiamo che clienteDAO.trovaPerId restituisca un oggetto Cliente con il credito aggiornato
         Cliente c = clienteDAO.trovaClientePerId(idCliente);
         BigDecimal costo = p.getImporto();
 
         if (c.getCredito().compareTo(costo) < 0) {
-            throw new Exception("Credito insufficiente. Carica il tuo conto per procedere.");
+            throw new Exception("Credito insufficiente!");
         }
 
-        // 3. Sottraiamo il costo dal credito del cliente
-        // Usiamo il metodo ricaricaSaldoCliente con segno negativo
-        BigDecimal importoDaSottrarre = costo.negate();
-        pagamentoDAO.ricaricaSaldoCliente(idCliente, importoDaSottrarre);
+        // AGGIORNA IL DB: Sottrae il costo dal saldo nel database
+        BigDecimal nuovoSaldoNegativo = costo.negate();
+        pagamentoDAO.ricaricaSaldoCliente(idCliente, nuovoSaldoNegativo);
 
-        // 4. Aggiorniamo lo stato del pagamento in COMPLETATO
+        // AGGIORNA IL DB: Cambia lo stato del pagamento
         p.setStato(Pagamento.StatoPagamento.COMPLETATO);
         pagamentoDAO.aggiornaPagamento(p);
     }
@@ -72,5 +68,11 @@ public class PagamentoService {
      */
     public List<Pagamento> getTuttiPagamenti() throws SQLException {
         return pagamentoDAO.trovaTuttiPagamenti();
+    }
+
+    // Dentro PagamentoService.java
+    public BigDecimal getSaldoAggiornato(int idCliente) throws SQLException {
+        Cliente c = clienteDAO.trovaClientePerId(idCliente);
+        return (c != null) ? c.getCredito() : BigDecimal.ZERO;
     }
 }
