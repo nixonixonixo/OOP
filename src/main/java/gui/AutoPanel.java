@@ -19,7 +19,7 @@ public class AutoPanel extends JPanel {
     private final PrenotazioneService prenotazioneService;
     private final Cliente clienteLoggato;
 
-    // Assicurati che i parametri siano esattamente questi
+
     public AutoPanel(AutoService autoService,
                      PrenotazioneService prenotazioneService,
                      Cliente cliente) {
@@ -63,8 +63,6 @@ public class AutoPanel extends JPanel {
     private void carica() {
         try {
             model.setRowCount(0);
-            // L'operatore forse vorrebbe vedere TUTTE le auto, non solo le disponibili.
-            // Se hai un metodo getTutteLeAuto(), potresti usarlo qui con un IF come in PagamentoPanel.
             List<Auto> lista = autoService.getAutoDisponibili();
 
             for (Auto a : lista) {

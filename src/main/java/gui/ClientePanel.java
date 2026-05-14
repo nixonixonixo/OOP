@@ -21,12 +21,11 @@ public class ClientePanel extends JPanel {
     private JTextField txtRicarica;
     private JButton btnRicarica;
 
-    // Modificato il costruttore per ricevere PagamentoService
     public ClientePanel(Cliente cliente, ClienteService service, PagamentoService pagamentoService) {
 
         this.cliente = cliente;
         this.clienteService = service;
-        this.pagamentoService = pagamentoService; // Inizializzato
+        this.pagamentoService = pagamentoService;
 
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -37,7 +36,7 @@ public class ClientePanel extends JPanel {
         lblEmail = new JLabel();
         lblCredito = new JLabel();
 
-        // Font più leggibile per il credito
+
         lblCredito.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         infoPanel.add(lblNome);
@@ -65,13 +64,13 @@ public class ClientePanel extends JPanel {
 
     private void aggiornaDati() {
         try {
-            // Recuperiamo i dati freschi dal DB
+
             Cliente aggiornato = clienteService.getClienteById(cliente.getIdUtente());
 
             lblNome.setText("Nome: " + aggiornato.getNome() + " " + aggiornato.getCognome());
             lblEmail.setText("Email: " + aggiornato.getEmail());
 
-            // Usiamo getCredito o getSaldo in base a come lo hai chiamato nel model
+
             lblCredito.setText("Credito Attuale: " + aggiornato.getCredito() + " €");
 
         } catch (Exception e) {
@@ -82,20 +81,19 @@ public class ClientePanel extends JPanel {
 
     private void ricaricaCredito() {
         try {
-            String testo = txtRicarica.getText().replace(",", "."); // Gestisce la virgola
+            String testo = txtRicarica.getText().replace(",", ".");
             BigDecimal importo = new BigDecimal(testo);
 
             if (importo.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("L'importo deve essere maggiore di zero");
             }
 
-            // USIAMO IL NUOVO METODO CHE ABBIAMO CREATO PRIMA
-            // Questo eseguirà: UPDATE CLIENTE SET credito = credito + ?
+
             pagamentoService.ricaricaConto(cliente.getIdUtente(), importo);
 
             JOptionPane.showMessageDialog(this, "Ricarica di " + importo + " € effettuata con successo!");
 
-            // PULIZIA E REFRESH
+
             txtRicarica.setText("");
             aggiornaDati();
 

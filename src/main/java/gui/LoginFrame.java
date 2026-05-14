@@ -83,7 +83,7 @@ public class LoginFrame extends JFrame {
 
             new DashboardFrame(
                     utente,
-                    this.utenteService, // Passa il servizio così non sarà null al prossimo logout!
+                    this.utenteService,
                     autoService,
                     prenotazioneService,
                     noleggioService,
