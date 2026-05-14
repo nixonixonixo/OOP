@@ -28,6 +28,10 @@ public class Auto {
         this.costoDaily = costoDaily;
     }
 
+    //costruttore vuoto
+    public Auto() {
+    }
+
     //attributi Auto
     private int idAuto;
     private String targa;
@@ -54,6 +58,10 @@ public class Auto {
 
     public BigDecimal getCostoDaily(){
         return costoDaily;
+    }
+
+    public void setIdAuto(int idAuto) {
+        this.idAuto = idAuto;
     }
 
     public void cambiaStato(StatoAuto nuovoStato) {

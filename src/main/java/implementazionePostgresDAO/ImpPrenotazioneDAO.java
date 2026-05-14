@@ -14,21 +14,27 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public void salvaPrenotazione(Prenotazione p) throws SQLException {
-
+        // L'idprenotazione NON è presente perché lo genera il DB (IDENTITY)
         String sql = """
-            INSERT INTO PRENOTAZIONE (idprenotazione, datainizio, datafine, stato, idcliente, idauto)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO PRENOTAZIONE (datainizio, datafine, stato, idcliente, idauto)
+            VALUES (?, ?, ?, ?, ?)
         """;
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, p.getIdPrenotazione());
-            ps.setDate(2, new java.sql.Date(p.getDataInizio().getTime()));
-            ps.setDate(3, new java.sql.Date(p.getDataFine().getTime()));
-            ps.setString(4, p.getStato().name());
-            ps.setInt(5, p.getCliente().getIdUtente());
-            ps.setInt(6, p.getAuto().getIdAuto());
+            ps.setDate(1, new java.sql.Date(p.getDataInizio().getTime()));
+
+            // Gestione datafine opzionale
+            if (p.getDataFine() != null) {
+                ps.setDate(2, new java.sql.Date(p.getDataFine().getTime()));
+            } else {
+                ps.setNull(2, Types.DATE);
+            }
+
+            ps.setString(3, p.getStato().name());
+            ps.setInt(4, p.getCliente().getIdUtente());
+            ps.setInt(5, p.getAuto().getIdAuto());
 
             ps.executeUpdate();
         }
@@ -36,7 +42,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override
     public Prenotazione trovaPrenotazionePerId(int idPrenotazione) throws SQLException {
-
         String sql = """
             SELECT p.idprenotazione, p.datainizio, p.datafine, p.stato,
                    a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero,
@@ -48,26 +53,18 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
             JOIN UTENTE u ON c.idutente = u.idutente
             WHERE p.idprenotazione = ?
         """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, idPrenotazione);
             ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mappaResultSetCompleto(rs);
-            }
+            if (rs.next()) return mappaResultSetCompleto(rs);
         }
-
         return null;
     }
 
     @Override
     public List<Prenotazione> trovaPrenotazioniCliente(int idCliente) throws SQLException {
-
         List<Prenotazione> lista = new ArrayList<>();
-
         String sql = """
             SELECT p.idprenotazione, p.datainizio, p.datafine, p.stato,
                    a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero,
@@ -79,26 +76,18 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
             JOIN UTENTE u ON c.idutente = u.idutente
             WHERE p.idcliente = ?
         """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, idCliente);
             ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                lista.add(mappaResultSetCompleto(rs));
-            }
+            while (rs.next()) lista.add(mappaResultSetCompleto(rs));
         }
-
         return lista;
     }
 
     @Override
     public List<Prenotazione> trovaTuttePrenotazioni() throws SQLException {
-
         List<Prenotazione> lista = new ArrayList<>();
-
         String sql = """
             SELECT p.idprenotazione, p.datainizio, p.datafine, p.stato,
                    a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero,
@@ -109,56 +98,58 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
             JOIN CLIENTE c ON p.idcliente = c.idutente
             JOIN UTENTE u ON c.idutente = u.idutente
         """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                lista.add(mappaResultSetCompleto(rs));
-            }
+            while (rs.next()) lista.add(mappaResultSetCompleto(rs));
         }
-
         return lista;
     }
 
     @Override
     public void aggiornaPrenotazione(Prenotazione p) throws SQLException {
-
         String sql = """
             UPDATE PRENOTAZIONE
             SET datainizio = ?, datafine = ?, stato = ?
             WHERE idprenotazione = ?
         """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setDate(1, new java.sql.Date(p.getDataInizio().getTime()));
-            ps.setDate(2, new java.sql.Date(p.getDataFine().getTime()));
+            if (p.getDataFine() != null) ps.setDate(2, new java.sql.Date(p.getDataFine().getTime()));
+            else ps.setNull(2, Types.DATE);
             ps.setString(3, p.getStato().name());
             ps.setInt(4, p.getIdPrenotazione());
-
             ps.executeUpdate();
         }
     }
 
     @Override
     public void eliminaPrenotazione(int idPrenotazione) throws SQLException {
-
         String sql = "DELETE FROM PRENOTAZIONE WHERE idprenotazione = ?";
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, idPrenotazione);
             ps.executeUpdate();
         }
     }
 
     @Override
-    public Prenotazione trovaPrenotazionePerAuto(int idAuto) throws SQLException {
+    public void creaPrenotazione(int idCliente, int idAuto) throws SQLException {
+        String sql = """
+            INSERT INTO PRENOTAZIONE (datainizio, datafine, stato, idcliente, idauto)
+            VALUES (CURRENT_DATE, NULL, 'IN_ATTESA', ?, ?)
+        """;
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            ps.setInt(2, idAuto);
+            ps.executeUpdate();
+        }
+    }
 
+    @Override
+    public Prenotazione trovaPrenotazionePerAuto(int idAuto) throws SQLException {
         String sql = """
             SELECT p.idprenotazione, p.datainizio, p.datafine, p.stato,
                    a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero,
@@ -171,45 +162,27 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
             WHERE p.idauto = ? AND p.stato <> 'ANNULLATA'
             LIMIT 1
         """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, idAuto);
             ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mappaResultSetCompleto(rs);
-            }
+            if (rs.next()) return mappaResultSetCompleto(rs);
         }
-
         return null;
     }
 
     @Override
     public void aggiornaStatoPrenotazione(int idPrenotazione, Prenotazione.StatoPren nuovoStato) throws SQLException {
-
-        String sql = """
-            UPDATE PRENOTAZIONE
-            SET stato = ?
-            WHERE idprenotazione = ?
-        """;
-
+        String sql = "UPDATE PRENOTAZIONE SET stato = ? WHERE idprenotazione = ?";
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, nuovoStato.name());
             ps.setInt(2, idPrenotazione);
-
             ps.executeUpdate();
         }
     }
 
-    // =========================
-    // MAPPING
-    // =========================
     private Prenotazione mappaResultSetCompleto(ResultSet rs) throws SQLException {
-
         Auto auto = new Auto(
                 rs.getInt("idauto"),
                 rs.getString("targa"),
@@ -217,7 +190,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 Auto.StatoAuto.valueOf(rs.getString("stato_auto").toUpperCase()),
                 rs.getBigDecimal("costogiornaliero")
         );
-
         Cliente cliente = new Cliente(
                 rs.getInt("idutente"),
                 rs.getString("username"),
@@ -228,7 +200,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 rs.getString("patente"),
                 rs.getBigDecimal("credito")
         );
-
         return new Prenotazione(
                 rs.getInt("idprenotazione"),
                 rs.getDate("datainizio"),
@@ -237,24 +208,5 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 cliente,
                 auto
         );
-    }
-
-    @Override
-    public void creaPrenotazione(int idCliente, int idAuto) throws SQLException {
-
-        String sql = """
-            INSERT INTO PRENOTAZIONE
-            (datainizio, datafine, stato, idcliente, idauto)
-            VALUES (CURRENT_DATE, NULL, 'IN_ATTESA', ?, ?)
-        """;
-
-        try (Connection conn = ConnessioneDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, idCliente);
-            ps.setInt(2, idAuto);
-
-            ps.executeUpdate();
-        }
     }
 }

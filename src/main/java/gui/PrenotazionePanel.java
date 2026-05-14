@@ -38,7 +38,6 @@ public class PrenotazionePanel extends JPanel {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 0) return Integer.class;
-                if (columnIndex == 3) return Prenotazione.StatoPren.class;
                 return Object.class;
             }
         };
@@ -48,7 +47,7 @@ public class PrenotazionePanel extends JPanel {
 
         add(new JScrollPane(tabella), BorderLayout.CENTER);
 
-
+        // Se l'utente è un operatore (clienteLoggato è null), mostriamo la toolbar
         if (clienteLoggato == null) {
             add(creaToolbarOperatore(), BorderLayout.SOUTH);
             tabella.getSelectionModel().addListSelectionListener(e -> {
@@ -70,9 +69,9 @@ public class PrenotazionePanel extends JPanel {
         btnConferma.setEnabled(false);
         btnAnnulla.setEnabled(false);
 
+        // Styling
         btnConferma.setBackground(new Color(40, 167, 69));
         btnConferma.setForeground(Color.WHITE);
-        // Rende il colore visibile anche su sistemi Mac/Linux
         btnConferma.setOpaque(true);
         btnConferma.setBorderPainted(false);
 
@@ -81,20 +80,9 @@ public class PrenotazionePanel extends JPanel {
         btnAnnulla.setOpaque(true);
         btnAnnulla.setBorderPainted(false);
 
-        btnConferma.addActionListener(e -> {
-            try {
-                aggiornaStato(Prenotazione.StatoPren.CONFERMATA);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        btnAnnulla.addActionListener(e -> {
-            try {
-                aggiornaStato(Prenotazione.StatoPren.ANNULLATA);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        // Listeners corretti dentro il metodo
+        btnConferma.addActionListener(e -> aggiornaStato(Prenotazione.StatoPren.CONFERMATA));
+        btnAnnulla.addActionListener(e -> aggiornaStato(Prenotazione.StatoPren.ANNULLATA));
 
         panel.add(btnConferma);
         panel.add(btnAnnulla);
@@ -116,22 +104,20 @@ public class PrenotazionePanel extends JPanel {
                             p.getIdPrenotazione(),
                             p.getDataInizio(),
                             p.getDataFine(),
-                            p.getStato(), // Questo è un oggetto Enum StatoPren
+                            p.getStato(),
                             (p.getAuto() != null) ? p.getAuto().getModello() : "N/D",
                             (p.getCliente() != null) ? p.getCliente().getIdUtente() : "N/D"
                     });
                 }
             }
-
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Errore caricamento: " + e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
     private void aggiornaBottoni() {
-
         if (clienteLoggato != null || btnConferma == null) return;
 
         int row = tabella.getSelectedRow();
@@ -141,33 +127,33 @@ public class PrenotazionePanel extends JPanel {
             return;
         }
 
-
         Object value = tableModel.getValueAt(row, 3);
-        if (value instanceof Prenotazione.StatoPren stato) {
-            boolean inAttesa = (stato == Prenotazione.StatoPren.IN_ATTESA);
-            btnConferma.setEnabled(inAttesa);
-            btnAnnulla.setEnabled(inAttesa);
-        }
+        // Controlliamo se lo stato è "IN_ATTESA" per abilitare i tasti
+        String statoStr = value.toString();
+        boolean inAttesa = statoStr.equalsIgnoreCase("IN_ATTESA");
+
+        btnConferma.setEnabled(inAttesa);
+        btnAnnulla.setEnabled(inAttesa);
     }
 
-    private void aggiornaStato(Prenotazione.StatoPren stato) throws Exception {
+    private void aggiornaStato(Prenotazione.StatoPren nuovoStato) {
         int row = tabella.getSelectedRow();
         if (row == -1) return;
 
-        int id = (Integer) tableModel.getValueAt(row, 0);
+        int idPre = (int) tableModel.getValueAt(row, 0);
 
         try {
-            if (stato == Prenotazione.StatoPren.CONFERMATA) {
-                prenotazioneService.confermaPrenotazione(id);
-            } else {
-                prenotazioneService.annullaPrenotazione(id);
+            if (nuovoStato == Prenotazione.StatoPren.CONFERMATA) {
+                prenotazioneService.confermaPrenotazione(idPre);
+                JOptionPane.showMessageDialog(this, "Prenotazione Confermata!");
+            } else if (nuovoStato == Prenotazione.StatoPren.ANNULLATA) {
+                prenotazioneService.annullaPrenotazione(idPre);
+                JOptionPane.showMessageDialog(this, "Prenotazione Annullata. L'auto è di nuovo disponibile.");
             }
 
-            JOptionPane.showMessageDialog(this, "Prenotazione aggiornata con successo");
-            caricaDati();
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Errore aggiornamento: " + e.getMessage());
+            caricaDati(); // Rinfresca la tabella
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Errore: " + ex.getMessage());
         }
     }
 }

@@ -4,21 +4,30 @@ import java.util.Date;
 
 public class Prenotazione {
 
-    //enum Prenotazione
-    public enum StatoPren{
+    public enum StatoPren {
         IN_ATTESA,
         CONFERMATA,
         ANNULLATA
     }
 
-    //costruttore Prenotazione
+    private int idPrenotazione;
+    private Date dataInizio;
+    private Date dataFine;
+    private StatoPren stato;
+    private Cliente cliente;
+    private Auto auto;
+
+    // Costruttore aggiornato: rimosso il vincolo null su dataFine
     public Prenotazione(int idPrenotazione, Date dataInizio, Date dataFine, StatoPren stato, Cliente cliente, Auto auto) {
-        if (dataInizio == null || dataFine == null || stato == null) {
-            throw new IllegalArgumentException("Parametri non validi");
+        if (dataInizio == null || stato == null) {
+            throw new IllegalArgumentException("Parametri obbligatori mancanti");
         }
-        if (dataFine.before(dataInizio)) {
-            throw new IllegalArgumentException("Intervallo di date non valido");
+
+        // Controllo date solo se dataFine è presente
+        if (dataFine != null && dataFine.before(dataInizio)) {
+            throw new IllegalArgumentException("La data di fine non può essere precedente all'inizio");
         }
+
         this.idPrenotazione = idPrenotazione;
         this.dataInizio = dataInizio;
         this.dataFine = dataFine;
@@ -27,64 +36,58 @@ public class Prenotazione {
         this.auto = auto;
     }
 
-    //attributi Prenotazione
-    private int idPrenotazione;
-    private Date dataInizio;
-    private Date dataFine;
-    private StatoPren stato;
+    // Costruttore vuoto (opzionale, utile per i form della GUI)
+    public Prenotazione() {}
 
-    //associazioni Prenotazione
-    private Cliente cliente;
-    private Auto auto;
+    // --- GETTER ---
+    public int getIdPrenotazione() { return idPrenotazione; }
+    public Date getDataInizio() { return dataInizio; }
+    public Date getDataFine() { return dataFine; }
+    public StatoPren getStato() { return stato; }
+    public Cliente getCliente() { return cliente; }
+    public Auto getAuto() { return auto; }
 
-    //metodi Prenotazione
-    public int getIdPrenotazione() {
-        return idPrenotazione;
+    // --- SETTER (Aggiunti e aggiornati) ---
+    public void setAuto(Auto auto) {
+        this.auto = auto;
     }
 
-    public Date getDataInizio() {
-        return dataInizio;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
-    public Date getDataFine() {
-        return dataFine;
+    public void setDataInizio(Date dataInizio) {
+        this.dataInizio = dataInizio;
     }
 
-    public StatoPren getStato() {
-        return stato;
+    public void setDataFine(Date dataFine) {
+        this.dataFine = dataFine;
     }
 
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public Auto getAuto() {
-        return auto;
-    }
-
-    public void setStato(StatoPren stato){
+    public void setStato(StatoPren stato) {
         this.stato = stato;
     }
 
+    public void setIdPrenotazione(int idPrenotazione) {
+        this.idPrenotazione = idPrenotazione;
+    }
+
+    // --- METODI DI LOGICA ---
     public void conferma() {
         if (stato == StatoPren.ANNULLATA) {
-            throw new IllegalStateException("Prenotazione annullata");
+            throw new IllegalStateException("Prenotazione già annullata");
         }
-        stato = StatoPren.CONFERMATA;
+        this.stato = StatoPren.CONFERMATA;
     }
 
     public void annulla() {
-        stato = StatoPren.ANNULLATA;
+        this.stato = StatoPren.ANNULLATA;
     }
 
     public boolean isSovrapposta(Prenotazione altra) {
-        if (altra == null) return false;
+        if (altra == null || this.dataFine == null || altra.dataFine == null) return false;
         return this.dataInizio.before(altra.dataFine) &&
                 this.dataFine.after(altra.dataInizio);
-    }
-
-    public boolean isValida() {
-        return stato != StatoPren.ANNULLATA;
     }
 
     @Override
