@@ -13,16 +13,20 @@ import java.util.List;
 public class ImpPagamentoDAO implements PagamentoDAO {
 
     @Override
-    public void ricaricaSaldoCliente(int idCliente, BigDecimal importo) throws SQLException {
-        // La query usa 'saldo + ?' per sommare al valore esistente
-        String sql = "UPDATE CLIENTE SET saldo = saldo + ? WHERE idcliente = ?";
+    public void ricaricaSaldoCliente(int idCliente, java.math.BigDecimal importo) throws SQLException {
+        // CORREZIONE: Cambiato idcliente in idutente come suggerito dall'errore
+        String sql = "UPDATE CLIENTE SET credito = credito + ? WHERE idutente = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setBigDecimal(1, importo);
-            ps.setInt(2, idCliente);
-            ps.executeUpdate();
+            ps.setInt(2, idCliente); // Questo passerà l'ID al posto del secondo '?'
+
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Nessun cliente trovato con ID: " + idCliente);
+            }
         }
     }
 

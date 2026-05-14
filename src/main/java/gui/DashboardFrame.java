@@ -90,7 +90,7 @@ public class DashboardFrame extends JFrame {
             tabs.addTab("Auto disponibili", new AutoPanel(autoService, prenotazioneService, c));
             tabs.addTab("Le mie prenotazioni", new PrenotazionePanel(c, prenotazioneService));
             tabs.addTab("Pagamenti", new PagamentoPanel(pagamentoService, c));
-            tabs.addTab("Profilo", new ClientePanel(c, clienteService));
+            tabs.addTab("Profilo", new ClientePanel(c, clienteService, pagamentoService));
         }
 
         setLayout(new BorderLayout());
