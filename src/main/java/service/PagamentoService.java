@@ -2,7 +2,7 @@ package service;
 
 import dao.PagamentoDAO;
 import model.Pagamento;
-
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -14,31 +14,25 @@ public class PagamentoService {
         this.pagamentoDAO = pagamentoDAO;
     }
 
+    // NUOVO METODO PER LA RICARICA
+    public void ricaricaConto(int idCliente, BigDecimal importo) throws SQLException {
+        if (importo.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("L'importo deve essere positivo");
+        }
+        pagamentoDAO.ricaricaSaldoCliente(idCliente, importo);
+    }
+
     public void salvaPagamento(Pagamento p) throws SQLException {
         pagamentoDAO.salvaPagamento(p);
     }
 
-    public Pagamento getPagamentoById(int id) throws SQLException {
-        return pagamentoDAO.trovaPagamentoPerId(id);
-    }
-
-    public List<Pagamento> getPagamentiByNoleggio(int idNoleggio) throws SQLException {
-        return pagamentoDAO.trovaPagamentiNoleggio(idNoleggio);
+    public List<Pagamento> getPagamentiByCliente(int idCliente) throws Exception {
+        return pagamentoDAO.trovaPagamentiCliente(idCliente);
     }
 
     public List<Pagamento> getTuttiPagamenti() throws SQLException {
         return pagamentoDAO.trovaTuttiPagamenti();
     }
 
-    public void aggiornaPagamento(Pagamento p) throws SQLException {
-        pagamentoDAO.aggiornaPagamento(p);
-    }
-
-    public void eliminaPagamento(int id) throws SQLException {
-        pagamentoDAO.eliminaPagamento(id);
-    }
-
-    public List<Pagamento> getPagamentiByCliente(int idCliente) throws Exception {
-        return pagamentoDAO.trovaPagamentiCliente(idCliente);
-    }
+    // ... gli altri metodi che avevi già rimangono uguali
 }

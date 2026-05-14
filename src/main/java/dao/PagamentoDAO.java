@@ -2,6 +2,7 @@ package dao;
 
 import model.Pagamento;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -26,5 +27,8 @@ public interface PagamentoDAO {
             throws SQLException;
 
     List<Pagamento> trovaPagamentiCliente(int idCliente)
+            throws SQLException;
+
+    void ricaricaSaldoCliente(int idCliente, BigDecimal importo)
             throws SQLException;
 }
