@@ -37,4 +37,8 @@ public class PagamentoService {
     public void eliminaPagamento(int id) throws SQLException {
         pagamentoDAO.eliminaPagamento(id);
     }
+
+    public List<Pagamento> getPagamentiByCliente(int idCliente) throws Exception {
+        return pagamentoDAO.trovaPagamentiCliente(idCliente);
+    }
 }

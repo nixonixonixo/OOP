@@ -162,4 +162,31 @@ public class ImpPagamentoDAO implements PagamentoDAO {
                 noleggio
         );
     }
+
+    @Override
+    public List<Pagamento> trovaPagamentiCliente(int idCliente) throws SQLException {
+
+        List<Pagamento> lista = new ArrayList<>();
+
+        String sql = """
+        SELECT p.*
+        FROM PAGAMENTO p
+        JOIN NOLEGGIO n ON p.idnoleggio = n.idnoleggio
+        JOIN PRENOTAZIONE pr ON n.idprenotazione = pr.idprenotazione
+        WHERE pr.idcliente = ?
+    """;
+
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idCliente);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                lista.add(mappaResultSetInPagamento(rs));
+            }
+        }
+
+        return lista;
+    }
 }

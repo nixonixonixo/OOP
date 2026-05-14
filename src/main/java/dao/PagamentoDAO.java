@@ -24,4 +24,7 @@ public interface PagamentoDAO {
 
     void eliminaPagamento(int idPagamento)
             throws SQLException;
+
+    List<Pagamento> trovaPagamentiCliente(int idCliente)
+            throws SQLException;
 }
