@@ -1,56 +1,79 @@
 package service;
 
-import dao.AutoDAO;
 import dao.PrenotazioneDAO;
-import model.Auto;
+import dao.NoleggioDAO;
 import model.Prenotazione;
+import model.Noleggio;
+
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Date;
 
 public class PrenotazioneService {
 
     private final PrenotazioneDAO prenotazioneDAO;
-    private final AutoDAO autoDAO;
+    private final NoleggioDAO noleggioDAO;
 
-    public PrenotazioneService(PrenotazioneDAO prenotazioneDAO, AutoDAO autoDAO) {
+    public PrenotazioneService(PrenotazioneDAO prenotazioneDAO, NoleggioDAO noleggioDAO) {
         this.prenotazioneDAO = prenotazioneDAO;
-        this.autoDAO = autoDAO;
+        this.noleggioDAO = noleggioDAO;
     }
 
-
-    public void effettuaPrenotazione(Prenotazione p) throws Exception {
-        if (p == null || p.getCliente() == null || p.getAuto() == null) {
-            throw new Exception("Dati incompleti");
-        }
-
-
-        prenotazioneDAO.salvaPrenotazione(p);
-
-
-        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
+    /**
+     * Recupera tutte le prenotazioni nel sistema (per l'operatore)
+     */
+    public List<Prenotazione> getTuttePrenotazioni() throws SQLException {
+        return prenotazioneDAO.trovaTuttePrenotazioni();
     }
 
-    public void confermaPrenotazione(int id) throws Exception {
-        prenotazioneDAO.aggiornaStatoPrenotazione(id, Prenotazione.StatoPren.CONFERMATA);
-    }
-
-
-    public void annullaPrenotazione(int id) throws Exception {
-
-        Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(id);
-
-        prenotazioneDAO.aggiornaStatoPrenotazione(id, Prenotazione.StatoPren.ANNULLATA);
-
-        if (p != null && p.getAuto() != null) {
-            autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.DISPONIBILE);
-        }
-    }
-
-    public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws Exception {
+    /**
+     * Recupera solo le prenotazioni di un determinato cliente
+     */
+    public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws SQLException {
         return prenotazioneDAO.trovaPrenotazioniCliente(idCliente);
     }
 
-    public List<Prenotazione> getTuttePrenotazioni() throws Exception {
-        return prenotazioneDAO.trovaTuttePrenotazioni();
+    /**
+     * FLUSSO CRITICO: Conferma la prenotazione e apre il noleggio
+     */
+    public void confermaPrenotazione(int idPrenotazione) throws Exception {
+        // 1. Recuperiamo la prenotazione dal database
+        Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
+
+        if (p == null) {
+            throw new Exception("Errore: Prenotazione non trovata.");
+        }
+
+        if (p.getStato() != Prenotazione.StatoPren.IN_ATTESA) {
+            throw new Exception("Errore: È possibile confermare solo prenotazioni 'IN ATTESA'.");
+        }
+
+        // 2. Aggiorniamo lo stato della prenotazione a CONFERMATA
+        prenotazioneDAO.aggiornaStatoPrenotazione(idPrenotazione, Prenotazione.StatoPren.CONFERMATA);
+
+        // 3. Creiamo l'oggetto Noleggio
+        // L'ID è 0 perché il DB lo genera automaticamente (Identity)
+        // La data di ritiro è la data attuale (new Date())
+        Noleggio nuovoNoleggio = new Noleggio(0, new Date(), p);
+
+        // 4. Salviamo il noleggio sul database tramite il DAO
+        noleggioDAO.salvaNoleggio(nuovoNoleggio);
+    }
+
+    /**
+     * Annulla la prenotazione e libera l'auto
+     */
+    public void annullaPrenotazione(int idPrenotazione) throws Exception {
+        Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
+
+        if (p == null) {
+            throw new Exception("Prenotazione non trovata.");
+        }
+
+        // Aggiorniamo lo stato a ANNULLATA
+        prenotazioneDAO.aggiornaStatoPrenotazione(idPrenotazione, Prenotazione.StatoPren.ANNULLATA);
+
+        // Nota: Qui potresti aggiungere una chiamata a autoDAO per rimettere
+        // l'auto come DISPONIBILE se il sistema la blocca già alla richiesta.
     }
 }
