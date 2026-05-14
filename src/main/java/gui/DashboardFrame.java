@@ -12,6 +12,9 @@ public class DashboardFrame extends JFrame {
 
     private final Utente utente;
 
+    // Aggiungiamo questo campo per non perdere il riferimento al servizio login
+    private final UtenteService utenteService;
+
     private final AutoService autoService;
     private final PrenotazioneService prenotazioneService;
     private final NoleggioService noleggioService;
@@ -20,19 +23,26 @@ public class DashboardFrame extends JFrame {
 
     public DashboardFrame(
             Utente utente,
+            UtenteService utenteService, // <--- AGGIUNTO
             AutoService autoService,
             PrenotazioneService prenotazioneService,
             NoleggioService noleggioService,
             PagamentoService pagamentoService,
             ClienteService clienteService
     ) {
-
+        // ASSEGNAZIONI
         this.utente = utente;
+        this.utenteService = utenteService; // Salva il servizio
         this.autoService = autoService;
         this.prenotazioneService = prenotazioneService;
         this.noleggioService = noleggioService;
         this.pagamentoService = pagamentoService;
         this.clienteService = clienteService;
+
+        if (this.utente == null) {
+            JOptionPane.showMessageDialog(null, "Sessione non valida.");
+            return;
+        }
 
         setTitle("Noleggio Auto - " + utente.getNome() + " " + utente.getCognome());
         setSize(1100, 750);
@@ -44,81 +54,47 @@ public class DashboardFrame extends JFrame {
     }
 
     private void initUI() {
-
-        // --- HEADER ---
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(45, 52, 54));
         header.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        JLabel info = new JLabel("Utente collegato: " + utente.getUsername() + " (" + utente.getClass().getSimpleName() + ")");
+        JLabel info = new JLabel("Utente: " + utente.getUsername() + " [" + utente.getClass().getSimpleName() + "]");
         info.setForeground(Color.WHITE);
-        info.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         JButton logout = new JButton("Logout");
         logout.addActionListener(e -> {
             dispose();
-            // Assicurati che LoginFrame accetti questi parametri nel costruttore
+            // Passiamo l'utenteService REALE, non null!
             new LoginFrame(
-                    utenteServiceFake(),
-                    clienteService,
-                    autoService,
-                    prenotazioneService,
-                    noleggioService,
-                    pagamentoService
+                    this.utenteService,
+                    this.clienteService,
+                    this.autoService,
+                    this.prenotazioneService,
+                    this.noleggioService,
+                    this.pagamentoService
             );
         });
 
         header.add(info, BorderLayout.WEST);
         header.add(logout, BorderLayout.EAST);
 
-        // --- TABS ---
         JTabbedPane tabs = new JTabbedPane();
 
-        // LOGICA PER OPERATORE
         if (utente instanceof Operatore) {
-
-            // AutoPanel richiede: AutoService, PrenotazioneService, Cliente (null per operatore)
-            tabs.addTab("Gestione Auto",
-                    new AutoPanel(autoService, prenotazioneService, null));
-
-            // PrenotazionePanel richiede: Cliente (null per operatore), PrenotazioneService
-            tabs.addTab("Tutte le Prenotazioni",
-                    new PrenotazionePanel(null, prenotazioneService));
-
-            tabs.addTab("Gestione Noleggi",
-                    new NoleggioPanel(noleggioService));
-
-            // PagamentoPanel richiede: PagamentoService, Cliente (null per operatore)
-            tabs.addTab("Tutti i Pagamenti",
-                    new PagamentoPanel(pagamentoService, null));
+            tabs.addTab("Auto", new AutoPanel(autoService, prenotazioneService, null));
+            tabs.addTab("Prenotazioni", new PrenotazionePanel(null, prenotazioneService));
+            tabs.addTab("Noleggi", new NoleggioPanel(noleggioService));
+            // Pagamenti nascosti per l'operatore
         }
-
-        // LOGICA PER CLIENTE
-        else if (utente instanceof Cliente cliente) {
-
-            // AutoPanel richiede: AutoService, PrenotazioneService, Cliente
-            tabs.addTab("Catalogo Auto",
-                    new AutoPanel(autoService, prenotazioneService, cliente));
-
-            // PrenotazionePanel richiede: Cliente, PrenotazioneService
-            tabs.addTab("Le mie Prenotazioni",
-                    new PrenotazionePanel(cliente, prenotazioneService));
-
-            // PagamentoPanel richiede: PagamentoService, Cliente
-            tabs.addTab("I miei Pagamenti",
-                    new PagamentoPanel(pagamentoService, cliente));
-
-            tabs.addTab("Il mio Profilo",
-                    new ClientePanel(cliente, clienteService));
+        else if (utente instanceof Cliente c) {
+            tabs.addTab("Auto disponibili", new AutoPanel(autoService, prenotazioneService, c));
+            tabs.addTab("Le mie prenotazioni", new PrenotazionePanel(c, prenotazioneService));
+            tabs.addTab("Pagamenti", new PagamentoPanel(pagamentoService, c));
+            tabs.addTab("Profilo", new ClientePanel(c, clienteService));
         }
 
         setLayout(new BorderLayout());
         add(header, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
-    }
-
-    // Metodo fittizio come da tuo codice originale
-    private UtenteService utenteServiceFake() {
-        return null;
     }
 }

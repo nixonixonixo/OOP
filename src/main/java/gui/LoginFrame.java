@@ -68,12 +68,22 @@ public class LoginFrame extends JFrame {
 
             Utente utente = utenteService.login(username, password);
 
+            if (utente == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Username o Password non corretti",
+                        "Accesso Negato",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             JOptionPane.showMessageDialog(this, "Benvenuto " + utente.getNome());
 
             this.dispose();
 
+            // Cambia la chiamata così:
             new DashboardFrame(
                     utente,
+                    this.utenteService, // Passa il servizio così non sarà null al prossimo logout!
                     autoService,
                     prenotazioneService,
                     noleggioService,
@@ -82,7 +92,7 @@ public class LoginFrame extends JFrame {
             );
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Errore di accesso", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Errore di sistema", JOptionPane.ERROR_MESSAGE);
         }
     }
 
