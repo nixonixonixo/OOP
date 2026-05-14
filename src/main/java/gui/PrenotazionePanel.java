@@ -35,7 +35,6 @@ public class PrenotazionePanel extends JPanel {
                 return false;
             }
 
-            // FIX: Sovrascriviamo getColumnClass per evitare errori di cast quando leggiamo lo Stato
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 0) return Integer.class;
@@ -49,10 +48,9 @@ public class PrenotazionePanel extends JPanel {
 
         add(new JScrollPane(tabella), BorderLayout.CENTER);
 
-        // Se l'utente è un operatore (clienteLoggato == null), aggiungiamo i controlli
+
         if (clienteLoggato == null) {
             add(creaToolbarOperatore(), BorderLayout.SOUTH);
-            // Listener per attivare/disattivare bottoni solo per l'operatore
             tabella.getSelectionModel().addListSelectionListener(e -> {
                 if (!e.getValueIsAdjusting()) {
                     aggiornaBottoni();
@@ -133,7 +131,7 @@ public class PrenotazionePanel extends JPanel {
     }
 
     private void aggiornaBottoni() {
-        // Se siamo un cliente o i bottoni non sono stati inizializzati, usciamo
+
         if (clienteLoggato != null || btnConferma == null) return;
 
         int row = tabella.getSelectedRow();
@@ -143,7 +141,7 @@ public class PrenotazionePanel extends JPanel {
             return;
         }
 
-        // Recupero sicuro dello stato
+
         Object value = tableModel.getValueAt(row, 3);
         if (value instanceof Prenotazione.StatoPren stato) {
             boolean inAttesa = (stato == Prenotazione.StatoPren.IN_ATTESA);

@@ -80,7 +80,7 @@ public class LoginFrame extends JFrame {
 
             this.dispose();
 
-            // Cambia la chiamata così:
+
             new DashboardFrame(
                     utente,
                     this.utenteService, // Passa il servizio così non sarà null al prossimo logout!

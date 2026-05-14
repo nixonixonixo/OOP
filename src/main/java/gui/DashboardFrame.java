@@ -12,7 +12,7 @@ public class DashboardFrame extends JFrame {
 
     private final Utente utente;
 
-    // Aggiungiamo questo campo per non perdere il riferimento al servizio login
+
     private final UtenteService utenteService;
 
     private final AutoService autoService;
@@ -23,16 +23,16 @@ public class DashboardFrame extends JFrame {
 
     public DashboardFrame(
             Utente utente,
-            UtenteService utenteService, // <--- AGGIUNTO
+            UtenteService utenteService,
             AutoService autoService,
             PrenotazioneService prenotazioneService,
             NoleggioService noleggioService,
             PagamentoService pagamentoService,
             ClienteService clienteService
     ) {
-        // ASSEGNAZIONI
+
         this.utente = utente;
-        this.utenteService = utenteService; // Salva il servizio
+        this.utenteService = utenteService;
         this.autoService = autoService;
         this.prenotazioneService = prenotazioneService;
         this.noleggioService = noleggioService;
@@ -64,7 +64,7 @@ public class DashboardFrame extends JFrame {
         JButton logout = new JButton("Logout");
         logout.addActionListener(e -> {
             dispose();
-            // Passiamo l'utenteService REALE, non null!
+
             new LoginFrame(
                     this.utenteService,
                     this.clienteService,
@@ -84,7 +84,7 @@ public class DashboardFrame extends JFrame {
             tabs.addTab("Auto", new AutoPanel(autoService, prenotazioneService, null));
             tabs.addTab("Prenotazioni", new PrenotazionePanel(null, prenotazioneService));
             tabs.addTab("Noleggi", new NoleggioPanel(noleggioService));
-            // Pagamenti nascosti per l'operatore
+
         }
         else if (utente instanceof Cliente c) {
             tabs.addTab("Auto disponibili", new AutoPanel(autoService, prenotazioneService, c));
