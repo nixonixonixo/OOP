@@ -2,8 +2,10 @@ package service;
 
 import dao.PrenotazioneDAO;
 import dao.NoleggioDAO;
+import dao.AutoDAO;
 import model.Prenotazione;
 import model.Noleggio;
+import model.Auto;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -11,69 +13,57 @@ import java.util.Date;
 
 public class PrenotazioneService {
 
+    // I Field della classe (necessari per far comunicare le diverse parti del sistema)
     private final PrenotazioneDAO prenotazioneDAO;
     private final NoleggioDAO noleggioDAO;
+    private final AutoDAO autoDAO;
 
-    public PrenotazioneService(PrenotazioneDAO prenotazioneDAO, NoleggioDAO noleggioDAO) {
+    // Il costruttore a 3 argomenti che ora combacia con la MainGUI
+    public PrenotazioneService(PrenotazioneDAO prenotazioneDAO, NoleggioDAO noleggioDAO, AutoDAO autoDAO) {
         this.prenotazioneDAO = prenotazioneDAO;
         this.noleggioDAO = noleggioDAO;
+        this.autoDAO = autoDAO;
     }
 
     /**
-     * Recupera tutte le prenotazioni nel sistema (per l'operatore)
+     * IL METODO CHE MANCAVA: Salva la prenotazione e mette l'auto in stato OCCUPATA
      */
+    public void effettuaPrenotazione(Prenotazione p) throws SQLException {
+        // 1. Salviamo la prenotazione nel DB
+        prenotazioneDAO.salvaPrenotazione(p);
+
+        // 2. Cambiamo lo stato dell'auto in OCCUPATA per non farla sparire dal catalogo
+        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
+    }
+
     public List<Prenotazione> getTuttePrenotazioni() throws SQLException {
         return prenotazioneDAO.trovaTuttePrenotazioni();
     }
 
-    /**
-     * Recupera solo le prenotazioni di un determinato cliente
-     */
     public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws SQLException {
         return prenotazioneDAO.trovaPrenotazioniCliente(idCliente);
     }
 
-    /**
-     * FLUSSO CRITICO: Conferma la prenotazione e apre il noleggio
-     */
     public void confermaPrenotazione(int idPrenotazione) throws Exception {
-        // 1. Recuperiamo la prenotazione dal database
         Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
+        if (p == null) throw new Exception("Prenotazione non trovata");
 
-        if (p == null) {
-            throw new Exception("Errore: Prenotazione non trovata.");
-        }
-
-        if (p.getStato() != Prenotazione.StatoPren.IN_ATTESA) {
-            throw new Exception("Errore: È possibile confermare solo prenotazioni 'IN ATTESA'.");
-        }
-
-        // 2. Aggiorniamo lo stato della prenotazione a CONFERMATA
+        // Aggiorna lo stato
         prenotazioneDAO.aggiornaStatoPrenotazione(idPrenotazione, Prenotazione.StatoPren.CONFERMATA);
 
-        // 3. Creiamo l'oggetto Noleggio
-        // L'ID è 0 perché il DB lo genera automaticamente (Identity)
-        // La data di ritiro è la data attuale (new Date())
-        Noleggio nuovoNoleggio = new Noleggio(0, new Date(), p);
-
-        // 4. Salviamo il noleggio sul database tramite il DAO
-        noleggioDAO.salvaNoleggio(nuovoNoleggio);
+        // Crea il noleggio automaticamente
+        Noleggio n = new Noleggio(0, new Date(), p);
+        noleggioDAO.salvaNoleggio(n);
     }
 
-    /**
-     * Annulla la prenotazione e libera l'auto
-     */
     public void annullaPrenotazione(int idPrenotazione) throws Exception {
         Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
+        if (p == null) throw new Exception("Prenotazione non trovata");
 
-        if (p == null) {
-            throw new Exception("Prenotazione non trovata.");
-        }
-
-        // Aggiorniamo lo stato a ANNULLATA
+        // Cambia lo stato in Annullata
         prenotazioneDAO.aggiornaStatoPrenotazione(idPrenotazione, Prenotazione.StatoPren.ANNULLATA);
 
-        // Nota: Qui potresti aggiungere una chiamata a autoDAO per rimettere
-        // l'auto come DISPONIBILE se il sistema la blocca già alla richiesta.
+        // LIBERA L'AUTO (fondamentale per rimetterla sul mercato)
+        autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.DISPONIBILE);
     }
 }

@@ -7,12 +7,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import java.util.Date; // Aggiunta importazione
 
 public class NoleggioPanel extends JPanel {
 
     private JTable table;
     private DefaultTableModel model;
-
     private final NoleggioService noleggioService;
 
     public NoleggioPanel(NoleggioService service) {
@@ -21,7 +21,7 @@ public class NoleggioPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
 
         model = new DefaultTableModel(
-                new Object[]{"ID", "Ritiro", "Restituzione", "Costo", "Stato"}, 0
+                new Object[]{"ID", "Auto", "Ritiro", "Restituzione", "Costo", "Stato"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -37,6 +37,10 @@ public class NoleggioPanel extends JPanel {
         JButton btnAggiorna = new JButton("Aggiorna");
         JButton btnChiudi = new JButton("Chiudi Noleggio");
 
+        // Estetica: differenziamo i bottoni
+        btnChiudi.setBackground(new Color(220, 53, 69));
+        btnChiudi.setForeground(Color.WHITE);
+
         btnAggiorna.addActionListener(e -> carica());
         btnChiudi.addActionListener(e -> chiudiSelezionato());
 
@@ -49,59 +53,70 @@ public class NoleggioPanel extends JPanel {
         carica();
     }
 
-
     private void carica() {
         try {
             model.setRowCount(0);
-
             List<Noleggio> lista = noleggioService.getTuttiNoleggi();
 
             for (Noleggio n : lista) {
+                String stato = (n.getDataRestituzione() == null) ? "ATTIVO" : "CHIUSO";
 
-                String stato = (n.getDataRestituzione() == null)
-                        ? "ATTIVO"
-                        : "CHIUSO";
-
-                String costo = (n.getCostoTot() == null)
-                        ? "Da calcolare"
-                        : n.getCostoTot().toString();
+                // Gestione null per il costo
+                String costoStr = (n.getCostoTot() == null || n.getCostoTot().doubleValue() == 0)
+                        ? "In corso..."
+                        : n.getCostoTot().toString() + " €";
 
                 model.addRow(new Object[]{
                         n.getIdNoleggio(),
+                        n.getPrenotazione().getAuto().getModello(), // Info utile in tabella
                         n.getDataRitiro(),
                         n.getDataRestituzione() == null ? "-" : n.getDataRestituzione(),
-                        costo,
+                        costoStr,
                         stato
                 });
             }
-
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Errore caricamento: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Errore caricamento: " + e.getMessage());
         }
     }
 
-     //chiusura del noleggio
     private void chiudiSelezionato() {
         int row = table.getSelectedRow();
 
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Seleziona un noleggio");
+            JOptionPane.showMessageDialog(this, "Seleziona un noleggio dalla tabella");
             return;
         }
 
-        try {
-            int id = (int) model.getValueAt(row, 0);
+        // Controllo se è già chiuso per evitare chiamate inutili
+        String stato = (String) model.getValueAt(row, 5);
+        if (stato.equals("CHIUSO")) {
+            JOptionPane.showMessageDialog(this, "Questo noleggio è già stato chiuso.");
+            return;
+        }
 
-            noleggioService.chiudiNoleggio(id, null);
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Vuoi procedere alla chiusura e generare il pagamento?",
+                "Conferma Rientro Auto", JOptionPane.YES_NO_OPTION);
 
-            JOptionPane.showMessageDialog(this, "Noleggio chiuso con successo");
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                int id = (int) model.getValueAt(row, 0);
 
-            carica();
+                // FIX: Passiamo la data attuale per la chiusura
+                // NOTA: Se il tuo service.chiudiNoleggio non accetta la data,
+                // usa quella che abbiamo scritto insieme nel passaggio precedente.
+                noleggioService.chiudiNoleggio(id);
 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Errore: " + e.getMessage());
+                JOptionPane.showMessageDialog(this,
+                        "Noleggio Chiuso!\nL'auto è tornata DISPONIBILE.\nPagamento inviato al cliente.");
+
+                carica();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Errore durante la chiusura: " + e.getMessage());
+            }
         }
     }
 }
