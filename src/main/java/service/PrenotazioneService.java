@@ -1,3 +1,11 @@
+package service;
+
+import dao.AutoDAO;
+import dao.PrenotazioneDAO;
+import model.Prenotazione;
+
+import java.util.List;
+
 public class PrenotazioneService {
 
     private final PrenotazioneDAO prenotazioneDAO;

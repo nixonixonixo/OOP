@@ -53,7 +53,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idPrenotazione);
-
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -85,7 +84,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idCliente);
-
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -178,7 +176,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idAuto);
-
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -208,6 +205,9 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         }
     }
 
+    // =========================
+    // MAPPING
+    // =========================
     private Prenotazione mappaResultSetCompleto(ResultSet rs) throws SQLException {
 
         Auto auto = new Auto(
@@ -237,24 +237,24 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 cliente,
                 auto
         );
-        @Override
-        public void creaPrenotazione(int idCliente, int idAuto) throws SQLException {
+    }
 
-            String sql = """
-        INSERT INTO PRENOTAZIONE
-        (datainizio, datafine, stato, idcliente, idauto)
-        VALUES (CURRENT_DATE, NULL, 'IN_ATTESA', ?, ?)
-    """;
+    @Override
+    public void creaPrenotazione(int idCliente, int idAuto) throws SQLException {
 
-            try (Connection conn = ConnessioneDatabase.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = """
+            INSERT INTO PRENOTAZIONE
+            (datainizio, datafine, stato, idcliente, idauto)
+            VALUES (CURRENT_DATE, NULL, 'IN_ATTESA', ?, ?)
+        """;
 
-                ps.setInt(1, idCliente);
-                ps.setInt(2, idAuto);
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-                ps.executeUpdate();
-            }
+            ps.setInt(1, idCliente);
+            ps.setInt(2, idAuto);
+
+            ps.executeUpdate();
         }
-
     }
 }
