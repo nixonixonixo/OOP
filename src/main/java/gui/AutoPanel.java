@@ -19,6 +19,7 @@ public class AutoPanel extends JPanel {
     private final PrenotazioneService prenotazioneService;
     private final Cliente clienteLoggato;
 
+    // Assicurati che i parametri siano esattamente questi
     public AutoPanel(AutoService autoService,
                      PrenotazioneService prenotazioneService,
                      Cliente cliente) {
@@ -32,15 +33,20 @@ public class AutoPanel extends JPanel {
         model = new DefaultTableModel(
                 new Object[]{"ID", "Targa", "Modello", "Costo Giornaliero", "Stato"}, 0
         ) {
+            @Override
             public boolean isCellEditable(int r, int c) { return false; }
         };
 
         table = new JTable(model);
-
         add(new JScrollPane(table), BorderLayout.CENTER);
 
         JButton btnAggiorna = new JButton("Aggiorna");
-        JButton btnPrenota = new JButton("Prenota");
+        JButton btnPrenota = new JButton("Prenota Auto");
+
+        // SE L'UTENTE È UN OPERATORE, NASCONDIAMO IL TASTO PRENOTA
+        if (clienteLoggato == null) {
+            btnPrenota.setVisible(false);
+        }
 
         btnAggiorna.addActionListener(e -> carica());
         btnPrenota.addActionListener(e -> prenota());
@@ -57,7 +63,8 @@ public class AutoPanel extends JPanel {
     private void carica() {
         try {
             model.setRowCount(0);
-
+            // L'operatore forse vorrebbe vedere TUTTE le auto, non solo le disponibili.
+            // Se hai un metodo getTutteLeAuto(), potresti usarlo qui con un IF come in PagamentoPanel.
             List<Auto> lista = autoService.getAutoDisponibili();
 
             for (Auto a : lista) {
@@ -69,29 +76,30 @@ public class AutoPanel extends JPanel {
                         a.getStato()
                 });
             }
-
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(this, "Errore caricamento auto: " + e.getMessage());
         }
     }
 
     private void prenota() {
-        int row = table.getSelectedRow();
+        if (clienteLoggato == null) {
+            JOptionPane.showMessageDialog(this, "Solo i clienti possono prenotare.");
+            return;
+        }
 
+        int row = table.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Seleziona un'auto");
+            JOptionPane.showMessageDialog(this, "Seleziona un'auto dalla tabella");
             return;
         }
 
         try {
             int idAuto = (int) model.getValueAt(row, 0);
-
             prenotazioneService.creaPrenotazione(clienteLoggato.getIdUtente(), idAuto);
-
-            JOptionPane.showMessageDialog(this, "Prenotazione inviata");
-
+            JOptionPane.showMessageDialog(this, "Prenotazione effettuata con successo!");
+            carica(); // Rinfresca la tabella
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(this, "Errore prenotazione: " + e.getMessage());
         }
     }
 }
