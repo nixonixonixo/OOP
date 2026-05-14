@@ -1,5 +1,6 @@
 package gui;
 
+import model.Cliente;
 import model.Pagamento;
 import service.PagamentoService;
 
@@ -14,34 +15,29 @@ public class PagamentoPanel extends JPanel {
     private DefaultTableModel model;
 
     private final PagamentoService pagamentoService;
+    private final Cliente cliente;
 
-    public PagamentoPanel(PagamentoService pagamentoService) {
+    public PagamentoPanel(PagamentoService pagamentoService, Cliente cliente) {
 
         this.pagamentoService = pagamentoService;
+        this.cliente = cliente;
 
         setLayout(new BorderLayout(10, 10));
 
         model = new DefaultTableModel(
                 new Object[]{"ID", "Importo", "Stato"}, 0
         ) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+            public boolean isCellEditable(int r, int c) { return false; }
         };
 
         table = new JTable(model);
-        table.getTableHeader().setReorderingAllowed(false);
 
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        JButton btnAggiorna = new JButton("Aggiorna Pagamenti");
+        JButton btnAggiorna = new JButton("Aggiorna");
         btnAggiorna.addActionListener(e -> carica());
 
-        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottom.add(btnAggiorna);
-
-        add(bottom, BorderLayout.SOUTH);
+        add(btnAggiorna, BorderLayout.SOUTH);
 
         carica();
     }
@@ -50,21 +46,19 @@ public class PagamentoPanel extends JPanel {
         try {
             model.setRowCount(0);
 
-            List<Pagamento> lista = pagamentoService.getTuttiPagamenti();
+            List<Pagamento> lista =
+                    pagamentoService.getPagamentiByCliente(cliente.getIdUtente());
 
             for (Pagamento p : lista) {
                 model.addRow(new Object[]{
                         p.getIdPagamento(),
-                        p.getImporto() + " €",
+                        p.getImporto(),
                         p.getStato()
                 });
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Errore caricamento pagamenti: " + e.getMessage(),
-                    "Errore",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
 }
