@@ -2,6 +2,8 @@ package gui;
 
 import model.Auto;
 import model.Cliente;
+import model.Operatore;
+import model.Utente;
 import model.Prenotazione;
 import service.AutoService;
 import service.PrenotazioneService;
@@ -19,18 +21,19 @@ public class AutoPanel extends JPanel {
 
     private final AutoService autoService;
     private final PrenotazioneService prenotazioneService;
-    private final Cliente clienteLoggato;
+    private final Utente utenteLoggato; // Usiamo Utente per gestire sia Cliente che Operatore
 
     public AutoPanel(AutoService autoService,
                      PrenotazioneService prenotazioneService,
-                     Cliente cliente) {
+                     Utente utente) {
 
         this.autoService = autoService;
         this.prenotazioneService = prenotazioneService;
-        this.clienteLoggato = cliente;
+        this.utenteLoggato = utente;
 
         setLayout(new BorderLayout(10, 10));
 
+        // Modello tabella
         model = new DefaultTableModel(
                 new Object[]{"ID", "Targa", "Modello", "Costo Giornaliero", "Stato"}, 0
         ) {
@@ -41,21 +44,33 @@ public class AutoPanel extends JPanel {
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
+        // Bottoni
         JButton btnAggiorna = new JButton("Aggiorna");
         JButton btnPrenota = new JButton("Prenota Auto");
+        JButton btnManutenzione = new JButton("Manda in Manutenzione");
+        JButton btnRendiDisp = new JButton("Rendi Disponibile");
 
-        if (clienteLoggato == null) {
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.add(btnAggiorna);
+
+        // LOGICA DEI RUOLI
+        if (utenteLoggato instanceof Cliente) {
+            bottom.add(btnPrenota);
+            btnManutenzione.setVisible(false);
+            btnRendiDisp.setVisible(false);
+        } else if (utenteLoggato instanceof Operatore) {
+            bottom.add(btnManutenzione);
+            bottom.add(btnRendiDisp);
             btnPrenota.setVisible(false);
         }
 
+        add(bottom, BorderLayout.SOUTH);
+
+        // Action Listeners
         btnAggiorna.addActionListener(e -> carica());
         btnPrenota.addActionListener(e -> prenota());
-
-        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottom.add(btnPrenota);
-        bottom.add(btnAggiorna);
-
-        add(bottom, BorderLayout.SOUTH);
+        btnManutenzione.addActionListener(e -> cambiaStato(Auto.StatoAuto.IN_MANUTENZIONE));
+        btnRendiDisp.addActionListener(e -> cambiaStato(Auto.StatoAuto.DISPONIBILE));
 
         carica();
     }
@@ -63,7 +78,14 @@ public class AutoPanel extends JPanel {
     private void carica() {
         try {
             model.setRowCount(0);
-            List<Auto> lista = autoService.getAutoDisponibili();
+            List<Auto> lista;
+
+            // Se è Operatore vede TUTTE, se è Cliente vede solo DISPONIBILI
+            if (utenteLoggato instanceof Operatore) {
+                lista = autoService.getTutte();
+            } else {
+                lista = autoService.getAutoDisponibili();
+            }
 
             for (Auto a : lista) {
                 model.addRow(new Object[]{
@@ -79,55 +101,58 @@ public class AutoPanel extends JPanel {
         }
     }
 
+    private void cambiaStato(Auto.StatoAuto nuovoStato) {
+        int row = table.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Seleziona un'auto!");
+            return;
+        }
+
+        int idAuto = (int) model.getValueAt(row, 0);
+        try {
+            autoService.cambiaStato(idAuto, nuovoStato);
+            JOptionPane.showMessageDialog(this, "Stato auto aggiornato in: " + nuovoStato);
+            carica();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Errore cambio stato: " + e.getMessage());
+        }
+    }
+
     private void prenota() {
-        if (clienteLoggato == null) {
+        if (!(utenteLoggato instanceof Cliente)) {
             JOptionPane.showMessageDialog(this, "Solo i clienti possono prenotare.");
             return;
         }
 
+        Cliente c = (Cliente) utenteLoggato;
         int row = table.getSelectedRow();
         if (row == -1) {
             JOptionPane.showMessageDialog(this, "Seleziona un'auto dalla tabella");
             return;
         }
 
-
         String inputData = JOptionPane.showInputDialog(this,
-                "Inserisci la data di fine noleggio (AAAA-MM-GG):\n(Lascia vuoto se non sei ancora sicuro)",
+                "Inserisci la data di fine noleggio (AAAA-MM-GG):",
                 "Data Fine Noleggio",
                 JOptionPane.QUESTION_MESSAGE);
 
         try {
             int idAuto = (int) model.getValueAt(row, 0);
-
-
             Date dataFineScelta = null;
-            if (inputData != null && !inputData.trim().isEmpty()) {
-                try {
-                    dataFineScelta = Date.valueOf(inputData.trim());
 
-                    if (dataFineScelta.before(new java.util.Date())) {
-                        JOptionPane.showMessageDialog(this, "La data di fine non può essere precedente a oggi.");
-                        return;
-                    }
-                } catch (IllegalArgumentException ex) {
-                    JOptionPane.showMessageDialog(this, "Formato data non valido! Usa AAAA-MM-GG (es. 2026-12-31)");
-                    return;
-                }
+            if (inputData != null && !inputData.trim().isEmpty()) {
+                dataFineScelta = Date.valueOf(inputData.trim());
             }
 
             Prenotazione nuovaPrenotazione = new Prenotazione();
-
-
             Auto autoSelezionata = new Auto();
             autoSelezionata.setIdAuto(idAuto);
 
             nuovaPrenotazione.setAuto(autoSelezionata);
-            nuovaPrenotazione.setCliente(clienteLoggato);
-            nuovaPrenotazione.setDataInizio(new java.util.Date()); // Oggi
+            nuovaPrenotazione.setCliente(c);
+            nuovaPrenotazione.setDataInizio(new java.util.Date());
             nuovaPrenotazione.setDataFine(dataFineScelta);
             nuovaPrenotazione.setStato(Prenotazione.StatoPren.IN_ATTESA);
-
 
             prenotazioneService.effettuaPrenotazione(nuovaPrenotazione);
 
@@ -135,7 +160,7 @@ public class AutoPanel extends JPanel {
             carica();
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Errore prenotazione: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Errore: " + e.getMessage());
         }
     }
 }
