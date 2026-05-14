@@ -37,7 +37,7 @@ public class LoginFrame extends JFrame {
     }
 
     private void initUI() {
-        // Ho aggiunto un po' di padding per estetica
+
         JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -66,16 +66,12 @@ public class LoginFrame extends JFrame {
                 throw new IllegalArgumentException("Inserisci credenziali valide");
             }
 
-            // Effettua il login tramite il service
             Utente utente = utenteService.login(username, password);
 
-            // Se arriviamo qui, il login ha avuto successo
             JOptionPane.showMessageDialog(this, "Benvenuto " + utente.getNome());
 
-            // CHIUDI il login
             this.dispose();
 
-            // APRI la Dashboard passando l'utente loggato e TUTTI i service
             new DashboardFrame(
                     utente,
                     autoService,

@@ -71,7 +71,7 @@ public class ClientePanel extends JPanel {
         }
     }
 
-    // metodo perricaricare credito
+    // metodo per ricaricare credito
     private void ricaricaCredito() {
         try {
             BigDecimal importo = new BigDecimal(txtRicarica.getText());

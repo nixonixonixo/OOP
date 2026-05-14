@@ -24,7 +24,7 @@ public class MainGUI {
             NoleggioService noleggioService = new NoleggioService(noleggioDAO, autoDAO);
             PagamentoService pagamentoService = new PagamentoService(pagamentoDAO);
 
-            // LOGIN (Passiamo i service necessari per le finestre successive)
+            // LOGIN
             new LoginFrame(
                     utenteService,
                     clienteService,

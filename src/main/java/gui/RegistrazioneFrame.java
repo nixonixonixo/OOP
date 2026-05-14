@@ -49,7 +49,7 @@ public class RegistrazioneFrame extends JFrame {
 
     private void registrazione() {
         try {
-            // Validazione minima
+
             if (usernameField.getText().isEmpty() || patenteField.getText().isEmpty()) {
                 throw new Exception("Compila tutti i campi obbligatori");
             }
