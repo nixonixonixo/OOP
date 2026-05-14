@@ -46,9 +46,9 @@ public class AutoPanel extends JPanel {
         carica();
     }
 
-    // =========================
-    // CARICAMENTO AUTO
-    // =========================
+
+
+    // metodo per caricare
     private void carica() {
         try {
             model.setRowCount(0);

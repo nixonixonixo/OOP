@@ -26,9 +26,7 @@ public class ClientePanel extends JPanel {
 
         setLayout(new BorderLayout(10, 10));
 
-        // =========================
-        // INFO CLIENTE
-        // =========================
+
         JPanel infoPanel = new JPanel(new GridLayout(3, 1, 5, 5));
 
         lblNome = new JLabel();
@@ -41,9 +39,7 @@ public class ClientePanel extends JPanel {
 
         add(infoPanel, BorderLayout.NORTH);
 
-        // =========================
-        // RICARICA CREDITO
-        // =========================
+
         JPanel ricaricaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         txtRicarica = new JTextField(10);
@@ -60,9 +56,7 @@ public class ClientePanel extends JPanel {
         aggiornaDati();
     }
 
-    // =========================
-    // CARICAMENTO DATI CLIENTE
-    // =========================
+
     private void aggiornaDati() {
         try {
             Cliente aggiornato = clienteService.getClienteById(cliente.getIdUtente());
@@ -77,9 +71,7 @@ public class ClientePanel extends JPanel {
         }
     }
 
-    // =========================
-    // RICARICA CREDITO
-    // =========================
+    // metodo perricaricare credito
     private void ricaricaCredito() {
         try {
             BigDecimal importo = new BigDecimal(txtRicarica.getText());

@@ -49,9 +49,7 @@ public class NoleggioPanel extends JPanel {
         carica();
     }
 
-    // =========================
-    // CARICAMENTO DATI
-    // =========================
+
     private void carica() {
         try {
             model.setRowCount(0);
@@ -83,9 +81,7 @@ public class NoleggioPanel extends JPanel {
         }
     }
 
-    // =========================
-    // CHIUSURA NOLEGGIO
-    // =========================
+     //chiusura del noleggio
     private void chiudiSelezionato() {
         int row = table.getSelectedRow();
 
