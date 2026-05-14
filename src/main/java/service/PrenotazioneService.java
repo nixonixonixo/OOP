@@ -1,12 +1,3 @@
-package service;
-
-import dao.AutoDAO;
-import dao.PrenotazioneDAO;
-import model.Prenotazione;
-
-import java.sql.SQLException;
-import java.util.List;
-
 public class PrenotazioneService {
 
     private final PrenotazioneDAO prenotazioneDAO;
@@ -17,19 +8,23 @@ public class PrenotazioneService {
         this.autoDAO = autoDAO;
     }
 
-    public List<Prenotazione> getTuttePrenotazioni() throws SQLException {
+    public void creaPrenotazione(int idCliente, int idAuto) throws Exception {
+        prenotazioneDAO.creaPrenotazione(idCliente, idAuto);
+    }
+
+    public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws Exception {
+        return prenotazioneDAO.trovaPrenotazioniCliente(idCliente);
+    }
+
+    public List<Prenotazione> getTuttePrenotazioni() throws Exception {
         return prenotazioneDAO.trovaTuttePrenotazioni();
     }
 
-    public List<Prenotazione> getPrenotazioniCliente(int id) throws SQLException {
-        return prenotazioneDAO.trovaPrenotazioniCliente(id);
-    }
-
-    public void confermaPrenotazione(int id) throws SQLException {
+    public void confermaPrenotazione(int id) throws Exception {
         prenotazioneDAO.aggiornaStatoPrenotazione(id, Prenotazione.StatoPren.CONFERMATA);
     }
 
-    public void annullaPrenotazione(int id) throws SQLException {
+    public void annullaPrenotazione(int id) throws Exception {
         prenotazioneDAO.aggiornaStatoPrenotazione(id, Prenotazione.StatoPren.ANNULLATA);
     }
 }

@@ -30,4 +30,6 @@ public interface PrenotazioneDAO {
 
      void aggiornaStatoPrenotazione(int idPrenotazione, Prenotazione.StatoPren nuovoStato)
         throws SQLException;
+    void creaPrenotazione(int idCliente, int idAuto)
+            throws SQLException;
 }
