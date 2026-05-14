@@ -237,5 +237,24 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
                 cliente,
                 auto
         );
+        @Override
+        public void creaPrenotazione(int idCliente, int idAuto) throws SQLException {
+
+            String sql = """
+        INSERT INTO PRENOTAZIONE
+        (datainizio, datafine, stato, idcliente, idauto)
+        VALUES (CURRENT_DATE, NULL, 'IN_ATTESA', ?, ?)
+    """;
+
+            try (Connection conn = ConnessioneDatabase.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setInt(1, idCliente);
+                ps.setInt(2, idAuto);
+
+                ps.executeUpdate();
+            }
+        }
+
     }
 }
