@@ -4,12 +4,14 @@ import java.util.Date;
 
 public class Prenotazione {
 
+    //enum
     public enum StatoPren {
         IN_ATTESA,
         CONFERMATA,
         ANNULLATA
     }
 
+    //attributi Prenotazione
     private int idPrenotazione;
     private Date dataInizio;
     private Date dataFine;
@@ -36,7 +38,7 @@ public class Prenotazione {
         this.auto = auto;
     }
 
-
+    //metodi Prenotazione
     public Prenotazione() {}
     public int getIdPrenotazione() { return idPrenotazione; }
     public Date getDataInizio() { return dataInizio; }
@@ -70,7 +72,7 @@ public class Prenotazione {
         this.idPrenotazione = idPrenotazione;
     }
 
-    // --- METODI DI LOGICA ---
+    //metodi di logica
     public void conferma() {
         if (stato == StatoPren.ANNULLATA) {
             throw new IllegalStateException("Prenotazione già annullata");

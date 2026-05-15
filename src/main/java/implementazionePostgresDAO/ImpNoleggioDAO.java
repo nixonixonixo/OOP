@@ -14,7 +14,6 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
     @Override
     public void salvaNoleggio(Noleggio noleggio) throws SQLException {
-        // FIX: Rimosso idnoleggio per permettere l'autoincremento sul DB
         String sql = """
             INSERT INTO NOLEGGIO (dataritiro, costototale, idprenotazione)
             VALUES (?, ?, ?)
@@ -25,7 +24,6 @@ public class ImpNoleggioDAO implements NoleggioDAO {
 
             ps.setDate(1, new java.sql.Date(noleggio.getDataRitiro().getTime()));
 
-            // Gestione costo totale (potrebbe essere null alla creazione)
             if (noleggio.getCostoTot() != null) {
                 ps.setBigDecimal(2, noleggio.getCostoTot());
             } else {
@@ -139,18 +137,16 @@ public class ImpNoleggioDAO implements NoleggioDAO {
                 rs.getBigDecimal("costogiornaliero")
         );
 
-        // Mappatura Prenotazione
         Prenotazione.StatoPren statoPren = Prenotazione.StatoPren.valueOf(rs.getString("stato_pren").toUpperCase());
         Prenotazione prenotazione = new Prenotazione(
                 rs.getInt("idprenotazione"),
                 rs.getDate("datainizio"),
                 rs.getDate("datafine"),
                 statoPren,
-                null, // idcliente può restare null qui o essere mappato se necessario
+                null,
                 auto
         );
 
-        // Mappatura Noleggio
         Noleggio n = new Noleggio(
                 rs.getInt("idnoleggio"),
                 rs.getDate("dataritiro"),

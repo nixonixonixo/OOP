@@ -55,7 +55,6 @@ public class DashboardFrame extends JFrame {
     }
 
     private void initUI() {
-        // --- HEADER ---
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(45, 52, 54));
         header.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
@@ -80,17 +79,15 @@ public class DashboardFrame extends JFrame {
         header.add(info, BorderLayout.WEST);
         header.add(logout, BorderLayout.EAST);
 
-        // --- TABS ---
         JTabbedPane tabs = new JTabbedPane();
 
-        // LOGICA PER OPERATORE
         if (utente instanceof Operatore op) {
             // Adesso passiamo 'op' invece di 'null'!
             tabs.addTab("Gestione Parco Auto", new AutoPanel(autoService, prenotazioneService, op));
             tabs.addTab("Tutte le Prenotazioni", new PrenotazionePanel(null, prenotazioneService));
             tabs.addTab("Gestione Noleggi", new NoleggioPanel(noleggioService));
         }
-        // LOGICA PER CLIENTE
+
         else if (utente instanceof Cliente c) {
             tabs.addTab("Catalogo Auto", new AutoPanel(autoService, prenotazioneService, c));
             tabs.addTab("Le mie Prenotazioni", new PrenotazionePanel(c, prenotazioneService));
@@ -98,7 +95,6 @@ public class DashboardFrame extends JFrame {
             tabs.addTab("Il mio Profilo", new ClientePanel(c, clienteService, pagamentoService));
         }
 
-        // --- LAYOUT FINALE ---
         setLayout(new BorderLayout());
         add(header, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);

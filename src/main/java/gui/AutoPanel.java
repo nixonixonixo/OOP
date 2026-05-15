@@ -21,7 +21,7 @@ public class AutoPanel extends JPanel {
 
     private final AutoService autoService;
     private final PrenotazioneService prenotazioneService;
-    private final Utente utenteLoggato; // Usiamo Utente per gestire sia Cliente che Operatore
+    private final Utente utenteLoggato;
 
     public AutoPanel(AutoService autoService,
                      PrenotazioneService prenotazioneService,
@@ -53,7 +53,7 @@ public class AutoPanel extends JPanel {
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottom.add(btnAggiorna);
 
-        // LOGICA DEI RUOLI
+        // Logica dei ruoli
         if (utenteLoggato instanceof Cliente) {
             bottom.add(btnPrenota);
             btnManutenzione.setVisible(false);
@@ -66,7 +66,7 @@ public class AutoPanel extends JPanel {
 
         add(bottom, BorderLayout.SOUTH);
 
-        // Action Listeners
+        // Listeners
         btnAggiorna.addActionListener(e -> carica());
         btnPrenota.addActionListener(e -> prenota());
         btnManutenzione.addActionListener(e -> cambiaStato(Auto.StatoAuto.IN_MANUTENZIONE));
@@ -80,7 +80,6 @@ public class AutoPanel extends JPanel {
             model.setRowCount(0);
             List<Auto> lista;
 
-            // Se è Operatore vede TUTTE, se è Cliente vede solo DISPONIBILI
             if (utenteLoggato instanceof Operatore) {
                 lista = autoService.getTutte();
             } else {

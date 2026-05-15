@@ -129,11 +129,8 @@ public class ImpAutoDAO implements AutoDAO {
         Auto.StatoAuto statoEnum;
 
         try {
-            // .trim().toUpperCase() evita errori dovuti a spazi o minuscole nel DB
             statoEnum = Auto.StatoAuto.valueOf(statoStr.trim().toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            // Se il DB ha un valore vecchio (es. 'MANUTENZIONE') che non esiste più
-            // nell'Enum (perché ora è 'IN_MANUTENZIONE'), evitiamo il crash totale.
             System.err.println("Errore mapping stato auto: " + statoStr + ". Impostato default DISPONIBILE.");
             statoEnum = Auto.StatoAuto.DISPONIBILE;
         }

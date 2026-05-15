@@ -2,7 +2,7 @@ package gui;
 
 import model.Cliente;
 import service.ClienteService;
-import service.PagamentoService; // Aggiunto import
+import service.PagamentoService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 public class ClientePanel extends JPanel {
 
     private final ClienteService clienteService;
-    private final PagamentoService pagamentoService; // Aggiunto servizio pagamenti
+    private final PagamentoService pagamentoService;
     private final Cliente cliente;
 
     private JLabel lblNome;

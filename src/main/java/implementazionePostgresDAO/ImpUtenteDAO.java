@@ -135,15 +135,15 @@ public class ImpUtenteDAO implements UtenteDAO {
     }
 
     private Utente mappaResultSetInUtente(ResultSet rs) throws SQLException {
-        // 1. Recupero dati comuni
+        //Recupero dati comuni
         int id = rs.getInt("idutente");
         String username = rs.getString("username");
-        String passwordHash = rs.getString("passwordhash"); // Questo è l'hash dal DB
+        String passwordHash = rs.getString("passwordhash");
         String nome = rs.getString("nome");
         String cognome = rs.getString("cognome");
         String email = rs.getString("email");
 
-        // 2. Controllo se è un Operatore
+        //Controllo se è un Operatore
         String ruoloStr = rs.getString("ruolo");
         if (ruoloStr != null) {
             Operatore.Ruolo ruolo;
@@ -152,20 +152,18 @@ public class ImpUtenteDAO implements UtenteDAO {
             } catch (Exception e) {
                 ruolo = Operatore.Ruolo.ADDETTO_NOLEGGIO;
             }
-            // USIAMO IL COSTRUTTORE CON IL FLAG TRUE
             return new Operatore(id, username, passwordHash, nome, cognome, email, ruolo, true);
         }
 
-        // 3. Controllo se è un Cliente
+        //Controllo se è un Cliente
         String patente = rs.getString("patente");
         if (patente != null) {
             BigDecimal credito = rs.getBigDecimal("credito");
             if (credito == null) credito = BigDecimal.ZERO;
-            // USIAMO IL COSTRUTTORE CON IL FLAG TRUE
             return new Cliente(id, username, passwordHash, nome, cognome, email, patente, credito, true);
         }
 
-        // 4. Utente generico (fallback)
+        //Utente generico
         return new Utente(id, username, passwordHash, nome, cognome, email, true);
     }
 }
