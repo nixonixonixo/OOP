@@ -23,11 +23,13 @@ public class UtenteService {
         this.operatoreDAO = operatoreDAO;
     }
 
-    // LOGIN
+    // LOGIN CORRETTO
     public Utente login(String username, String password) throws SQLException {
         Utente u = utenteDAO.trovaUtentePerUsername(username);
 
-        if (u == null || !u.getPasswordHash().equals(password)) {
+        // Usiamo verificaPassword che internamente hasha la stringa
+        // ricevuta e la confronta con l'hash nel database
+        if (u == null || !u.verificaPassword(password)) {
             throw new IllegalArgumentException("Credenziali errate");
         }
 
