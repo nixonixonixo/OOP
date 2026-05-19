@@ -50,7 +50,7 @@ public class Utente {
             byte[] hashBytes = digest.digest(password.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hashBytes);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Errore critico: Algoritmo di hashing non disponibile", e);
+            throw new RuntimeException("Algoritmo di hashing non disponibile", e);
         }
     }
 
