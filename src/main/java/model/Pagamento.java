@@ -22,8 +22,7 @@ public class Pagamento {
     public enum StatoPagamento{
         IN_ATTESA,
         COMPLETATO,
-        FALLITO,
-        RIMBORSATO
+        FALLITO
     }
 
     //attributi Pagamento
@@ -67,13 +66,6 @@ public class Pagamento {
             throw new IllegalStateException("Pagamento non fallibile");
         }
         stato = StatoPagamento.FALLITO;
-    }
-
-    public void rimborsa() {
-        if (stato != StatoPagamento.COMPLETATO) {
-            throw new IllegalStateException("Rimborso non possibile");
-        }
-        stato = StatoPagamento.RIMBORSATO;
     }
 
     @Override
