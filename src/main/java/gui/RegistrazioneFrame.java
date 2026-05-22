@@ -52,14 +52,14 @@ public class RegistrazioneFrame extends JFrame {
 
 
             Cliente cliente = new Cliente(
-                    0, // ID fittizio o gestito a monte
+                    0,
                     username,
                     password,
                     nome,
                     cognome,
                     email,
                     patente,
-                    BigDecimal.ZERO // Credito iniziale azzerato
+                    BigDecimal.ZERO
             );
 
 
