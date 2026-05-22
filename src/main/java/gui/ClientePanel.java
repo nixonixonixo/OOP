@@ -10,7 +10,6 @@ import java.sql.SQLException;
 
 public class ClientePanel extends JPanel {
 
-    // Componenti bound tramite l'interfaccia grafica di IntelliJ
     private JPanel mainPanel;
     private JLabel lblNome;
     private JLabel lblEmail;
@@ -26,26 +25,20 @@ public class ClientePanel extends JPanel {
     public ClientePanel(Controller controller) {
         this.controller = controller;
 
-        // Collega il pannello principale generato dal Form a questo oggetto JPanel
         add(mainPanel);
 
-        // Configurazione font per il credito (personalizzazione via codice)
         lblCredito.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        // Assegnazione del listener al bottone di ricarica
         btnRicarica.addActionListener(e -> ricaricaCredito());
 
-        // Caricamento iniziale dei dati sul form
         aggiornaDati();
     }
 
     private void aggiornaDati() {
         try {
-            // Verifichiamo prima che l'utente loggato sia effettivamente un cliente
             if (controller.getUtenteLoggato() instanceof Cliente) {
                 Cliente clienteSessione = (Cliente) controller.getUtenteLoggato();
 
-                // Recuperiamo i dati aggiornati direttamente dal database
                 Cliente aggiornato = controller.getClienteById(clienteSessione.getIdUtente());
 
                 lblNome.setText("Nome: " + aggiornato.getNome() + " " + aggiornato.getCognome());
@@ -75,7 +68,6 @@ public class ClientePanel extends JPanel {
 
             Cliente clienteSessione = (Cliente) controller.getUtenteLoggato();
 
-            // Esegue l'operazione di ricarica tramite il controller unico
             controller.ricaricaConto(clienteSessione.getIdUtente(), importo);
 
             JOptionPane.showMessageDialog(this, "Ricarica di " + importo + " € effettuata con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);

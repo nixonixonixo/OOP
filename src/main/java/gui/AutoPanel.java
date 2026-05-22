@@ -16,7 +16,6 @@ import java.util.List;
 
 public class AutoPanel extends JPanel {
 
-    // Componenti bound tramite l'interfaccia grafica di IntelliJ
     private JPanel mainPanel;
     private JTable table;
     private JButton btnAggiorna;
@@ -32,10 +31,8 @@ public class AutoPanel extends JPanel {
     public AutoPanel(Controller controller) {
         this.controller = controller;
 
-        // Collega il pannello principale generato dal Form a questo oggetto JPanel
         add(mainPanel);
 
-        // Inizializzazione del modello della tabella
         model = new DefaultTableModel(
                 new Object[]{"ID", "Targa", "Modello", "Costo Giornaliero", "Stato"}, 0
         ) {
@@ -44,16 +41,13 @@ public class AutoPanel extends JPanel {
         };
         table.setModel(model);
 
-        // Gestione visibilità bottoni in base al ruolo dell'utente loggato
         configuraInterfacciaPerRuolo();
 
-        // Assegnazione dei listener ai bottoni
         btnAggiorna.addActionListener(e -> carica());
         btnPrenota.addActionListener(e -> prenota());
         btnManutenzione.addActionListener(e -> cambiaStato(Auto.StatoAuto.IN_MANUTENZIONE));
         btnRendiDisp.addActionListener(e -> cambiaStato(Auto.StatoAuto.DISPONIBILE));
 
-        // Caricamento iniziale dei dati
         carica();
     }
 
@@ -130,7 +124,7 @@ public class AutoPanel extends JPanel {
                 "Data Fine Noleggio",
                 JOptionPane.QUESTION_MESSAGE);
 
-        if (inputData == null) return; // L'utente ha premuto Annulla
+        if (inputData == null) return;
 
         try {
             int idAuto = (int) model.getValueAt(row, 0);
