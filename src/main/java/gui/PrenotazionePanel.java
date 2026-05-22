@@ -93,6 +93,9 @@ public class PrenotazionePanel extends JPanel {
         mainPanel.add(scrollPane1, BorderLayout.CENTER);
         tabella = new JTable();
         scrollPane1.setViewportView(tabella);
+        btnConferma = new JButton();
+        btnConferma.setText("Conferma");
+        mainPanel.add(btnConferma, BorderLayout.SOUTH);
     }
 
     /**
@@ -101,4 +104,5 @@ public class PrenotazionePanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }

@@ -2,6 +2,7 @@ package implementazionePostgresDAO;
 
 import dao.NoleggioDAO;
 import database.ConnessioneDatabase;
+import model.Cliente;
 import model.Noleggio;
 import model.Prenotazione;
 import model.Auto;
@@ -12,12 +13,23 @@ import java.util.List;
 
 public class ImpNoleggioDAO implements NoleggioDAO {
 
+    private static final String SELECT_QUERY = """
+            SELECT 
+                n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
+                n.idprenotazione,
+                p.datainizio, p.datafine, p.stato AS stato_pren,
+                a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero,
+                u.idutente AS id_utente_finale, u.nome, u.cognome, u.email, c.patente
+            FROM NOLEGGIO n
+            JOIN PRENOTAZIONE p ON n.idprenotazione = p.idprenotazione
+            JOIN AUTO a ON p.idauto = a.idauto
+            JOIN CLIENTE c ON p.idcliente = c.idutente
+            JOIN UTENTE u ON c.idutente = u.idutente
+            """;
+
     @Override
     public void salvaNoleggio(Noleggio noleggio) throws SQLException {
-        String sql = """
-            INSERT INTO NOLEGGIO (dataritiro, costototale, idprenotazione)
-            VALUES (?, ?, ?)
-        """;
+        String sql = "INSERT INTO NOLEGGIO (dataritiro, costototale, idprenotazione) VALUES (?, ?, ?)";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -31,24 +43,13 @@ public class ImpNoleggioDAO implements NoleggioDAO {
             }
 
             ps.setInt(3, noleggio.getPrenotazione().getIdPrenotazione());
-
             ps.executeUpdate();
         }
     }
 
     @Override
     public Noleggio trovaNoleggioPerId(int idNoleggio) throws SQLException {
-        String sql = """
-            SELECT 
-                n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
-                n.idprenotazione,
-                p.datainizio, p.datafine, p.stato AS stato_pren,
-                a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero
-            FROM NOLEGGIO n
-            JOIN PRENOTAZIONE p ON n.idprenotazione = p.idprenotazione
-            JOIN AUTO a ON p.idauto = a.idauto
-            WHERE n.idnoleggio = ?
-        """;
+        String sql = SELECT_QUERY + " WHERE n.idnoleggio = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -66,20 +67,9 @@ public class ImpNoleggioDAO implements NoleggioDAO {
     @Override
     public List<Noleggio> trovaTuttiNoleggi() throws SQLException {
         List<Noleggio> lista = new ArrayList<>();
-        String sql = """
-            SELECT 
-                n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
-                n.idprenotazione,
-                p.datainizio, p.datafine, p.stato AS stato_pren,
-                a.idauto, a.targa, a.modello, a.stato AS stato_auto, a.costogiornaliero
-            FROM NOLEGGIO n
-            JOIN PRENOTAZIONE p ON n.idprenotazione = p.idprenotazione
-            JOIN AUTO a ON p.idauto = a.idauto
-        """;
-
         try (Connection conn = ConnessioneDatabase.getConnection();
              Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+             ResultSet rs = st.executeQuery(SELECT_QUERY)) {
 
             while (rs.next()) {
                 lista.add(mappaResultSetInNoleggio(rs));
@@ -127,23 +117,32 @@ public class ImpNoleggioDAO implements NoleggioDAO {
     }
 
     private Noleggio mappaResultSetInNoleggio(ResultSet rs) throws SQLException {
-        // Mappatura Auto
-        Auto.StatoAuto statoAuto = Auto.StatoAuto.valueOf(rs.getString("stato_auto").toUpperCase());
         Auto auto = new Auto(
                 rs.getInt("idauto"),
                 rs.getString("targa"),
                 rs.getString("modello"),
-                statoAuto,
+                Auto.StatoAuto.valueOf(rs.getString("stato_auto").toUpperCase()),
                 rs.getBigDecimal("costogiornaliero")
         );
 
-        Prenotazione.StatoPren statoPren = Prenotazione.StatoPren.valueOf(rs.getString("stato_pren").toUpperCase());
+        Cliente cliente = new Cliente(
+                rs.getInt("id_utente_finale"),
+                "N/A", // Username
+                "N/A", // Password (hashata)
+                rs.getString("nome"),
+                rs.getString("cognome"),
+                rs.getString("email"),
+                rs.getString("patente"),
+                java.math.BigDecimal.ZERO,
+                true
+        );
+
         Prenotazione prenotazione = new Prenotazione(
                 rs.getInt("idprenotazione"),
                 rs.getDate("datainizio"),
                 rs.getDate("datafine"),
-                statoPren,
-                null,
+                Prenotazione.StatoPren.valueOf(rs.getString("stato_pren").toUpperCase()),
+                cliente,
                 auto
         );
 
