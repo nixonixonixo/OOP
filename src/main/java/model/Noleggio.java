@@ -48,6 +48,18 @@ public class Noleggio {
         return prenotazione;
     }
 
+    public Cliente getCliente() {
+        return this.prenotazione.getCliente();
+    }
+
+    public Auto getAuto() {
+        return this.prenotazione.getAuto();
+    }
+
+    public boolean isAttivo() {
+        return this.dataRestituzione == null;
+    }
+
     public void setDataRestituzione(Date dataRestituzione){
         this.dataRestituzione = dataRestituzione;
     }

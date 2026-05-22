@@ -4,7 +4,7 @@ import controller.Controller;
 import model.Utente;
 
 import javax.swing.*;
-import java.awt.*;
+import java.sql.SQLException;
 
 public class DashboardFrame extends JFrame {
 
@@ -16,10 +16,9 @@ public class DashboardFrame extends JFrame {
 
     private final Controller controller;
 
-    public DashboardFrame(Controller controller) {
+    public DashboardFrame(Controller controller) throws SQLException {
         this.controller = controller;
 
-        // Setup base della finestra
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setContentPane(mainPanel);
         setSize(1100, 750);
@@ -36,7 +35,7 @@ public class DashboardFrame extends JFrame {
         });
     }
 
-    private void initDashboard() {
+    private void initDashboard() throws SQLException {
         Utente utente = controller.getUtenteLoggato();
         if (utente != null) {
             String tipoUtente = controller.isOperatoreLoggato() ? "Operatore" : "Cliente";
@@ -44,10 +43,16 @@ public class DashboardFrame extends JFrame {
             lblUserInfo.setText("Utente: " + utente.getUsername() + " [" + utente.getClass().getSimpleName() + "]");
         }
 
+        tabbedPane.removeAll();
+
         if (controller.isOperatoreLoggato()) {
             tabbedPane.addTab("Gestione Parco Auto", new AutoPanel(controller));
+            tabbedPane.addTab("Prenotazioni", new PrenotazionePanel(controller));
+            tabbedPane.addTab("Noleggi Attivi", new NoleggioPanel(controller));
         } else {
             tabbedPane.addTab("Catalogo Auto", new AutoPanel(controller));
+            tabbedPane.addTab("Le mie Prenotazioni", new PrenotazionePanel(controller));
+            tabbedPane.addTab("I miei Pagamenti", new PagamentoPanel(controller));
             tabbedPane.addTab("Il mio Profilo", new ClientePanel(controller));
         }
     }

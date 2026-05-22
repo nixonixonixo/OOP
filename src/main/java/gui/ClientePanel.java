@@ -53,7 +53,6 @@ public class ClientePanel extends JPanel {
                 lblCredito.setText("Credito Attuale: " + aggiornato.getCredito() + " €");
             }
         } catch (SQLException e) {
-            // Log dell'errore senza bloccare l'interfaccia
             System.err.println("Errore caricamento dati: " + e.getMessage());
         }
     }
