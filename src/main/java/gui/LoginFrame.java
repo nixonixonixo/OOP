@@ -64,8 +64,7 @@ public class LoginFrame extends JFrame {
     }
 
     private void openRegistration() {
-
-
-        JOptionPane.showMessageDialog(this, "Finestra di registrazione in fase di collegamento.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        RegistrazioneFrame regFrame = new RegistrazioneFrame(controller);
+        regFrame.setVisible(true);
     }
 }

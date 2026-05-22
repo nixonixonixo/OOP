@@ -48,6 +48,9 @@ public class AutoPanel extends JPanel {
         btnManutenzione.addActionListener(e -> cambiaStato(Auto.StatoAuto.IN_MANUTENZIONE));
         btnRendiDisp.addActionListener(e -> cambiaStato(Auto.StatoAuto.DISPONIBILE));
 
+    }
+
+    public void caricaDatiIniziali() {
         carica();
     }
 

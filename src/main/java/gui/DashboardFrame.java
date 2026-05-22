@@ -1,8 +1,6 @@
 package gui;
 
 import controller.Controller;
-import model.Cliente;
-import model.Operatore;
 import model.Utente;
 
 import javax.swing.*;
@@ -21,15 +19,7 @@ public class DashboardFrame extends JFrame {
     public DashboardFrame(Controller controller) {
         this.controller = controller;
 
-        Utente utente = controller.getUtenteLoggato();
-        if (utente == null) {
-            JOptionPane.showMessageDialog(null, "Sessione non valida.", "Errore Sessione", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String tipoUtente = controller.isOperatoreLoggato() ? "Operatore" : "Cliente";
-        setTitle("Noleggio Auto - " + utente.getNome() + " " + utente.getCognome() + " (" + tipoUtente + ")");
-
+        // Setup base della finestra
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setContentPane(mainPanel);
         setSize(1100, 750);
@@ -40,7 +30,6 @@ public class DashboardFrame extends JFrame {
         btnLogout.addActionListener(e -> {
             controller.logout();
             dispose();
-
             LoginFrame loginFrame = new LoginFrame(controller);
             loginFrame.setLocationRelativeTo(null);
             loginFrame.setVisible(true);
@@ -49,7 +38,11 @@ public class DashboardFrame extends JFrame {
 
     private void initDashboard() {
         Utente utente = controller.getUtenteLoggato();
-        lblUserInfo.setText("Utente: " + utente.getUsername() + " [" + utente.getClass().getSimpleName() + "]");
+        if (utente != null) {
+            String tipoUtente = controller.isOperatoreLoggato() ? "Operatore" : "Cliente";
+            setTitle("Noleggio Auto - " + utente.getNome() + " " + utente.getCognome() + " (" + tipoUtente + ")");
+            lblUserInfo.setText("Utente: " + utente.getUsername() + " [" + utente.getClass().getSimpleName() + "]");
+        }
 
         if (controller.isOperatoreLoggato()) {
             tabbedPane.addTab("Gestione Parco Auto", new AutoPanel(controller));
