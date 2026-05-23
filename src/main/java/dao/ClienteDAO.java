@@ -19,4 +19,6 @@ public interface ClienteDAO {
     void eliminaCliente(int idUtente) throws SQLException;
 
     void aggiornaCredito(int idUtente, BigDecimal nuovoCredito) throws SQLException;
+
+    void prelevaSaldo(int idCliente, java.math.BigDecimal importo) throws SQLException;
 }

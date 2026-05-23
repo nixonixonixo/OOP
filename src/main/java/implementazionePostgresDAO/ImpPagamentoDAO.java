@@ -133,4 +133,17 @@ public class ImpPagamentoDAO implements PagamentoDAO {
         Pagamento.StatoPagamento statoEnum = Pagamento.StatoPagamento.valueOf(statoStr);
         return new Pagamento(rs.getInt("idpagamento"), rs.getBigDecimal("importo"), statoEnum, noleggio);
     }
+
+    @Override
+    public void aggiornaStatoPagamento(int idPagamento, Pagamento.StatoPagamento nuovoStato) throws SQLException {
+        String sql = "UPDATE PAGAMENTO SET stato = ? WHERE idpagamento = ?";
+
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, nuovoStato.name());
+            ps.setInt(2, idPagamento);
+            ps.executeUpdate();
+        }
+    }
 }

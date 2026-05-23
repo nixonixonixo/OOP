@@ -12,6 +12,7 @@ import java.util.List;
 public class PagamentoPanel extends JPanel {
     private JPanel mainPanel;
     private JTable tablePagamenti;
+    private JButton btnPaga;
     private DefaultTableModel model;
     private final Controller controller;
 
@@ -22,6 +23,8 @@ public class PagamentoPanel extends JPanel {
         String[] colonne = {"ID", "Importo", "Stato"};
         model = new DefaultTableModel(colonne, 0);
         tablePagamenti.setModel(model);
+
+        btnPaga.addActionListener(e -> pagaSelezionato());
 
         this.addAncestorListener(new AncestorListener() {
             @Override
@@ -37,6 +40,23 @@ public class PagamentoPanel extends JPanel {
             public void ancestorMoved(AncestorEvent event) {
             }
         });
+    }
+
+    private void pagaSelezionato() {
+        int row = tablePagamenti.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Seleziona un pagamento in sospeso.");
+            return;
+        }
+
+        int idPagamento = (int) model.getValueAt(row, 0);
+        try {
+            controller.confermaPagamento(idPagamento);
+            JOptionPane.showMessageDialog(this, "Pagamento effettuato con successo!");
+            caricaPagamenti();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Errore: " + ex.getMessage());
+        }
     }
 
     private void caricaPagamenti() {
@@ -78,6 +98,12 @@ public class PagamentoPanel extends JPanel {
         mainPanel.add(scrollPane1, BorderLayout.CENTER);
         tablePagamenti = new JTable();
         scrollPane1.setViewportView(tablePagamenti);
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        mainPanel.add(panel1, BorderLayout.SOUTH);
+        btnPaga = new JButton();
+        btnPaga.setText("Paga Selezionato");
+        panel1.add(btnPaga);
     }
 
     /**

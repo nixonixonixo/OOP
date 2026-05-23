@@ -116,4 +116,42 @@ public class Controller {
     }
 
     public List<Pagamento> getPagamentiByCliente(int idCliente) throws SQLException { return pagamentoDAO.trovaPagamentiCliente(idCliente); }
+
+    public void confermaPagamento(int idPagamento) throws Exception {
+        Pagamento p = pagamentoDAO.trovaPagamentoPerId(idPagamento);
+        if (p == null) throw new Exception("Pagamento non trovato.");
+        if (p.getStato() == Pagamento.StatoPagamento.COMPLETATO) throw new Exception("Pagamento già effettuato.");
+
+        int idCliente = recuperaIdClienteDaPagamento(idPagamento);
+
+        Cliente c = clienteDAO.trovaClientePerId(idCliente);
+        if (c == null) throw new Exception("Cliente non trovato.");
+
+
+        if (c.getCredito().compareTo(p.getImporto()) < 0) {
+            throw new Exception("Credito insufficiente. Ricarica il conto!");
+        }
+
+        clienteDAO.prelevaSaldo(idCliente, p.getImporto());
+        pagamentoDAO.aggiornaStatoPagamento(idPagamento, Pagamento.StatoPagamento.COMPLETATO);
+    }
+
+    private int recuperaIdClienteDaPagamento(int idPagamento) throws SQLException {
+        String sql = "SELECT pr.idcliente FROM PRENOTAZIONE pr " +
+                "JOIN NOLEGGIO n ON n.idprenotazione = pr.idprenotazione " +
+                "JOIN PAGAMENTO p ON p.idnoleggio = n.idnoleggio " +
+                "WHERE p.idpagamento = ?";
+
+        try (java.sql.Connection conn = database.ConnessioneDatabase.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idPagamento);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("idcliente");
+                } else {
+                    throw new SQLException("Impossibile trovare il cliente associato al pagamento.");
+                }
+            }
+        }
+    }
 }

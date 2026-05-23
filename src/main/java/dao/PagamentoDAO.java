@@ -31,4 +31,7 @@ public interface PagamentoDAO {
 
     void ricaricaSaldoCliente(int idCliente, BigDecimal importo)
             throws SQLException;
+
+    void aggiornaStatoPagamento(int idPagamento, Pagamento.StatoPagamento nuovoStato)
+            throws SQLException;
 }

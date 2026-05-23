@@ -2,26 +2,41 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="gui.NoleggioPanel">
   <grid id="27dc6" binding="mainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="800" height="600"/>
+      <xy x="20" y="20" width="500" height="400"/>
     </constraints>
+    <properties/>
     <border type="none"/>
     <children>
-      <scrollpane id="a1b2c">
+      <scrollpane id="d3b1f">
         <constraints border-constraint="Center"/>
+        <properties/>
         <border type="none"/>
         <children>
-          <component id="tabellaNoleggi" class="javax.swing.JTable" binding="tabellaNoleggi">
+          <component id="a1c1d" class="javax.swing.JTable" binding="tabellaNoleggi">
             <constraints/>
             <properties/>
           </component>
         </children>
       </scrollpane>
-      <component id="btnChiudi" class="javax.swing.JButton" binding="btnChiudi">
+      <grid id="f4e5d" layout-manager="FlowLayout" hgap="5" vgap="5">
         <constraints border-constraint="South"/>
-        <properties>
-          <text value="Chiudi Noleggio"/>
-        </properties>
-      </component>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="b2c3d" class="javax.swing.JButton" binding="btnAggiorna">
+            <constraints/>
+            <properties>
+              <text value="Aggiorna"/>
+            </properties>
+          </component>
+          <component id="c3d4e" class="javax.swing.JButton" binding="btnChiudi">
+            <constraints/>
+            <properties>
+              <text value="Chiudi Noleggio"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>

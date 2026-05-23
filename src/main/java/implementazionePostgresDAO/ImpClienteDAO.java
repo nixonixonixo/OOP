@@ -140,4 +140,15 @@ public class ImpClienteDAO implements ClienteDAO {
                 credito
         );
     }
+
+    @Override
+    public void prelevaSaldo(int idCliente, java.math.BigDecimal importo) throws SQLException {
+        String sql = "UPDATE CLIENTE SET credito = credito - ? WHERE idutente = ?";
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBigDecimal(1, importo);
+            ps.setInt(2, idCliente);
+            ps.executeUpdate();
+        }
+    }
 }

@@ -7,17 +7,28 @@
     <properties/>
     <border type="none"/>
     <children>
-      <scrollpane id="a1b2c">
+      <scrollpane id="d3b1f">
         <constraints border-constraint="Center"/>
-        <properties/>
         <border type="none"/>
         <children>
-          <component id="d3e4f" class="javax.swing.JTable" binding="tablePagamenti">
+          <component id="a1c1d" class="javax.swing.JTable" binding="tablePagamenti">
             <constraints/>
             <properties/>
           </component>
         </children>
       </scrollpane>
+      <grid id="f4e5d" layout-manager="FlowLayout" hgap="5" vgap="5">
+        <constraints border-constraint="South"/>
+        <border type="none"/>
+        <children>
+          <component id="btnPaga" class="javax.swing.JButton" binding="btnPaga">
+            <constraints/>
+            <properties>
+              <text value="Paga Selezionato"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>
