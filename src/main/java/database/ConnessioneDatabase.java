@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 public class ConnessioneDatabase {
 
-	private static ConnessioneDatabase instace;    //oggetto statico che evita problemi di concorrenza
 	private static final String URL =
 			"jdbc:postgresql://localhost:5432/noleggio_auto";
 
