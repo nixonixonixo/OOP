@@ -3,21 +3,39 @@ package model;
 import java.math.BigDecimal;
 
 /**
- * The type Pagamento.
+ * Rappresenta una transazione di pagamento associata a un contratto di {@link Noleggio}.
+ * Gestisce l'importo della transazione e il suo ciclo di vita (Stato).
  */
 public class Pagamento {
 
     /**
-     * Instantiates a new Pagamento.
-     *
-     * @param idPagamento the id pagamento
-     * @param importo     the importo
-     * @param stato       the stato
-     * @param noleggio    the noleggio
+     * Definisce i possibili stati in cui un pagamento può trovarsi.
      */
-    //costruttore Pagamento
-    public Pagamento(int idPagamento, BigDecimal importo, StatoPagamento stato, Noleggio noleggio){
-        if (importo.compareTo(BigDecimal.ZERO) <= 0) {
+    public enum StatoPagamento {
+        /** La transazione è in attesa di elaborazione. */
+        IN_ATTESA,
+        /** La transazione è stata conclusa con successo. */
+        COMPLETATO,
+        /** La transazione non è andata a buon fine. */
+        FALLITO
+    }
+
+    private int idPagamento;
+    private BigDecimal importo;
+    private StatoPagamento stato;
+    private Noleggio noleggio;
+
+    /**
+     * Crea una nuova istanza di Pagamento.
+     *
+     * @param idPagamento l'ID univoco del pagamento
+     * @param importo     l'importo della transazione
+     * @param stato       lo {@link StatoPagamento} iniziale
+     * @param noleggio    il {@link Noleggio} a cui il pagamento si riferisce
+     * @throws IllegalArgumentException se l'importo è non valido o lo stato è nullo
+     */
+    public Pagamento(int idPagamento, BigDecimal importo, StatoPagamento stato, Noleggio noleggio) {
+        if (importo == null || importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Importo non valido");
         }
         if (stato == null) {
@@ -30,80 +48,49 @@ public class Pagamento {
     }
 
     /**
-     * The enum Stato pagamento.
+     * Restituisce l'ID del pagamento.
+     * @return l'ID univoco
      */
-    //enum Pagamento
-    public enum StatoPagamento{
-        /**
-         * In attesa stato pagamento.
-         */
-        IN_ATTESA,
-        /**
-         * Completato stato pagamento.
-         */
-        COMPLETATO,
-        /**
-         * Fallito stato pagamento.
-         */
-        FALLITO
-    }
-
-    //attributi Pagamento
-    private int idPagamento;
-    private BigDecimal importo;
-    private StatoPagamento stato;
-
-    //associazioni Pagamento
-    private Noleggio noleggio;
-
-    /**
-     * Gets id pagamento.
-     *
-     * @return the id pagamento
-     */
-    //metodi Pagamento
     public int getIdPagamento() {
         return idPagamento;
     }
 
     /**
-     * Gets importo.
-     *
-     * @return the importo
+     * Restituisce l'importo del pagamento.
+     * @return l'importo come {@link BigDecimal}
      */
     public BigDecimal getImporto() {
         return importo;
     }
 
     /**
-     * Gets stato.
-     *
-     * @return the stato
+     * Restituisce lo stato attuale del pagamento.
+     * @return lo {@link StatoPagamento} corrente
      */
     public StatoPagamento getStato() {
         return stato;
     }
 
     /**
-     * Gets noleggio.
-     *
-     * @return the noleggio
+     * Restituisce il noleggio associato a questo pagamento.
+     * @return l'oggetto {@link Noleggio}
      */
     public Noleggio getNoleggio() {
         return noleggio;
     }
 
     /**
-     * Set stato.
-     *
-     * @param stato the stato
+     * Imposta lo stato del pagamento.
+     * @param stato il nuovo {@link StatoPagamento}
      */
-    public void setStato(StatoPagamento stato){
+    public void setStato(StatoPagamento stato) {
         this.stato = stato;
     }
 
     /**
-     * Completa pagamento
+     * Imposta lo stato del pagamento a {@link StatoPagamento#COMPLETATO}.
+     *
+     * @throws IllegalStateException se il pagamento non è attualmente in stato IN_ATTESA
      */
     public void completa() {
         if (stato != StatoPagamento.IN_ATTESA) {
@@ -113,7 +100,9 @@ public class Pagamento {
     }
 
     /**
-     * Pagamento fallito
+     * Imposta lo stato del pagamento a {@link StatoPagamento#FALLITO}.
+     *
+     * @throws IllegalStateException se il pagamento non è attualmente in stato IN_ATTESA
      */
     public void fallisci() {
         if (stato != StatoPagamento.IN_ATTESA) {
@@ -123,7 +112,8 @@ public class Pagamento {
     }
 
     @Override
-    public String toString(){
-        return idPagamento + " " + importo + " " + stato + " " + noleggio.getIdNoleggio();
+    public String toString() {
+        return "Pagamento #" + idPagamento + " | Importo: " + importo +
+                " | Stato: " + stato + " | Noleggio ID: " + noleggio.getIdNoleggio();
     }
 }

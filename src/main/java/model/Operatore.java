@@ -1,43 +1,40 @@
 package model;
 
 /**
- * The type Operatore.
+ * Rappresenta un operatore del sistema di noleggio.
+ * Estende {@link Utente} e definisce il ruolo specifico ricoperto
+ * all'interno dell'organizzazione (es. Admin, Addetto Noleggio, Manutentore).
  */
-public class Operatore  extends Utente{
+public class Operatore extends Utente {
 
     /**
-     * The enum Ruolo.
+     * Definisce i possibili ruoli operativi all'interno del sistema.
      */
-    //enum Operatore
-    public enum Ruolo{
-        /**
-         * Admin ruolo.
-         */
+    public enum Ruolo {
+        /** Amministratore con privilegi elevati. */
         ADMIN,
-        /**
-         * Addetto noleggio ruolo.
-         */
+        /** Operatore dedicato alla gestione delle pratiche di noleggio. */
         ADDETTO_NOLEGGIO,
-        /**
-         * Manutentore ruolo.
-         */
+        /** Operatore responsabile della manutenzione dei veicoli. */
         MANUTENTORE
     }
 
+    private Ruolo ruolo;
+
     /**
-     * Instantiates a new Operatore.
+     * Crea una nuova istanza di Operatore.
      *
-     * @param idUtente the id utente
-     * @param username the username
-     * @param password the password
-     * @param nome     the nome
-     * @param cognome  the cognome
-     * @param email    the email
-     * @param ruolo    the ruolo
+     * @param idUtente l'ID dell'utente
+     * @param username lo username
+     * @param password la password in chiaro
+     * @param nome     il nome
+     * @param cognome  il cognome
+     * @param email    l'email
+     * @param ruolo    il {@link Ruolo} assegnato
+     * @throws IllegalArgumentException se il ruolo fornito è nullo
      */
-    //costruttore Operatore
-    public Operatore(int idUtente, String username, String password, String nome, String cognome, String email,Ruolo ruolo){
-        super(idUtente,username,password,nome,cognome,email);
+    public Operatore(int idUtente, String username, String password, String nome, String cognome, String email, Ruolo ruolo) {
+        super(idUtente, username, password, nome, cognome, email);
         if (ruolo == null) {
             throw new IllegalArgumentException("Ruolo non valido");
         }
@@ -45,50 +42,46 @@ public class Operatore  extends Utente{
     }
 
     /**
-     * Instantiates a new Operatore.
+     * Costruttore utilizzato dai DAO per istanziare un operatore recuperato dal database.
      *
-     * @param idUtente        the id utente
-     * @param username        the username
-     * @param passwordHash    the password hash
-     * @param nome            the nome
-     * @param cognome         the cognome
-     * @param email           the email
-     * @param ruolo           the ruolo
-     * @param isAlreadyHashed the is already hashed
+     * @param idUtente        l'ID dell'utente
+     * @param username        lo username
+     * @param passwordHash    la password già hashata
+     * @param nome            il nome
+     * @param cognome         il cognome
+     * @param email           l'email
+     * @param ruolo           il {@link Ruolo} assegnato
+     * @param isAlreadyHashed flag per indicare che la password è già stata processata
      */
-    //costruttore per DAO
     public Operatore(int idUtente, String username, String passwordHash, String nome, String cognome, String email, Ruolo ruolo, boolean isAlreadyHashed) {
         super(idUtente, username, passwordHash, nome, cognome, email, isAlreadyHashed);
         this.ruolo = ruolo;
     }
 
-    //attributi Operatore
-    private Ruolo ruolo;
-
     /**
-     * Gets ruolo.
+     * Restituisce il ruolo dell'operatore.
      *
-     * @return the ruolo
+     * @return il {@link Ruolo} corrente
      */
-    //metodi Operatore
     public Ruolo getRuolo() {
         return ruolo;
     }
 
     /**
-     * Sets ruolo.
+     * Modifica il ruolo dell'operatore.
      *
-     * @param ruolo the ruolo
+     * @param ruolo il nuovo {@link Ruolo} da assegnare
      */
     public void setRuolo(Ruolo ruolo) {
         this.ruolo = ruolo;
     }
 
     /**
-     * Aggiorna stato auto.
+     * Aggiorna lo stato di un'auto nel sistema.
      *
-     * @param auto       the auto
-     * @param nuovoStato the nuovo stato
+     * @param auto       l'oggetto {@link Auto} da modificare
+     * @param nuovoStato il nuovo {@link Auto.StatoAuto} da impostare
+     * @throws IllegalArgumentException se l'auto o lo stato fornito sono nulli
      */
     public void aggiornaStatoAuto(Auto auto, Auto.StatoAuto nuovoStato) {
         if (auto == null || nuovoStato == null) {
@@ -98,7 +91,7 @@ public class Operatore  extends Utente{
     }
 
     @Override
-    public String toString(){
-        return super.toString() + " " + ruolo;
+    public String toString() {
+        return super.toString() + " | Ruolo: " + ruolo;
     }
 }
