@@ -11,6 +11,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Imp utente dao.
+ */
 public class ImpUtenteDAO implements UtenteDAO {
 
     @Override

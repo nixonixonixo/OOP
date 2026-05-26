@@ -10,6 +10,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Imp prenotazione dao.
+ */
 public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
     @Override

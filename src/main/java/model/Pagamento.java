@@ -15,7 +15,7 @@ public class Pagamento {
      * @param stato       the stato
      * @param noleggio    the noleggio
      */
-//costruttore Pagamento
+    //costruttore Pagamento
     public Pagamento(int idPagamento, BigDecimal importo, StatoPagamento stato, Noleggio noleggio){
         if (importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Importo non valido");
@@ -32,7 +32,7 @@ public class Pagamento {
     /**
      * The enum Stato pagamento.
      */
-//enum Pagamento
+    //enum Pagamento
     public enum StatoPagamento{
         /**
          * In attesa stato pagamento.
@@ -61,7 +61,7 @@ public class Pagamento {
      *
      * @return the id pagamento
      */
-//metodi Pagamento
+    //metodi Pagamento
     public int getIdPagamento() {
         return idPagamento;
     }
@@ -103,7 +103,7 @@ public class Pagamento {
     }
 
     /**
-     * Completa.
+     * Completa pagamento
      */
     public void completa() {
         if (stato != StatoPagamento.IN_ATTESA) {
@@ -113,7 +113,7 @@ public class Pagamento {
     }
 
     /**
-     * Fallisci.
+     * Pagamento fallito
      */
     public void fallisci() {
         if (stato != StatoPagamento.IN_ATTESA) {

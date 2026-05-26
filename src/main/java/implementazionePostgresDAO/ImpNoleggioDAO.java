@@ -11,6 +11,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Imp noleggio dao.
+ */
 public class ImpNoleggioDAO implements NoleggioDAO {
 
     private static final String SELECT_QUERY = """

@@ -16,7 +16,7 @@ public class Noleggio {
      * @param dataRitiro   the data ritiro
      * @param prenotazione the prenotazione
      */
-//costruttore Noleggio
+    //costruttore Noleggio
     public Noleggio(int idNoleggio, Date dataRitiro, Prenotazione prenotazione) {
         if (dataRitiro == null) {
             throw new IllegalArgumentException("Data ritiro non valida");
@@ -42,7 +42,7 @@ public class Noleggio {
      *
      * @return the id noleggio
      */
-//metodi Noleggio
+    //metodi Noleggio
     public int getIdNoleggio() {
         return idNoleggio;
     }

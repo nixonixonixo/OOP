@@ -10,7 +10,7 @@ public class Prenotazione {
     /**
      * The enum Stato pren.
      */
-//enum
+    //enum
     public enum StatoPren {
         /**
          * In attesa stato pren.
@@ -66,7 +66,7 @@ public class Prenotazione {
     /**
      * Instantiates a new Prenotazione.
      */
-//metodi Prenotazione
+    //metodi Prenotazione
     public Prenotazione() {}
 
     /**
@@ -169,7 +169,7 @@ public class Prenotazione {
     /**
      * Conferma.
      */
-//metodi di logica
+    //metodi di logica
     public void conferma() {
         if (stato == StatoPren.ANNULLATA) {
             throw new IllegalStateException("Prenotazione già annullata");

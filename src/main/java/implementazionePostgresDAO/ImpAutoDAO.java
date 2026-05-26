@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Implementazione auto dao.
+ */
 public class ImpAutoDAO implements AutoDAO {
 
     @Override

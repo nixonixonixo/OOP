@@ -19,7 +19,7 @@ public class Cliente extends Utente {
      * @param patente  the patente
      * @param credito  the credito
      */
-//costruttore Cliente
+    //costruttore Cliente
     public Cliente(int idUtente, String username, String password, String nome, String cognome, String email,String patente, BigDecimal credito){
         super(idUtente,username,password,nome,cognome,email);
         if (patente == null || patente.isBlank()) {
@@ -43,9 +43,9 @@ public class Cliente extends Utente {
      * @param email           the email
      * @param patente         the patente
      * @param credito         the credito
-     * @param isAlreadyHashed the is already hashed
+     * @param isAlreadyHashed parametro per capire se la password è già hashata
      */
-//costruttore per DAO
+    //costruttore per DAO
     public Cliente(int idUtente, String username, String passwordHash, String nome, String cognome, String email, String patente, BigDecimal credito, boolean isAlreadyHashed) {
         super(idUtente, username, passwordHash, nome, cognome, email, isAlreadyHashed);
         this.patente = patente;
@@ -61,7 +61,7 @@ public class Cliente extends Utente {
      *
      * @param importo the importo
      */
-//metodi Cliente
+    //metodi Cliente
     public void ricaricaCredito(BigDecimal importo) {
         if (importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Importo non valido");

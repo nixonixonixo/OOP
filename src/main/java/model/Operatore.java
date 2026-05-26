@@ -8,7 +8,7 @@ public class Operatore  extends Utente{
     /**
      * The enum Ruolo.
      */
-//enum Operatore
+    //enum Operatore
     public enum Ruolo{
         /**
          * Admin ruolo.
@@ -35,7 +35,7 @@ public class Operatore  extends Utente{
      * @param email    the email
      * @param ruolo    the ruolo
      */
-//costruttore Operatore
+    //costruttore Operatore
     public Operatore(int idUtente, String username, String password, String nome, String cognome, String email,Ruolo ruolo){
         super(idUtente,username,password,nome,cognome,email);
         if (ruolo == null) {
@@ -56,7 +56,7 @@ public class Operatore  extends Utente{
      * @param ruolo           the ruolo
      * @param isAlreadyHashed the is already hashed
      */
-//costruttore per DAO
+    //costruttore per DAO
     public Operatore(int idUtente, String username, String passwordHash, String nome, String cognome, String email, Ruolo ruolo, boolean isAlreadyHashed) {
         super(idUtente, username, passwordHash, nome, cognome, email, isAlreadyHashed);
         this.ruolo = ruolo;
@@ -70,7 +70,7 @@ public class Operatore  extends Utente{
      *
      * @return the ruolo
      */
-//metodi Operatore
+    //metodi Operatore
     public Ruolo getRuolo() {
         return ruolo;
     }

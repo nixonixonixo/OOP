@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * The type Controller.
+ */
 public class Controller {
 
     private final UtenteDAO utenteDAO;
@@ -22,6 +25,17 @@ public class Controller {
 
     private Utente utenteLoggato;
 
+    /**
+     * Instantiates a new Controller.
+     *
+     * @param utenteDAO       the utente dao
+     * @param clienteDAO      the cliente dao
+     * @param operatoreDAO    the operatore dao
+     * @param autoDAO         the auto dao
+     * @param noleggioDAO     the noleggio dao
+     * @param pagamentoDAO    the pagamento dao
+     * @param prenotazioneDAO the prenotazione dao
+     */
     //Costruttore Controller
     public Controller(UtenteDAO utenteDAO, ClienteDAO clienteDAO, OperatoreDAO operatoreDAO,
                       AutoDAO autoDAO, NoleggioDAO noleggioDAO, PagamentoDAO pagamentoDAO,
@@ -35,6 +49,14 @@ public class Controller {
         this.prenotazioneDAO = prenotazioneDAO;
     }
 
+    /**
+     * Login utente.
+     *
+     * @param username the username
+     * @param password the password
+     * @return the utente
+     * @throws SQLException the sql exception
+     */
     public Utente login(String username, String password) throws SQLException {
         Utente u = utenteDAO.trovaUtentePerUsername(username);
         if (u == null || !u.verificaPassword(password)) {
@@ -44,47 +66,105 @@ public class Controller {
         return u;
     }
 
+    /**
+     * Logout.
+     */
     //Metodo per logout
     public void logout() { this.utenteLoggato = null; }
 
+    /**
+     * Gets utente loggato.
+     *
+     * @return the utente loggato
+     */
     //Getter per l'utente loggato
     public Utente getUtenteLoggato() { return utenteLoggato; }
 
+    /**
+     * Is operatore loggato boolean.
+     *
+     * @return the boolean
+     */
     //Metodo per capire se l'utente loggato è un operatore
     public boolean isOperatoreLoggato() { return utenteLoggato instanceof Operatore; }
 
+    /**
+     * Gets cliente by id.
+     *
+     * @param id the id
+     * @return the cliente by id
+     * @throws SQLException the sql exception
+     */
     //Getter del cliente per ID
     public Cliente getClienteById(int id) throws SQLException {
         return clienteDAO.trovaClientePerId(id);
     }
 
+    /**
+     * Registra cliente.
+     *
+     * @param c the c
+     * @throws SQLException the sql exception
+     */
     //Metodo per la registrazione
     public void registraCliente(Cliente c) throws SQLException {
         utenteDAO.salvaUtente(c);
         clienteDAO.salvaCliente(c);
     }
 
+    /**
+     * Ricarica conto.
+     *
+     * @param idCliente the id cliente
+     * @param importo   the importo
+     * @throws SQLException the sql exception
+     */
     //Metodo per ricarica il conto di un cliente
     public void ricaricaConto(int idCliente, BigDecimal importo) throws SQLException {
         if (importo.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalArgumentException("Importo non valido");
         pagamentoDAO.ricaricaSaldoCliente(idCliente, importo);
     }
 
+    /**
+     * Gets tutte auto.
+     *
+     * @return the tutte auto
+     * @throws SQLException the sql exception
+     */
     //Getter di tutte le auto
     public List<Auto> getTutteAuto() throws SQLException {
         return autoDAO.trovaTutteAuto();
     }
 
+    /**
+     * Gets auto disponibili.
+     *
+     * @return the auto disponibili
+     * @throws SQLException the sql exception
+     */
     //Getter per le auto disponibili
     public List<Auto> getAutoDisponibili() throws SQLException {
         return autoDAO.trovaAutoDisponibili();
     }
 
+    /**
+     * Cambia stato auto.
+     *
+     * @param idAuto the id auto
+     * @param stato  the stato
+     * @throws SQLException the sql exception
+     */
     //Metodo per cambiare lo stato dell'auto
     public void cambiaStatoAuto(int idAuto, Auto.StatoAuto stato) throws SQLException {
         autoDAO.aggiornaStatoAuto(idAuto, stato);
     }
 
+    /**
+     * Effettua prenotazione.
+     *
+     * @param p the p
+     * @throws Exception the exception
+     */
     //Metodo che permette al cliente di effettuare una prenotazione
     public void effettuaPrenotazione(Prenotazione p) throws Exception {
         prenotazioneDAO.salvaPrenotazione(p);
@@ -92,12 +172,31 @@ public class Controller {
         autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
     }
 
+    /**
+     * Gets tutte prenotazioni.
+     *
+     * @return the tutte prenotazioni
+     * @throws SQLException the sql exception
+     */
     //Getter di tutte le prenotazioni
     public List<Prenotazione> getTuttePrenotazioni() throws SQLException { return prenotazioneDAO.trovaTuttePrenotazioni(); }
 
+    /**
+     * Gets prenotazioni cliente.
+     *
+     * @param idCliente the id cliente
+     * @return the prenotazioni cliente
+     * @throws SQLException the sql exception
+     */
     //Getter di prenotazioni di un cliente
     public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws SQLException { return prenotazioneDAO.trovaPrenotazioniCliente(idCliente); }
 
+    /**
+     * Conferma prenotazione.
+     *
+     * @param idPrenotazione the id prenotazione
+     * @throws Exception the exception
+     */
     //Metodo per confermare la prenotazione
     public void confermaPrenotazione(int idPrenotazione) throws Exception {
         Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
@@ -107,6 +206,12 @@ public class Controller {
         noleggioDAO.salvaNoleggio(n);
     }
 
+    /**
+     * Gets noleggi attivi.
+     *
+     * @return the noleggi attivi
+     * @throws SQLException the sql exception
+     */
     //Metodo per mostrare i noleggi attivi
     public List<Noleggio> getNoleggiAttivi() throws SQLException {
         return noleggioDAO.trovaTuttiNoleggi().stream()
@@ -114,6 +219,12 @@ public class Controller {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Termina noleggio.
+     *
+     * @param idNoleggio the id noleggio
+     * @throws Exception the exception
+     */
     //Metodo per terminare il noleggio
     public void terminaNoleggio(int idNoleggio) throws Exception {
         Noleggio n = noleggioDAO.trovaNoleggioPerId(idNoleggio);
@@ -131,8 +242,21 @@ public class Controller {
         autoDAO.aggiornaStatoAuto(n.getPrenotazione().getAuto().getIdAuto(), Auto.StatoAuto.DISPONIBILE);
     }
 
+    /**
+     * Gets pagamenti by cliente.
+     *
+     * @param idCliente the id cliente
+     * @return the pagamenti by cliente
+     * @throws SQLException the sql exception
+     */
     public List<Pagamento> getPagamentiByCliente(int idCliente) throws SQLException { return pagamentoDAO.trovaPagamentiCliente(idCliente); }
 
+    /**
+     * Conferma pagamento.
+     *
+     * @param idPagamento the id pagamento
+     * @throws Exception the exception
+     */
     //Metodo per permettere all'utente di pagare
     public void confermaPagamento(int idPagamento) throws Exception {
         Pagamento p = pagamentoDAO.trovaPagamentoPerId(idPagamento);

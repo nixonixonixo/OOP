@@ -8,6 +8,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Imp operatore dao.
+ */
 public class ImpOperatoreDAO implements OperatoreDAO {
 
     @Override

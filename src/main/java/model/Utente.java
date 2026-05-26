@@ -28,7 +28,7 @@ public class Utente {
      * @param cognome        the cognome
      * @param email          the email
      */
-//costruttore Utente
+    //costruttore Utente
     public Utente(int idUtente, String username, String passwordChiara, String nome, String cognome, String email) {
         validaCampi(username, passwordChiara, nome, cognome, email);
         this.idUtente = idUtente;
@@ -48,9 +48,9 @@ public class Utente {
      * @param nome            the nome
      * @param cognome         the cognome
      * @param email           the email
-     * @param isAlreadyHashed the is already hashed
+     * @param isAlreadyHashed parametro per capire se la password è già hashata
      */
-//costruttore DAO
+    //costruttore DAO
     public Utente(int idUtente, String username, String passwordHash, String nome, String cognome, String email, boolean isAlreadyHashed) {
         this.idUtente = idUtente;
         this.username = username;
@@ -66,7 +66,7 @@ public class Utente {
      * @param passwordChiara the password chiara
      * @return the boolean
      */
-//metodi di logica
+    //metodi di logica
     public boolean verificaPassword(String passwordChiara) {
         if (passwordChiara == null) return false;
         String hashDaVerificare = generaHash(passwordChiara);
@@ -97,7 +97,7 @@ public class Utente {
      *
      * @return the id utente
      */
-//metodi Utente
+    //metodi Utente
     public int getIdUtente() { return idUtente; }
 
     /**
