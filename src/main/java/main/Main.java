@@ -6,7 +6,15 @@ import gui.LoginFrame;
 import implementazionePostgresDAO.*;
 import javax.swing.*;
 
+/**
+ * The type Main.
+ */
 public class Main {
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Controller controller = new Controller(

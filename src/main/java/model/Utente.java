@@ -5,6 +5,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+/**
+ * The type Utente.
+ */
 public class Utente {
 
     //attributi Utente
@@ -15,7 +18,17 @@ public class Utente {
     private String cognome;
     private String email;
 
-    //costruttore Utente
+    /**
+     * Instantiates a new Utente.
+     *
+     * @param idUtente       the id utente
+     * @param username       the username
+     * @param passwordChiara the password chiara
+     * @param nome           the nome
+     * @param cognome        the cognome
+     * @param email          the email
+     */
+//costruttore Utente
     public Utente(int idUtente, String username, String passwordChiara, String nome, String cognome, String email) {
         validaCampi(username, passwordChiara, nome, cognome, email);
         this.idUtente = idUtente;
@@ -26,7 +39,18 @@ public class Utente {
         this.email = email;
     }
 
-    //costruttore DAO
+    /**
+     * Instantiates a new Utente.
+     *
+     * @param idUtente        the id utente
+     * @param username        the username
+     * @param passwordHash    the password hash
+     * @param nome            the nome
+     * @param cognome         the cognome
+     * @param email           the email
+     * @param isAlreadyHashed the is already hashed
+     */
+//costruttore DAO
     public Utente(int idUtente, String username, String passwordHash, String nome, String cognome, String email, boolean isAlreadyHashed) {
         this.idUtente = idUtente;
         this.username = username;
@@ -36,7 +60,13 @@ public class Utente {
         this.email = email;
     }
 
-    //metodi di logica
+    /**
+     * Verifica password boolean.
+     *
+     * @param passwordChiara the password chiara
+     * @return the boolean
+     */
+//metodi di logica
     public boolean verificaPassword(String passwordChiara) {
         if (passwordChiara == null) return false;
         String hashDaVerificare = generaHash(passwordChiara);
@@ -62,26 +92,91 @@ public class Utente {
         if (email == null || !email.contains("@")) throw new IllegalArgumentException("Email non valida");
     }
 
-    //metodi Utente
+    /**
+     * Gets id utente.
+     *
+     * @return the id utente
+     */
+//metodi Utente
     public int getIdUtente() { return idUtente; }
+
+    /**
+     * Sets id utente.
+     *
+     * @param idUtente the id utente
+     */
     public void setIdUtente(int idUtente) { this.idUtente = idUtente; }
 
+    /**
+     * Gets username.
+     *
+     * @return the username
+     */
     public String getUsername() { return username; }
+
+    /**
+     * Sets username.
+     *
+     * @param username the username
+     */
     public void setUsername(String username) { this.username = username; }
 
+    /**
+     * Gets password hash.
+     *
+     * @return the password hash
+     */
     public String getPasswordHash() { return passwordHash; }
 
+    /**
+     * Cambia password.
+     *
+     * @param nuovaPasswordChiara the nuova password chiara
+     */
     public void cambiaPassword(String nuovaPasswordChiara) {
         this.passwordHash = generaHash(nuovaPasswordChiara);
     }
 
+    /**
+     * Gets nome.
+     *
+     * @return the nome
+     */
     public String getNome() { return nome; }
+
+    /**
+     * Sets nome.
+     *
+     * @param nome the nome
+     */
     public void setNome(String nome) { this.nome = nome; }
 
+    /**
+     * Gets cognome.
+     *
+     * @return the cognome
+     */
     public String getCognome() { return cognome; }
+
+    /**
+     * Sets cognome.
+     *
+     * @param cognome the cognome
+     */
     public void setCognome(String cognome) { this.cognome = cognome; }
 
+    /**
+     * Gets email.
+     *
+     * @return the email
+     */
     public String getEmail() { return email; }
+
+    /**
+     * Sets email.
+     *
+     * @param email the email
+     */
     public void setEmail(String email) { this.email = email; }
 
     @Override

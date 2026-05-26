@@ -2,9 +2,20 @@ package model;
 
 import java.math.BigDecimal;
 
+/**
+ * The type Pagamento.
+ */
 public class Pagamento {
 
-    //costruttore Pagamento
+    /**
+     * Instantiates a new Pagamento.
+     *
+     * @param idPagamento the id pagamento
+     * @param importo     the importo
+     * @param stato       the stato
+     * @param noleggio    the noleggio
+     */
+//costruttore Pagamento
     public Pagamento(int idPagamento, BigDecimal importo, StatoPagamento stato, Noleggio noleggio){
         if (importo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Importo non valido");
@@ -18,10 +29,22 @@ public class Pagamento {
         this.noleggio = noleggio;
     }
 
-    //enum Pagamento
+    /**
+     * The enum Stato pagamento.
+     */
+//enum Pagamento
     public enum StatoPagamento{
+        /**
+         * In attesa stato pagamento.
+         */
         IN_ATTESA,
+        /**
+         * Completato stato pagamento.
+         */
         COMPLETATO,
+        /**
+         * Fallito stato pagamento.
+         */
         FALLITO
     }
 
@@ -33,27 +56,55 @@ public class Pagamento {
     //associazioni Pagamento
     private Noleggio noleggio;
 
-    //metodi Pagamento
+    /**
+     * Gets id pagamento.
+     *
+     * @return the id pagamento
+     */
+//metodi Pagamento
     public int getIdPagamento() {
         return idPagamento;
     }
 
+    /**
+     * Gets importo.
+     *
+     * @return the importo
+     */
     public BigDecimal getImporto() {
         return importo;
     }
 
+    /**
+     * Gets stato.
+     *
+     * @return the stato
+     */
     public StatoPagamento getStato() {
         return stato;
     }
 
+    /**
+     * Gets noleggio.
+     *
+     * @return the noleggio
+     */
     public Noleggio getNoleggio() {
         return noleggio;
     }
 
+    /**
+     * Set stato.
+     *
+     * @param stato the stato
+     */
     public void setStato(StatoPagamento stato){
         this.stato = stato;
     }
 
+    /**
+     * Completa.
+     */
     public void completa() {
         if (stato != StatoPagamento.IN_ATTESA) {
             throw new IllegalStateException("Pagamento non completabile");
@@ -61,6 +112,9 @@ public class Pagamento {
         stato = StatoPagamento.COMPLETATO;
     }
 
+    /**
+     * Fallisci.
+     */
     public void fallisci() {
         if (stato != StatoPagamento.IN_ATTESA) {
             throw new IllegalStateException("Pagamento non fallibile");
