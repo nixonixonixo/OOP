@@ -7,13 +7,17 @@ import implementazionePostgresDAO.*;
 import javax.swing.*;
 
 /**
- * The type Main.
+ * Classe di avvio dell'applicativo.
+ * <p>
+ * Questa classe rappresenta il punto di ingresso (entry point) del programma.
+ * Si occupa di inizializzare lo strato di persistenza (DAO), istanziare il
+ * {@link controller.Controller} principale e lanciare la finestra di autenticazione iniziale.
  */
 public class Main {
     /**
-     * The entry point of application.
+     * Metodo main che avvia l'applicazione all'interno dell'Event Dispatch Thread (EDT).
      *
-     * @param args the input arguments
+     * @param args argomenti passati dalla riga di comando (non utilizzati).
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

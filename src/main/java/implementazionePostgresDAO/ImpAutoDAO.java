@@ -14,6 +14,12 @@ import java.util.List;
  */
 public class ImpAutoDAO implements AutoDAO {
 
+    /**
+     * Salva una nuova entità Auto nel database.
+     *
+     * @param auto l'oggetto Auto da persistire
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void salvaAuto(Auto auto) throws SQLException {
         String sql = "INSERT INTO AUTO (idauto, targa, modello, stato, costogiornaliero) VALUES (?, ?, ?, ?, ?)";
@@ -31,6 +37,13 @@ public class ImpAutoDAO implements AutoDAO {
         }
     }
 
+    /**
+     * Recupera un'Auto dal database tramite il suo identificativo univoco.
+     *
+     * @param idAuto l'ID dell'auto da cercare
+     * @return l'oggetto Auto corrispondente, o null se non trovato
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public Auto trovaAutoPerId(int idAuto) throws SQLException {
         String sql = "SELECT * FROM AUTO WHERE idauto = ?";
@@ -50,6 +63,12 @@ public class ImpAutoDAO implements AutoDAO {
         return null;
     }
 
+    /**
+     * Recupera l'elenco completo di tutte le auto presenti nel database.
+     *
+     * @return una lista di oggetti Auto
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public List<Auto> trovaTutteAuto() throws SQLException {
         List<Auto> lista = new ArrayList<>();
@@ -67,6 +86,12 @@ public class ImpAutoDAO implements AutoDAO {
         return lista;
     }
 
+    /**
+     * Recupera l'elenco delle sole auto attualmente disponibili per il noleggio.
+     *
+     * @return una lista di oggetti Auto con stato DISPONIBILE
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public List<Auto> trovaAutoDisponibili() throws SQLException {
         List<Auto> lista = new ArrayList<>();
@@ -84,6 +109,12 @@ public class ImpAutoDAO implements AutoDAO {
         return lista;
     }
 
+    /**
+     * Aggiorna i dati di un'auto esistente nel database.
+     *
+     * @param auto l'oggetto Auto contenente i dati aggiornati
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void aggiornaAuto(Auto auto) throws SQLException {
         String sql = "UPDATE AUTO SET targa = ?, modello = ?, stato = ?, costogiornaliero = ? WHERE idauto = ?";
@@ -101,6 +132,13 @@ public class ImpAutoDAO implements AutoDAO {
         }
     }
 
+    /**
+     * Aggiorna esclusivamente lo stato di un'auto specifica nel database.
+     *
+     * @param idAuto l'ID dell'auto da aggiornare
+     * @param stato  il nuovo stato da impostare
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void aggiornaStatoAuto(int idAuto, Auto.StatoAuto stato) throws SQLException {
         String sql = "UPDATE AUTO SET stato = ? WHERE idauto = ?";
@@ -115,6 +153,12 @@ public class ImpAutoDAO implements AutoDAO {
         }
     }
 
+    /**
+     * Rimuove un'auto dal database tramite il suo identificativo.
+     *
+     * @param idAuto l'ID dell'auto da eliminare
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void eliminaAuto(int idAuto) throws SQLException {
         String sql = "DELETE FROM AUTO WHERE idauto = ?";
@@ -127,6 +171,13 @@ public class ImpAutoDAO implements AutoDAO {
         }
     }
 
+    /**
+     * Metodo di supporto per mappare una riga del ResultSet in un oggetto Auto.
+     *
+     * @param rs il ResultSet corrente posizionato sulla riga da mappare
+     * @return un'istanza di Auto popolata con i dati del database
+     * @throws SQLException se si verifica un errore nell'estrazione dei dati dalle colonne
+     */
     private Auto mappaResultSetInAuto(ResultSet rs) throws SQLException {
         String statoStr = rs.getString("stato");
         Auto.StatoAuto statoEnum;
