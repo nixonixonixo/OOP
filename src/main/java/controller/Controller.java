@@ -22,6 +22,7 @@ public class Controller {
 
     private Utente utenteLoggato;
 
+    //Costruttore Controller
     public Controller(UtenteDAO utenteDAO, ClienteDAO clienteDAO, OperatoreDAO operatoreDAO,
                       AutoDAO autoDAO, NoleggioDAO noleggioDAO, PagamentoDAO pagamentoDAO,
                       PrenotazioneDAO prenotazioneDAO) {
@@ -43,48 +44,61 @@ public class Controller {
         return u;
     }
 
+    //Metodo per logout
     public void logout() { this.utenteLoggato = null; }
 
+    //Getter per l'utente loggato
     public Utente getUtenteLoggato() { return utenteLoggato; }
 
+    //Metodo per capire se l'utente loggato è un operatore
     public boolean isOperatoreLoggato() { return utenteLoggato instanceof Operatore; }
 
+    //Getter del cliente per ID
     public Cliente getClienteById(int id) throws SQLException {
         return clienteDAO.trovaClientePerId(id);
     }
 
+    //Metodo per la registrazione
     public void registraCliente(Cliente c) throws SQLException {
         utenteDAO.salvaUtente(c);
         clienteDAO.salvaCliente(c);
     }
 
+    //Metodo per ricarica il conto di un cliente
     public void ricaricaConto(int idCliente, BigDecimal importo) throws SQLException {
         if (importo.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalArgumentException("Importo non valido");
         pagamentoDAO.ricaricaSaldoCliente(idCliente, importo);
     }
 
+    //Getter di tutte le auto
     public List<Auto> getTutteAuto() throws SQLException {
         return autoDAO.trovaTutteAuto();
     }
 
+    //Getter per le auto disponibili
     public List<Auto> getAutoDisponibili() throws SQLException {
         return autoDAO.trovaAutoDisponibili();
     }
 
+    //Metodo per cambiare lo stato dell'auto
     public void cambiaStatoAuto(int idAuto, Auto.StatoAuto stato) throws SQLException {
         autoDAO.aggiornaStatoAuto(idAuto, stato);
     }
 
+    //Metodo che permette al cliente di effettuare una prenotazione
     public void effettuaPrenotazione(Prenotazione p) throws Exception {
         prenotazioneDAO.salvaPrenotazione(p);
 
         autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
     }
 
+    //Getter di tutte le prenotazioni
     public List<Prenotazione> getTuttePrenotazioni() throws SQLException { return prenotazioneDAO.trovaTuttePrenotazioni(); }
 
+    //Getter di prenotazioni di un cliente
     public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws SQLException { return prenotazioneDAO.trovaPrenotazioniCliente(idCliente); }
 
+    //Metodo per confermare la prenotazione
     public void confermaPrenotazione(int idPrenotazione) throws Exception {
         Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
         if (p == null) throw new Exception("Prenotazione non trovata");
@@ -93,12 +107,14 @@ public class Controller {
         noleggioDAO.salvaNoleggio(n);
     }
 
+    //Metodo per mostrare i noleggi attivi
     public List<Noleggio> getNoleggiAttivi() throws SQLException {
         return noleggioDAO.trovaTuttiNoleggi().stream()
                 .filter(n -> n.getDataRestituzione() == null)
                 .collect(Collectors.toList());
     }
 
+    //Metodo per terminare il noleggio
     public void terminaNoleggio(int idNoleggio) throws Exception {
         Noleggio n = noleggioDAO.trovaNoleggioPerId(idNoleggio);
         if (n == null) throw new Exception("Noleggio non trovato.");
@@ -117,6 +133,7 @@ public class Controller {
 
     public List<Pagamento> getPagamentiByCliente(int idCliente) throws SQLException { return pagamentoDAO.trovaPagamentiCliente(idCliente); }
 
+    //Metodo per permettere all'utente di pagare
     public void confermaPagamento(int idPagamento) throws Exception {
         Pagamento p = pagamentoDAO.trovaPagamentoPerId(idPagamento);
         if (p == null) throw new Exception("Pagamento non trovato.");
@@ -136,6 +153,7 @@ public class Controller {
         pagamentoDAO.aggiornaStatoPagamento(idPagamento, Pagamento.StatoPagamento.COMPLETATO);
     }
 
+    //Metodo di supporto per il metodo confermaPagamento
     private int recuperaIdClienteDaPagamento(int idPagamento) throws SQLException {
         String sql = "SELECT pr.idcliente FROM PRENOTAZIONE pr " +
                 "JOIN NOLEGGIO n ON n.idprenotazione = pr.idprenotazione " +
