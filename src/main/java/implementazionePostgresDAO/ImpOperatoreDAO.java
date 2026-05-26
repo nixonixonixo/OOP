@@ -9,13 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The type Imp operatore dao.
+ * Implementazione DAO per la persistenza dei dati degli Operatori su database PostgreSQL.
+ * Gestisce l'associazione tra l'entità Operatore e le tabelle UTENTE e OPERATORE.
  */
 public class ImpOperatoreDAO implements OperatoreDAO {
 
+    /**
+     * Salva i dati specifici dell'operatore nel database.
+     *
+     * @param operatore l'oggetto Operatore da persistere
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void salvaOperatore(Operatore operatore) throws SQLException {
-
         String sql = """
             INSERT INTO OPERATORE (idutente, ruolo)
             VALUES (?, ?)
@@ -31,9 +37,15 @@ public class ImpOperatoreDAO implements OperatoreDAO {
         }
     }
 
+    /**
+     * Recupera un operatore dal database tramite il suo ID, unendo i dati delle tabelle UTENTE e OPERATORE.
+     *
+     * @param idUtente l'ID univoco dell'utente
+     * @return l'oggetto Operatore popolato, o null se non trovato
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public Operatore trovaOperatorePerId(int idUtente) throws SQLException {
-
         String sql = """
             SELECT u.idutente, u.username, u.passwordhash, u.nome, u.cognome, u.email,
                    o.ruolo
@@ -47,19 +59,24 @@ public class ImpOperatoreDAO implements OperatoreDAO {
 
             ps.setInt(1, idUtente);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mappaResultSetInOperatore(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mappaResultSetInOperatore(rs);
+                }
             }
         }
 
         return null;
     }
 
+    /**
+     * Recupera l'elenco di tutti gli operatori registrati nel sistema.
+     *
+     * @return una lista di oggetti Operatore
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public List<Operatore> trovaTuttiOperatori() throws SQLException {
-
         List<Operatore> operatori = new ArrayList<>();
 
         String sql = """
@@ -81,9 +98,14 @@ public class ImpOperatoreDAO implements OperatoreDAO {
         return operatori;
     }
 
+    /**
+     * Aggiorna il ruolo di un operatore esistente.
+     *
+     * @param operatore l'oggetto Operatore contenente il nuovo ruolo
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void aggiornaOperatore(Operatore operatore) throws SQLException {
-
         String sql = """
             UPDATE OPERATORE
             SET ruolo = ?
@@ -100,9 +122,14 @@ public class ImpOperatoreDAO implements OperatoreDAO {
         }
     }
 
+    /**
+     * Elimina l'associazione dell'operatore dal database.
+     *
+     * @param idUtente l'ID dell'utente da rimuovere dal ruolo di operatore
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void eliminaOperatore(int idUtente) throws SQLException {
-
         String sql = "DELETE FROM OPERATORE WHERE idutente = ?";
 
         try (Connection conn = ConnessioneDatabase.getConnection();
@@ -113,8 +140,14 @@ public class ImpOperatoreDAO implements OperatoreDAO {
         }
     }
 
+    /**
+     * Metodo di supporto per mappare una riga del ResultSet in un oggetto Operatore.
+     *
+     * @param rs il ResultSet posizionato sulla riga corrente
+     * @return un'istanza di Operatore popolata con i dati del database
+     * @throws SQLException se si verifica un errore nella lettura delle colonne
+     */
     private Operatore mappaResultSetInOperatore(ResultSet rs) throws SQLException {
-
         Operatore.Ruolo ruoloEnum = Operatore.Ruolo.valueOf(
                 rs.getString("ruolo").toUpperCase()
         );

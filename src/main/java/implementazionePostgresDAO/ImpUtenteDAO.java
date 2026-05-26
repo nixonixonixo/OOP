@@ -12,10 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The type Imp utente dao.
+ * Implementazione DAO per la gestione degli Utenti su database PostgreSQL.
+ * Gestisce l'identificazione e il recupero polimorfico degli utenti,
+ * distinguendo tra base Utente, Cliente o Operatore in base alle tabelle correlate.
  */
 public class ImpUtenteDAO implements UtenteDAO {
 
+    /**
+     * Salva i dati anagrafici base dell'utente nel database.
+     *
+     * @param utente l'oggetto Utente da persistere
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void salvaUtente(Utente utente) throws SQLException {
         String sql = "INSERT INTO utente (idutente, username, passwordhash, nome, cognome, email) VALUES (?, ?, ?, ?, ?, ?)";
@@ -34,6 +42,14 @@ public class ImpUtenteDAO implements UtenteDAO {
         }
     }
 
+    /**
+     * Recupera un utente dal database tramite il suo ID.
+     * Effettua join con le tabelle Cliente e Operatore per ricostruire l'oggetto corretto.
+     *
+     * @param idUtente l'ID dell'utente
+     * @return l'oggetto Utente (o la sottoclasse Cliente/Operatore) trovato, o null
+     * @throws SQLException se si verifica un errore durante la query
+     */
     @Override
     public Utente trovaUtentePerId(int idUtente) throws SQLException {
         String sql = """
@@ -57,6 +73,13 @@ public class ImpUtenteDAO implements UtenteDAO {
         return null;
     }
 
+    /**
+     * Cerca un utente per il suo username (utile per la logica di login).
+     *
+     * @param username lo username da cercare
+     * @return l'oggetto Utente trovato, o null
+     * @throws SQLException se si verifica un errore durante la query
+     */
     @Override
     public Utente trovaUtentePerUsername(String username) throws SQLException {
         String sql = """
@@ -80,6 +103,12 @@ public class ImpUtenteDAO implements UtenteDAO {
         return null;
     }
 
+    /**
+     * Recupera l'elenco completo di tutti gli utenti registrati.
+     *
+     * @return lista di oggetti Utente (polimorfici)
+     * @throws SQLException se si verifica un errore durante la query
+     */
     @Override
     public List<Utente> trovaTuttiUtenti() throws SQLException {
         List<Utente> utenti = new ArrayList<>();
@@ -103,6 +132,12 @@ public class ImpUtenteDAO implements UtenteDAO {
         return utenti;
     }
 
+    /**
+     * Aggiorna le informazioni anagrafiche base dell'utente.
+     *
+     * @param utente l'oggetto Utente aggiornato
+     * @throws SQLException se l'aggiornamento fallisce
+     */
     @Override
     public void aggiornaUtente(Utente utente) throws SQLException {
         String sql = """
@@ -125,6 +160,12 @@ public class ImpUtenteDAO implements UtenteDAO {
         }
     }
 
+    /**
+     * Elimina un utente dal sistema.
+     *
+     * @param idUtente l'ID dell'utente da eliminare
+     * @throws SQLException se l'operazione fallisce
+     */
     @Override
     public void eliminaUtente(int idUtente) throws SQLException {
         String sql = "DELETE FROM utente WHERE idutente = ?";
@@ -137,6 +178,14 @@ public class ImpUtenteDAO implements UtenteDAO {
         }
     }
 
+    /**
+     * Metodo privato di mapping che istanzia l'oggetto corretto (Utente, Cliente o Operatore)
+     * analizzando la presenza di dati nelle tabelle esterne (join).
+     *
+     * @param rs il ResultSet posizionato sulla riga corrente
+     * @return un'istanza dell'oggetto specifico (Cliente/Operatore/Utente)
+     * @throws SQLException se la lettura fallisce
+     */
     private Utente mappaResultSetInUtente(ResultSet rs) throws SQLException {
         int id = rs.getInt("idutente");
         String username = rs.getString("username");
@@ -145,6 +194,7 @@ public class ImpUtenteDAO implements UtenteDAO {
         String cognome = rs.getString("cognome");
         String email = rs.getString("email");
 
+        // Verifica se l'utente è un Operatore
         String ruoloStr = rs.getString("ruolo");
         if (ruoloStr != null) {
             Operatore.Ruolo ruolo;
@@ -156,6 +206,7 @@ public class ImpUtenteDAO implements UtenteDAO {
             return new Operatore(id, username, passwordHash, nome, cognome, email, ruolo, true);
         }
 
+        // Verifica se l'utente è un Cliente
         String patente = rs.getString("patente");
         if (patente != null) {
             BigDecimal credito = rs.getBigDecimal("credito");
@@ -163,6 +214,7 @@ public class ImpUtenteDAO implements UtenteDAO {
             return new Cliente(id, username, passwordHash, nome, cognome, email, patente, credito, true);
         }
 
+        // Caso base: Utente generico
         return new Utente(id, username, passwordHash, nome, cognome, email, true);
     }
 }

@@ -3,48 +3,45 @@ package model;
 import java.math.BigDecimal;
 
 /**
- * The type Auto.
+ * Rappresenta un veicolo all'interno del sistema di noleggio.
+ * Contiene le informazioni anagrafiche del veicolo, il suo stato attuale
+ * e il costo giornaliero associato.
  */
 public class Auto {
 
     /**
-     * The enum Stato auto.
+     * Definisce i possibili stati in cui un veicolo può trovarsi.
      */
-//enum Auto
-    public enum StatoAuto{
-        /**
-         * Disponibile stato auto.
-         */
+    public enum StatoAuto {
+        /** Veicolo pronto per essere noleggiato. */
         DISPONIBILE,
-        /**
-         * Prenotata stato auto.
-         */
+        /** Veicolo prenotato da un cliente. */
         PRENOTATA,
-        /**
-         * Noleggiata stato auto.
-         */
+        /** Veicolo attualmente in uso. */
         NOLEGGIATA,
-        /**
-         * In manutenzione stato auto.
-         */
+        /** Veicolo in fase di manutenzione. */
         IN_MANUTENZIONE,
-        /**
-         * Non disponibile stato auto.
-         */
+        /** Veicolo non disponibile per altri motivi. */
         NON_DISPONIBILE
     }
 
+    private int idAuto;
+    private String targa;
+    private String modello;
+    private StatoAuto stato;
+    private BigDecimal costoDaily;
+
     /**
-     * Instantiates a new Auto.
+     * Crea una nuova istanza di Auto con i parametri specificati.
      *
-     * @param idAuto     the id auto
-     * @param targa      the targa
-     * @param modello    the modello
-     * @param stato      the stato
-     * @param costoDaily the costo daily
+     * @param idAuto     l'identificativo univoco dell'auto
+     * @param targa      la targa del veicolo
+     * @param modello    il modello del veicolo
+     * @param stato      lo stato iniziale dell'auto
+     * @param costoDaily il costo giornaliero del noleggio
+     * @throws IllegalArgumentException se i parametri obbligatori sono nulli o il costo è negativo
      */
-//costruttore Auto
-    public Auto(int idAuto, String targa, String modello, StatoAuto stato,BigDecimal costoDaily){
+    public Auto(int idAuto, String targa, String modello, StatoAuto stato, BigDecimal costoDaily) {
         if (targa == null || modello == null || stato == null) {
             throw new IllegalArgumentException("Parametri non validi");
         }
@@ -59,78 +56,64 @@ public class Auto {
     }
 
     /**
-     * Instantiates a new Auto.
+     * Costruttore vuoto per inizializzazioni differite.
      */
-//costruttore vuoto
     public Auto() {
     }
 
-    //attributi Auto
-    private int idAuto;
-    private String targa;
-    private String modello;
-    private StatoAuto stato;
-    private BigDecimal costoDaily;
-
     /**
-     * Gets id auto.
-     *
-     * @return the id auto
+     * Restituisce l'ID dell'auto.
+     * @return l'ID univoco
      */
-//metodi Auto
     public int getIdAuto() {
         return idAuto;
     }
 
     /**
-     * Gets targa.
-     *
-     * @return the targa
+     * Restituisce la targa del veicolo.
+     * @return la targa
      */
     public String getTarga() {
         return targa;
     }
 
     /**
-     * Gets modello.
-     *
-     * @return the modello
+     * Restituisce il modello del veicolo.
+     * @return il modello
      */
     public String getModello() {
         return modello;
     }
 
     /**
-     * Gets stato.
-     *
-     * @return the stato
+     * Restituisce lo stato attuale dell'auto.
+     * @return lo {@link StatoAuto} corrente
      */
     public StatoAuto getStato() {
         return stato;
     }
 
     /**
-     * Get costo daily big decimal.
-     *
-     * @return the big decimal
+     * Restituisce il costo giornaliero di noleggio.
+     * @return il costo come BigDecimal
      */
-    public BigDecimal getCostoDaily(){
+    public BigDecimal getCostoDaily() {
         return costoDaily;
     }
 
     /**
-     * Sets id auto.
-     *
-     * @param idAuto the id auto
+     * Imposta l'ID dell'auto.
+     * @param idAuto l'ID da assegnare
      */
     public void setIdAuto(int idAuto) {
         this.idAuto = idAuto;
     }
 
     /**
-     * Cambia stato.
+     * Modifica lo stato attuale del veicolo.
      *
-     * @param nuovoStato the nuovo stato
+     * @param nuovoStato il nuovo {@link StatoAuto} da impostare
+     * @throws IllegalArgumentException se lo stato fornito è null
      */
     public void cambiaStato(StatoAuto nuovoStato) {
         if (nuovoStato == null) {
@@ -140,16 +123,16 @@ public class Auto {
     }
 
     /**
-     * Is disponibile boolean.
+     * Verifica se il veicolo è disponibile per un nuovo noleggio.
      *
-     * @return the boolean
+     * @return true se l'auto è disponibile, false altrimenti
      */
     public boolean isDisponibile() {
         return this.stato == StatoAuto.DISPONIBILE;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return idAuto + " " + targa + " " + modello + " " + stato;
     }
 }

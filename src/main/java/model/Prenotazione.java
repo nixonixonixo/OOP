@@ -3,30 +3,24 @@ package model;
 import java.util.Date;
 
 /**
- * The type Prenotazione.
+ * Rappresenta una richiesta di noleggio effettuata da un cliente per un veicolo.
+ * Gestisce le date di validità, lo stato della richiesta e le associazioni
+ * con {@link Cliente} e {@link Auto}.
  */
 public class Prenotazione {
 
     /**
-     * The enum Stato pren.
+     * Definisce i possibili stati della prenotazione.
      */
-    //enum
     public enum StatoPren {
-        /**
-         * In attesa stato pren.
-         */
+        /** Richiesta inviata, in attesa di approvazione. */
         IN_ATTESA,
-        /**
-         * Confermata stato pren.
-         */
+        /** Prenotazione confermata e valida. */
         CONFERMATA,
-        /**
-         * Annullata stato pren.
-         */
+        /** Prenotazione annullata dal cliente o dal sistema. */
         ANNULLATA
     }
 
-    //attributi Prenotazione
     private int idPrenotazione;
     private Date dataInizio;
     private Date dataFine;
@@ -34,23 +28,21 @@ public class Prenotazione {
     private Cliente cliente;
     private Auto auto;
 
-
     /**
-     * Instantiates a new Prenotazione.
+     * Crea una nuova istanza di Prenotazione.
      *
-     * @param idPrenotazione the id prenotazione
-     * @param dataInizio     the data inizio
-     * @param dataFine       the data fine
-     * @param stato          the stato
-     * @param cliente        the cliente
-     * @param auto           the auto
+     * @param idPrenotazione l'ID univoco della prenotazione
+     * @param dataInizio     la data di inizio prenotazione
+     * @param dataFine       la data di fine prenotazione
+     * @param stato          lo {@link StatoPren} iniziale
+     * @param cliente        il {@link Cliente} che effettua la richiesta
+     * @param auto           l'{@link Auto} richiesta
+     * @throws IllegalArgumentException se i parametri obbligatori sono nulli o la fine precede l'inizio
      */
     public Prenotazione(int idPrenotazione, Date dataInizio, Date dataFine, StatoPren stato, Cliente cliente, Auto auto) {
         if (dataInizio == null || stato == null) {
             throw new IllegalArgumentException("Parametri obbligatori mancanti");
         }
-
-
         if (dataFine != null && dataFine.before(dataInizio)) {
             throw new IllegalArgumentException("La data di fine non può essere precedente all'inizio");
         }
@@ -64,112 +56,86 @@ public class Prenotazione {
     }
 
     /**
-     * Instantiates a new Prenotazione.
+     * Costruttore vuoto per uso con framework di persistenza.
      */
-    //metodi Prenotazione
     public Prenotazione() {}
 
     /**
-     * Gets id prenotazione.
-     *
-     * @return the id prenotazione
+     * Restituisce l'ID della prenotazione.
+     * @return l'ID univoco
      */
     public int getIdPrenotazione() { return idPrenotazione; }
 
     /**
-     * Gets data inizio.
-     *
-     * @return the data inizio
+     * Restituisce la data di inizio.
+     * @return la data di inizio
      */
     public Date getDataInizio() { return dataInizio; }
 
     /**
-     * Gets data fine.
-     *
-     * @return the data fine
+     * Restituisce la data di fine.
+     * @return la data di fine
      */
     public Date getDataFine() { return dataFine; }
 
     /**
-     * Gets stato.
-     *
-     * @return the stato
+     * Restituisce lo stato corrente.
+     * @return lo {@link StatoPren}
      */
     public StatoPren getStato() { return stato; }
 
     /**
-     * Gets cliente.
-     *
-     * @return the cliente
+     * Restituisce il cliente associato.
+     * @return l'oggetto {@link Cliente}
      */
     public Cliente getCliente() { return cliente; }
 
     /**
-     * Gets auto.
-     *
-     * @return the auto
+     * Restituisce l'auto prenotata.
+     * @return l'oggetto {@link Auto}
      */
     public Auto getAuto() { return auto; }
 
+    /**
+     * Imposta l'auto per la prenotazione.
+     * @param auto l'auto da associare
+     */
+    public void setAuto(Auto auto) { this.auto = auto; }
 
     /**
-     * Sets auto.
-     *
-     * @param auto the auto
+     * Imposta il cliente per la prenotazione.
+     * @param cliente il cliente da associare
      */
-    public void setAuto(Auto auto) {
-        this.auto = auto;
-    }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
 
     /**
-     * Sets cliente.
-     *
-     * @param cliente the cliente
+     * Imposta la data di inizio.
+     * @param dataInizio la data di inizio
      */
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
+    public void setDataInizio(Date dataInizio) { this.dataInizio = dataInizio; }
 
     /**
-     * Sets data inizio.
-     *
-     * @param dataInizio the data inizio
+     * Imposta la data di fine.
+     * @param dataFine la data di fine
      */
-    public void setDataInizio(Date dataInizio) {
-        this.dataInizio = dataInizio;
-    }
+    public void setDataFine(Date dataFine) { this.dataFine = dataFine; }
 
     /**
-     * Sets data fine.
-     *
-     * @param dataFine the data fine
+     * Imposta lo stato della prenotazione.
+     * @param stato il nuovo {@link StatoPren}
      */
-    public void setDataFine(Date dataFine) {
-        this.dataFine = dataFine;
-    }
+    public void setStato(StatoPren stato) { this.stato = stato; }
 
     /**
-     * Sets stato.
-     *
-     * @param stato the stato
+     * Imposta l'ID della prenotazione.
+     * @param idPrenotazione l'ID da assegnare
      */
-    public void setStato(StatoPren stato) {
-        this.stato = stato;
-    }
+    public void setIdPrenotazione(int idPrenotazione) { this.idPrenotazione = idPrenotazione; }
 
     /**
-     * Sets id prenotazione.
-     *
-     * @param idPrenotazione the id prenotazione
+     * Transita lo stato a {@link StatoPren#CONFERMATA}.
+     * @throws IllegalStateException se la prenotazione è già annullata
      */
-    public void setIdPrenotazione(int idPrenotazione) {
-        this.idPrenotazione = idPrenotazione;
-    }
-
-    /**
-     * Conferma.
-     */
-    //metodi di logica
     public void conferma() {
         if (stato == StatoPren.ANNULLATA) {
             throw new IllegalStateException("Prenotazione già annullata");
@@ -178,17 +144,17 @@ public class Prenotazione {
     }
 
     /**
-     * Annulla.
+     * Annulla la prenotazione portando lo stato a {@link StatoPren#ANNULLATA}.
      */
     public void annulla() {
         this.stato = StatoPren.ANNULLATA;
     }
 
     /**
-     * Is sovrapposta boolean.
+     * Verifica se questa prenotazione si sovrappone temporalmente con un'altra.
      *
-     * @param altra the altra
-     * @return the boolean
+     * @param altra l'altra prenotazione da confrontare
+     * @return true se c'è sovrapposizione, false altrimenti
      */
     public boolean isSovrapposta(Prenotazione altra) {
         if (altra == null || this.dataFine == null || altra.dataFine == null) return false;
@@ -198,7 +164,7 @@ public class Prenotazione {
 
     @Override
     public String toString() {
-        return idPrenotazione + " " + dataInizio + " " + dataFine  + " " + stato + " " + cliente.getCognome()
-                + " " + auto.getTarga();
+        return "Prenotazione #" + idPrenotazione + " | Periodo: " + dataInizio + " - " + dataFine +
+                " | Stato: " + stato + " | Cliente: " + cliente.getCognome() + " | Auto: " + auto.getTarga();
     }
 }

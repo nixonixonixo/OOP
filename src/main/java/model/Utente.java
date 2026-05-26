@@ -6,11 +6,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 /**
- * The type Utente.
+ * Rappresenta l'entità base di un utente nel sistema.
+ * Gestisce le informazioni anagrafiche, le credenziali di accesso e la logica di sicurezza
+ * relativa all'hashing delle password.
  */
 public class Utente {
 
-    //attributi Utente
     private int idUtente;
     private String username;
     private String passwordHash;
@@ -19,16 +20,15 @@ public class Utente {
     private String email;
 
     /**
-     * Instantiates a new Utente.
+     * Crea un nuovo utente con password da hashare.
      *
-     * @param idUtente       the id utente
-     * @param username       the username
-     * @param passwordChiara the password chiara
-     * @param nome           the nome
-     * @param cognome        the cognome
-     * @param email          the email
+     * @param idUtente       l'ID univoco
+     * @param username       lo username
+     * @param passwordChiara la password in chiaro (verrà convertita in hash)
+     * @param nome           il nome
+     * @param cognome        il cognome
+     * @param email          l'email
      */
-    //costruttore Utente
     public Utente(int idUtente, String username, String passwordChiara, String nome, String cognome, String email) {
         validaCampi(username, passwordChiara, nome, cognome, email);
         this.idUtente = idUtente;
@@ -40,17 +40,16 @@ public class Utente {
     }
 
     /**
-     * Instantiates a new Utente.
+     * Costruttore utilizzato dai DAO per istanziare un utente dal database.
      *
-     * @param idUtente        the id utente
-     * @param username        the username
-     * @param passwordHash    the password hash
-     * @param nome            the nome
-     * @param cognome         the cognome
-     * @param email           the email
-     * @param isAlreadyHashed parametro per capire se la password è già hashata
+     * @param idUtente        l'ID univoco
+     * @param username        lo username
+     * @param passwordHash    la password già hashata
+     * @param nome            il nome
+     * @param cognome         il cognome
+     * @param email           l'email
+     * @param isAlreadyHashed flag per indicare se la stringa fornita è già un hash
      */
-    //costruttore DAO
     public Utente(int idUtente, String username, String passwordHash, String nome, String cognome, String email, boolean isAlreadyHashed) {
         this.idUtente = idUtente;
         this.username = username;
@@ -61,19 +60,23 @@ public class Utente {
     }
 
     /**
-     * Verifica password boolean.
+     * Verifica se la password fornita in chiaro corrisponde all'hash salvato.
      *
-     * @param passwordChiara the password chiara
-     * @return the boolean
+     * @param passwordChiara la password da verificare
+     * @return true se la password è corretta, false altrimenti
      */
-    //metodi di logica
     public boolean verificaPassword(String passwordChiara) {
         if (passwordChiara == null) return false;
         String hashDaVerificare = generaHash(passwordChiara);
         return this.passwordHash.equals(hashDaVerificare);
     }
 
-    //metodo per hashing con algoritmo SHA-256
+    /**
+     * Genera l'hash SHA-256 della password fornita.
+     *
+     * @param password la password in chiaro
+     * @return la password hashata in formato Base64
+     */
     private String generaHash(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -84,6 +87,9 @@ public class Utente {
         }
     }
 
+    /**
+     * Valida i campi obbligatori dell'utente.
+     */
     private void validaCampi(String username, String password, String nome, String cognome, String email) {
         if (username == null || username.isBlank()) throw new IllegalArgumentException("Username obbligatorio");
         if (password == null || password.length() < 4) throw new IllegalArgumentException("Password troppo corta");
@@ -92,91 +98,31 @@ public class Utente {
         if (email == null || !email.contains("@")) throw new IllegalArgumentException("Email non valida");
     }
 
-    /**
-     * Gets id utente.
-     *
-     * @return the id utente
-     */
-    //metodi Utente
-    public int getIdUtente() { return idUtente; }
+    // --- Getter e Setter ---
 
-    /**
-     * Sets id utente.
-     *
-     * @param idUtente the id utente
-     */
+    public int getIdUtente() { return idUtente; }
     public void setIdUtente(int idUtente) { this.idUtente = idUtente; }
 
-    /**
-     * Gets username.
-     *
-     * @return the username
-     */
     public String getUsername() { return username; }
-
-    /**
-     * Sets username.
-     *
-     * @param username the username
-     */
     public void setUsername(String username) { this.username = username; }
 
-    /**
-     * Gets password hash.
-     *
-     * @return the password hash
-     */
     public String getPasswordHash() { return passwordHash; }
 
     /**
-     * Cambia password.
-     *
-     * @param nuovaPasswordChiara the nuova password chiara
+     * Aggiorna la password dell'utente.
+     * @param nuovaPasswordChiara la nuova password in chiaro
      */
     public void cambiaPassword(String nuovaPasswordChiara) {
         this.passwordHash = generaHash(nuovaPasswordChiara);
     }
 
-    /**
-     * Gets nome.
-     *
-     * @return the nome
-     */
     public String getNome() { return nome; }
-
-    /**
-     * Sets nome.
-     *
-     * @param nome the nome
-     */
     public void setNome(String nome) { this.nome = nome; }
 
-    /**
-     * Gets cognome.
-     *
-     * @return the cognome
-     */
     public String getCognome() { return cognome; }
-
-    /**
-     * Sets cognome.
-     *
-     * @param cognome the cognome
-     */
     public void setCognome(String cognome) { this.cognome = cognome; }
 
-    /**
-     * Gets email.
-     *
-     * @return the email
-     */
     public String getEmail() { return email; }
-
-    /**
-     * Sets email.
-     *
-     * @param email the email
-     */
     public void setEmail(String email) { this.email = email; }
 
     @Override

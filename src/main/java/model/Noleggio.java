@@ -2,21 +2,28 @@ package model;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
- * The type Noleggio.
+ * Rappresenta un contratto di noleggio effettivo concluso tra il cliente e l'azienda.
+ * Gestisce le date di ritiro e restituzione, il calcolo dei costi e il riferimento
+ * alla {@link Prenotazione} originaria.
  */
 public class Noleggio {
 
+    private int idNoleggio;
+    private Date dataRitiro;
+    private Date dataRestituzione;
+    private BigDecimal costoTot;
+    private Prenotazione prenotazione;
+
     /**
-     * Instantiates a new Noleggio.
+     * Crea una nuova istanza di Noleggio.
      *
-     * @param idNoleggio   the id noleggio
-     * @param dataRitiro   the data ritiro
-     * @param prenotazione the prenotazione
+     * @param idNoleggio   l'ID univoco del noleggio
+     * @param dataRitiro   la data di inizio noleggio
+     * @param prenotazione la {@link Prenotazione} da cui deriva il noleggio
+     * @throws IllegalArgumentException se la data di ritiro è nulla
      */
-    //costruttore Noleggio
     public Noleggio(int idNoleggio, Date dataRitiro, Prenotazione prenotazione) {
         if (dataRitiro == null) {
             throw new IllegalArgumentException("Data ritiro non valida");
@@ -24,115 +31,97 @@ public class Noleggio {
         this.idNoleggio = idNoleggio;
         this.dataRitiro = dataRitiro;
         this.dataRestituzione = null;
-        this.costoTot = new BigDecimal("0");
+        this.costoTot = BigDecimal.ZERO;
         this.prenotazione = prenotazione;
     }
 
-    //attributi Noleggio
-    private int idNoleggio;
-    private Date dataRitiro;
-    private Date dataRestituzione;
-    private BigDecimal costoTot;
-
-    //associazioni Noleggio
-    private Prenotazione prenotazione;
-
     /**
-     * Gets id noleggio.
-     *
-     * @return the id noleggio
+     * Restituisce l'ID del noleggio.
+     * @return l'ID univoco
      */
-    //metodi Noleggio
     public int getIdNoleggio() {
         return idNoleggio;
     }
 
     /**
-     * Gets data ritiro.
-     *
-     * @return the data ritiro
+     * Restituisce la data di ritiro.
+     * @return la data di ritiro
      */
     public Date getDataRitiro() {
         return dataRitiro;
     }
 
     /**
-     * Gets data restituzione.
-     *
-     * @return the data restituzione
+     * Restituisce la data di restituzione (null se il noleggio è ancora attivo).
+     * @return la data di restituzione
      */
     public Date getDataRestituzione() {
         return dataRestituzione;
     }
 
     /**
-     * Gets costo tot.
-     *
-     * @return the costo tot
+     * Restituisce il costo totale calcolato per il noleggio.
+     * @return il costo totale
      */
     public BigDecimal getCostoTot() {
         return costoTot;
     }
 
     /**
-     * Gets prenotazione.
-     *
-     * @return the prenotazione
+     * Restituisce la prenotazione associata.
+     * @return l'oggetto {@link Prenotazione}
      */
     public Prenotazione getPrenotazione() {
         return prenotazione;
     }
 
     /**
-     * Gets cliente.
-     *
-     * @return the cliente
+     * Restituisce il cliente che ha effettuato il noleggio.
+     * @return l'oggetto {@link Cliente}
      */
     public Cliente getCliente() {
         return this.prenotazione.getCliente();
     }
 
     /**
-     * Gets auto.
-     *
-     * @return the auto
+     * Restituisce l'auto noleggiata.
+     * @return l'oggetto {@link Auto}
      */
     public Auto getAuto() {
         return this.prenotazione.getAuto();
     }
 
     /**
-     * Is attivo boolean.
+     * Verifica se il noleggio è attualmente in corso.
      *
-     * @return the boolean
+     * @return true se il veicolo non è ancora stato restituito
      */
     public boolean isAttivo() {
         return this.dataRestituzione == null;
     }
 
     /**
-     * Set data restituzione.
-     *
-     * @param dataRestituzione the data restituzione
+     * Imposta la data di restituzione del veicolo.
+     * @param dataRestituzione la data di fine noleggio
      */
-    public void setDataRestituzione(Date dataRestituzione){
+    public void setDataRestituzione(Date dataRestituzione) {
         this.dataRestituzione = dataRestituzione;
     }
 
     /**
-     * Set costo tot.
-     *
-     * @param costoTot the costo tot
+     * Imposta manualmente il costo totale del noleggio.
+     * @param costoTot l'importo calcolato
      */
-    public void setCostoTot(BigDecimal costoTot){
+    public void setCostoTot(BigDecimal costoTot) {
         this.costoTot = costoTot;
     }
 
     /**
-     * Chiudi noleggio.
+     * Finalizza il noleggio impostando la data di restituzione e calcolando il costo finale.
      *
-     * @param dataRestituzione the data restituzione
-     * @param costoGiornaliero the costo giornaliero
+     * @param dataRestituzione la data di fine noleggio
+     * @param costoGiornaliero il costo giornaliero dell'auto
+     * @throws IllegalArgumentException se la data di restituzione è nulla o precedente al ritiro
      */
     public void chiudiNoleggio(Date dataRestituzione, BigDecimal costoGiornaliero) {
         if (dataRestituzione == null) {
@@ -147,22 +136,22 @@ public class Noleggio {
     }
 
     /**
-     * Calcola durata giorni int.
+     * Calcola la durata del noleggio in giorni.
      *
-     * @return the int
+     * @return il numero di giorni trascorsi, o 0 se il noleggio non è terminato
      */
     public int calcolaDurataGiorni() {
         if (dataRestituzione == null) {
             return 0;
         }
         long diff = dataRestituzione.getTime() - dataRitiro.getTime();
+        // Converte i millisecondi in giorni arrotondando per eccesso
         return (int) Math.ceil(diff / (1000.0 * 60 * 60 * 24));
     }
 
     @Override
-    public String toString(){
-        return idNoleggio+ " " + dataRestituzione +  " " +dataRitiro + " " + costoTot
-        + " " + prenotazione.getIdPrenotazione();
+    public String toString() {
+        return "Noleggio #" + idNoleggio + " | Ritiro: " + dataRitiro +
+                " | Restituzione: " + dataRestituzione + " | Costo: " + costoTot;
     }
-
 }

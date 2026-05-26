@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * The type Controller.
+ * Controller principale dell'applicativo che funge da mediatore tra la GUI e il Data Access Layer.
+ * Implementa la logica di business relativa alla gestione di utenti, noleggi, prenotazioni e pagamenti.
  */
 public class Controller {
 
@@ -26,17 +27,16 @@ public class Controller {
     private Utente utenteLoggato;
 
     /**
-     * Instantiates a new Controller.
+     * Inizializza il controller con le implementazioni DAO necessarie.
      *
-     * @param utenteDAO       the utente dao
-     * @param clienteDAO      the cliente dao
-     * @param operatoreDAO    the operatore dao
-     * @param autoDAO         the auto dao
-     * @param noleggioDAO     the noleggio dao
-     * @param pagamentoDAO    the pagamento dao
-     * @param prenotazioneDAO the prenotazione dao
+     * @param utenteDAO       DAO per la gestione degli utenti
+     * @param clienteDAO      DAO per la gestione dei clienti
+     * @param operatoreDAO    DAO per la gestione degli operatori
+     * @param autoDAO         DAO per la gestione delle auto
+     * @param noleggioDAO     DAO per la gestione dei noleggi
+     * @param pagamentoDAO    DAO per la gestione dei pagamenti
+     * @param prenotazioneDAO DAO per la gestione delle prenotazioni
      */
-    //Costruttore Controller
     public Controller(UtenteDAO utenteDAO, ClienteDAO clienteDAO, OperatoreDAO operatoreDAO,
                       AutoDAO autoDAO, NoleggioDAO noleggioDAO, PagamentoDAO pagamentoDAO,
                       PrenotazioneDAO prenotazioneDAO) {
@@ -50,12 +50,13 @@ public class Controller {
     }
 
     /**
-     * Login utente.
+     * Esegue l'autenticazione dell'utente nel sistema.
      *
-     * @param username the username
-     * @param password the password
-     * @return the utente
-     * @throws SQLException the sql exception
+     * @param username lo username inserito
+     * @param password la password inserita
+     * @return l'oggetto Utente autenticato
+     * @throws SQLException             se si verifica un errore nel database
+     * @throws IllegalArgumentException se le credenziali non sono valide
      */
     public Utente login(String username, String password) throws SQLException {
         Utente u = utenteDAO.trovaUtentePerUsername(username);
@@ -67,137 +68,123 @@ public class Controller {
     }
 
     /**
-     * Logout.
+     * Termina la sessione dell'utente corrente.
      */
-    //Metodo per logout
     public void logout() { this.utenteLoggato = null; }
 
     /**
-     * Gets utente loggato.
+     * Restituisce l'utente attualmente loggato.
      *
-     * @return the utente loggato
+     * @return l'utente loggato, o null se nessuno è autenticato
      */
-    //Getter per l'utente loggato
     public Utente getUtenteLoggato() { return utenteLoggato; }
 
     /**
-     * Is operatore loggato boolean.
+     * Verifica se l'utente autenticato è un operatore.
      *
-     * @return the boolean
+     * @return true se l'utente è un operatore, false altrimenti
      */
-    //Metodo per capire se l'utente loggato è un operatore
     public boolean isOperatoreLoggato() { return utenteLoggato instanceof Operatore; }
 
     /**
-     * Gets cliente by id.
+     * Recupera un cliente specifico tramite il suo ID univoco.
      *
-     * @param id the id
-     * @return the cliente by id
-     * @throws SQLException the sql exception
+     * @param id l'ID del cliente
+     * @return l'oggetto Cliente trovato
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Getter del cliente per ID
     public Cliente getClienteById(int id) throws SQLException {
         return clienteDAO.trovaClientePerId(id);
     }
 
     /**
-     * Registra cliente.
+     * Registra un nuovo cliente nel sistema.
      *
-     * @param c the c
-     * @throws SQLException the sql exception
+     * @param c il cliente da registrare
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Metodo per la registrazione
     public void registraCliente(Cliente c) throws SQLException {
         utenteDAO.salvaUtente(c);
         clienteDAO.salvaCliente(c);
     }
 
     /**
-     * Ricarica conto.
+     * Effettua una ricarica sul saldo disponibile di un cliente.
      *
-     * @param idCliente the id cliente
-     * @param importo   the importo
-     * @throws SQLException the sql exception
+     * @param idCliente l'ID del cliente
+     * @param importo   l'importo da accreditare
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Metodo per ricarica il conto di un cliente
     public void ricaricaConto(int idCliente, BigDecimal importo) throws SQLException {
         if (importo.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalArgumentException("Importo non valido");
         pagamentoDAO.ricaricaSaldoCliente(idCliente, importo);
     }
 
     /**
-     * Gets tutte auto.
+     * Restituisce l'elenco completo delle auto nel sistema.
      *
-     * @return the tutte auto
-     * @throws SQLException the sql exception
+     * @return una lista di auto
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Getter di tutte le auto
     public List<Auto> getTutteAuto() throws SQLException {
         return autoDAO.trovaTutteAuto();
     }
 
     /**
-     * Gets auto disponibili.
+     * Restituisce solo le auto attualmente disponibili per il noleggio.
      *
-     * @return the auto disponibili
-     * @throws SQLException the sql exception
+     * @return una lista di auto disponibili
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Getter per le auto disponibili
     public List<Auto> getAutoDisponibili() throws SQLException {
         return autoDAO.trovaAutoDisponibili();
     }
 
     /**
-     * Cambia stato auto.
+     * Aggiorna lo stato di un'auto nel database.
      *
-     * @param idAuto the id auto
-     * @param stato  the stato
-     * @throws SQLException the sql exception
+     * @param idAuto l'ID dell'auto
+     * @param stato  il nuovo stato da impostare
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Metodo per cambiare lo stato dell'auto
     public void cambiaStatoAuto(int idAuto, Auto.StatoAuto stato) throws SQLException {
         autoDAO.aggiornaStatoAuto(idAuto, stato);
     }
 
     /**
-     * Effettua prenotazione.
+     * Finalizza una prenotazione e imposta l'auto come noleggiata.
      *
-     * @param p the p
-     * @throws Exception the exception
+     * @param p la prenotazione da effettuare
+     * @throws Exception in caso di errore di persistenza
      */
-    //Metodo che permette al cliente di effettuare una prenotazione
     public void effettuaPrenotazione(Prenotazione p) throws Exception {
         prenotazioneDAO.salvaPrenotazione(p);
-
         autoDAO.aggiornaStatoAuto(p.getAuto().getIdAuto(), Auto.StatoAuto.NOLEGGIATA);
     }
 
     /**
-     * Gets tutte prenotazioni.
+     * Restituisce tutte le prenotazioni presenti.
      *
-     * @return the tutte prenotazioni
-     * @throws SQLException the sql exception
+     * @return lista di prenotazioni
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Getter di tutte le prenotazioni
     public List<Prenotazione> getTuttePrenotazioni() throws SQLException { return prenotazioneDAO.trovaTuttePrenotazioni(); }
 
     /**
-     * Gets prenotazioni cliente.
+     * Restituisce le prenotazioni effettuate da un cliente specifico.
      *
-     * @param idCliente the id cliente
-     * @return the prenotazioni cliente
-     * @throws SQLException the sql exception
+     * @param idCliente l'ID del cliente
+     * @return lista di prenotazioni del cliente
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Getter di prenotazioni di un cliente
     public List<Prenotazione> getPrenotazioniCliente(int idCliente) throws SQLException { return prenotazioneDAO.trovaPrenotazioniCliente(idCliente); }
 
     /**
-     * Conferma prenotazione.
+     * Conferma una prenotazione esistente e crea un nuovo noleggio associato.
      *
-     * @param idPrenotazione the id prenotazione
-     * @throws Exception the exception
+     * @param idPrenotazione l'ID della prenotazione da confermare
+     * @throws Exception se la prenotazione non esiste
      */
-    //Metodo per confermare la prenotazione
     public void confermaPrenotazione(int idPrenotazione) throws Exception {
         Prenotazione p = prenotazioneDAO.trovaPrenotazionePerId(idPrenotazione);
         if (p == null) throw new Exception("Prenotazione non trovata");
@@ -207,12 +194,11 @@ public class Controller {
     }
 
     /**
-     * Gets noleggi attivi.
+     * Restituisce la lista dei noleggi in corso (non ancora restituiti).
      *
-     * @return the noleggi attivi
-     * @throws SQLException the sql exception
+     * @return lista di noleggi attivi
+     * @throws SQLException se si verifica un errore nel database
      */
-    //Metodo per mostrare i noleggi attivi
     public List<Noleggio> getNoleggiAttivi() throws SQLException {
         return noleggioDAO.trovaTuttiNoleggi().stream()
                 .filter(n -> n.getDataRestituzione() == null)
@@ -220,12 +206,11 @@ public class Controller {
     }
 
     /**
-     * Termina noleggio.
+     * Calcola il costo totale, chiude il noleggio e crea la richiesta di pagamento.
      *
-     * @param idNoleggio the id noleggio
-     * @throws Exception the exception
+     * @param idNoleggio l'ID del noleggio da terminare
+     * @throws Exception in caso di errori durante il calcolo o la persistenza
      */
-    //Metodo per terminare il noleggio
     public void terminaNoleggio(int idNoleggio) throws Exception {
         Noleggio n = noleggioDAO.trovaNoleggioPerId(idNoleggio);
         if (n == null) throw new Exception("Noleggio non trovato.");
@@ -243,21 +228,20 @@ public class Controller {
     }
 
     /**
-     * Gets pagamenti by cliente.
+     * Restituisce i pagamenti effettuati o in attesa di un cliente.
      *
-     * @param idCliente the id cliente
-     * @return the pagamenti by cliente
-     * @throws SQLException the sql exception
+     * @param idCliente l'ID del cliente
+     * @return lista di pagamenti
+     * @throws SQLException se si verifica un errore nel database
      */
     public List<Pagamento> getPagamentiByCliente(int idCliente) throws SQLException { return pagamentoDAO.trovaPagamentiCliente(idCliente); }
 
     /**
-     * Conferma pagamento.
+     * Effettua il pagamento di una fattura utilizzando il credito disponibile del cliente.
      *
-     * @param idPagamento the id pagamento
-     * @throws Exception the exception
+     * @param idPagamento l'ID del pagamento da saldare
+     * @throws Exception se il credito è insufficiente o il pagamento non esiste
      */
-    //Metodo per permettere all'utente di pagare
     public void confermaPagamento(int idPagamento) throws Exception {
         Pagamento p = pagamentoDAO.trovaPagamentoPerId(idPagamento);
         if (p == null) throw new Exception("Pagamento non trovato.");
@@ -268,7 +252,6 @@ public class Controller {
         Cliente c = clienteDAO.trovaClientePerId(idCliente);
         if (c == null) throw new Exception("Cliente non trovato.");
 
-
         if (c.getCredito().compareTo(p.getImporto()) < 0) {
             throw new Exception("Credito insufficiente. Ricarica il conto!");
         }
@@ -277,7 +260,13 @@ public class Controller {
         pagamentoDAO.aggiornaStatoPagamento(idPagamento, Pagamento.StatoPagamento.COMPLETATO);
     }
 
-    //Metodo di supporto per il metodo confermaPagamento
+    /**
+     * Metodo privato di supporto per risalire al cliente partendo da un ID pagamento.
+     *
+     * @param idPagamento l'ID del pagamento
+     * @return l'ID del cliente associato
+     * @throws SQLException se non viene trovato il cliente o c'è un errore SQL
+     */
     private int recuperaIdClienteDaPagamento(int idPagamento) throws SQLException {
         String sql = "SELECT pr.idcliente FROM PRENOTAZIONE pr " +
                 "JOIN NOLEGGIO n ON n.idprenotazione = pr.idprenotazione " +

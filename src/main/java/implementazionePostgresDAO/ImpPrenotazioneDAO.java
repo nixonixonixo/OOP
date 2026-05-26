@@ -11,10 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The type Imp prenotazione dao.
+ * Implementazione DAO per la gestione delle Prenotazioni su database PostgreSQL.
+ * Gestisce l'integrazione tra le entità Prenotazione, Auto e Cliente.
  */
 public class ImpPrenotazioneDAO implements PrenotazioneDAO {
 
+    /**
+     * Salva una nuova prenotazione nel database.
+     *
+     * @param p l'oggetto Prenotazione da persistere
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void salvaPrenotazione(Prenotazione p) throws SQLException {
         String sql = """
@@ -26,7 +33,6 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setDate(1, new java.sql.Date(p.getDataInizio().getTime()));
-
 
             if (p.getDataFine() != null) {
                 ps.setDate(2, new java.sql.Date(p.getDataFine().getTime()));
@@ -42,6 +48,13 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         }
     }
 
+    /**
+     * Recupera una prenotazione dal database tramite il suo ID univoco.
+     *
+     * @param idPrenotazione l'ID della prenotazione
+     * @return l'oggetto Prenotazione popolato, o null se non trovato
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public Prenotazione trovaPrenotazionePerId(int idPrenotazione) throws SQLException {
         String sql = """
@@ -64,6 +77,13 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         return null;
     }
 
+    /**
+     * Recupera tutte le prenotazioni effettuate da un cliente specifico.
+     *
+     * @param idCliente l'ID del cliente
+     * @return lista di prenotazioni del cliente
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public List<Prenotazione> trovaPrenotazioniCliente(int idCliente) throws SQLException {
         List<Prenotazione> lista = new ArrayList<>();
@@ -87,6 +107,12 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         return lista;
     }
 
+    /**
+     * Recupera l'elenco completo di tutte le prenotazioni registrate.
+     *
+     * @return lista di tutte le prenotazioni
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public List<Prenotazione> trovaTuttePrenotazioni() throws SQLException {
         List<Prenotazione> lista = new ArrayList<>();
@@ -108,6 +134,12 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         return lista;
     }
 
+    /**
+     * Aggiorna le date e lo stato di una prenotazione esistente.
+     *
+     * @param p l'oggetto Prenotazione aggiornato
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void aggiornaPrenotazione(Prenotazione p) throws SQLException {
         String sql = """
@@ -126,6 +158,12 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         }
     }
 
+    /**
+     * Elimina una prenotazione dal database.
+     *
+     * @param idPrenotazione l'ID della prenotazione da eliminare
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void eliminaPrenotazione(int idPrenotazione) throws SQLException {
         String sql = "DELETE FROM PRENOTAZIONE WHERE idprenotazione = ?";
@@ -136,6 +174,13 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         }
     }
 
+    /**
+     * Crea una nuova prenotazione in stato 'IN_ATTESA' usando la data corrente.
+     *
+     * @param idCliente l'ID del cliente
+     * @param idAuto    l'ID dell'auto
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void creaPrenotazione(int idCliente, int idAuto) throws SQLException {
         String sql = """
@@ -150,6 +195,13 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         }
     }
 
+    /**
+     * Cerca una prenotazione attiva per una specifica auto.
+     *
+     * @param idAuto l'ID dell'auto
+     * @return la prenotazione trovata, o null se l'auto è libera
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public Prenotazione trovaPrenotazionePerAuto(int idAuto) throws SQLException {
         String sql = """
@@ -173,6 +225,13 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         return null;
     }
 
+    /**
+     * Aggiorna lo stato di una prenotazione specifica.
+     *
+     * @param idPrenotazione l'ID della prenotazione
+     * @param nuovoStato     il nuovo stato da impostare
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void aggiornaStatoPrenotazione(int idPrenotazione, Prenotazione.StatoPren nuovoStato) throws SQLException {
         String sql = "UPDATE PRENOTAZIONE SET stato = ? WHERE idprenotazione = ?";
@@ -184,6 +243,13 @@ public class ImpPrenotazioneDAO implements PrenotazioneDAO {
         }
     }
 
+    /**
+     * Metodo di supporto per mappare una riga del ResultSet in un oggetto Prenotazione completo di Auto e Cliente.
+     *
+     * @param rs il ResultSet posizionato sulla riga corrente
+     * @return un'istanza di Prenotazione popolata
+     * @throws SQLException se si verifica un errore nella lettura delle colonne
+     */
     private Prenotazione mappaResultSetCompleto(ResultSet rs) throws SQLException {
         Auto auto = new Auto(
                 rs.getInt("idauto"),

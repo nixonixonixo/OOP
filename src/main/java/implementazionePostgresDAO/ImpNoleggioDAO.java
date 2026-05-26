@@ -12,10 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The type Imp noleggio dao.
+ * Implementazione DAO per la gestione dei Noleggi.
+ * Include logiche di join complesse per ricostruire l'intero grafo degli oggetti (Noleggio, Prenotazione, Auto, Cliente).
  */
 public class ImpNoleggioDAO implements NoleggioDAO {
 
+    /**
+     * Query base utilizzata per recuperare un noleggio insieme a tutte le entità correlate.
+     */
     private static final String SELECT_QUERY = """
             SELECT 
                 n.idnoleggio, n.dataritiro, n.datarestituzione, n.costototale,
@@ -30,6 +34,12 @@ public class ImpNoleggioDAO implements NoleggioDAO {
             JOIN UTENTE u ON c.idutente = u.idutente
             """;
 
+    /**
+     * Salva un nuovo record di noleggio nel database.
+     *
+     * @param noleggio l'oggetto Noleggio da persistere
+     * @throws SQLException se si verifica un errore durante l'esecuzione dell'istruzione SQL
+     */
     @Override
     public void salvaNoleggio(Noleggio noleggio) throws SQLException {
         String sql = "INSERT INTO NOLEGGIO (dataritiro, costototale, idprenotazione) VALUES (?, ?, ?)";
@@ -50,6 +60,13 @@ public class ImpNoleggioDAO implements NoleggioDAO {
         }
     }
 
+    /**
+     * Recupera un noleggio specifico dato il suo ID, ricostruendo l'intera gerarchia degli oggetti.
+     *
+     * @param idNoleggio l'ID del noleggio
+     * @return l'oggetto Noleggio corrispondente, o null se non trovato
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public Noleggio trovaNoleggioPerId(int idNoleggio) throws SQLException {
         String sql = SELECT_QUERY + " WHERE n.idnoleggio = ?";
@@ -67,6 +84,12 @@ public class ImpNoleggioDAO implements NoleggioDAO {
         return null;
     }
 
+    /**
+     * Recupera l'elenco di tutti i noleggi registrati.
+     *
+     * @return una lista di oggetti Noleggio
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public List<Noleggio> trovaTuttiNoleggi() throws SQLException {
         List<Noleggio> lista = new ArrayList<>();
@@ -81,6 +104,12 @@ public class ImpNoleggioDAO implements NoleggioDAO {
         return lista;
     }
 
+    /**
+     * Aggiorna i dettagli di un noleggio esistente, inclusa la data di restituzione e il costo finale.
+     *
+     * @param noleggio l'oggetto Noleggio aggiornato
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void aggiornaNoleggio(Noleggio noleggio) throws SQLException {
         String sql = """
@@ -107,6 +136,12 @@ public class ImpNoleggioDAO implements NoleggioDAO {
         }
     }
 
+    /**
+     * Elimina un record di noleggio dal database.
+     *
+     * @param idNoleggio l'ID del noleggio da rimuovere
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void eliminaNoleggio(int idNoleggio) throws SQLException {
         String sql = "DELETE FROM NOLEGGIO WHERE idnoleggio = ?";
@@ -119,6 +154,13 @@ public class ImpNoleggioDAO implements NoleggioDAO {
         }
     }
 
+    /**
+     * Metodo di mapping complesso che ricostruisce gli oggetti Noleggio, Prenotazione, Auto e Cliente dal ResultSet.
+     *
+     * @param rs il ResultSet posizionato sulla riga corrente
+     * @return un'istanza di Noleggio completamente popolata
+     * @throws SQLException se si verifica un errore nella lettura delle colonne
+     */
     private Noleggio mappaResultSetInNoleggio(ResultSet rs) throws SQLException {
         Auto auto = new Auto(
                 rs.getInt("idauto"),
