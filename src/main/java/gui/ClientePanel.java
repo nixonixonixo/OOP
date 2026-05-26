@@ -10,6 +10,12 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
+/**
+ * Pannello dell'interfaccia grafica riservato alla gestione del profilo cliente.
+ * <p>
+ * Permette la visualizzazione delle informazioni anagrafiche, del saldo attuale
+ * e consente al cliente di effettuare ricariche del proprio credito.
+ */
 public class ClientePanel extends JPanel {
 
     private JPanel mainPanel;
@@ -23,6 +29,12 @@ public class ClientePanel extends JPanel {
     private JLabel lblImportoDesc;
     private final Controller controller;
 
+    /**
+     * Inizializza il pannello e registra un {@link AncestorListener} per
+     * aggiornare automaticamente i dati ogni volta che il pannello viene visualizzato.
+     *
+     * @param controller il controller di sistema
+     */
     public ClientePanel(Controller controller) {
         this.controller = controller;
         add(mainPanel);
@@ -30,6 +42,7 @@ public class ClientePanel extends JPanel {
         lblCredito.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnRicarica.addActionListener(e -> ricaricaCredito());
 
+        // Listener per ricaricare i dati quando il componente entra nello stage attivo
         this.addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -46,6 +59,9 @@ public class ClientePanel extends JPanel {
         });
     }
 
+    /**
+     * Recupera i dati aggiornati dal controller e refresha le label a schermo.
+     */
     private void aggiornaDati() {
         try {
             if (controller.getUtenteLoggato() instanceof Cliente) {
@@ -61,6 +77,9 @@ public class ClientePanel extends JPanel {
         }
     }
 
+    /**
+     * Legge l'importo dal campo di testo e richiama la logica di ricarica nel controller.
+     */
     private void ricaricaCredito() {
         try {
             String testo = txtRicarica.getText().replace(",", ".");
@@ -130,4 +149,5 @@ public class ClientePanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }

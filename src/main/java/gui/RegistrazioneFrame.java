@@ -7,6 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
 
+/**
+ * Finestra di registrazione per i nuovi clienti.
+ * <p>
+ * Gestisce l'input dei dati anagrafici e della patente, validando la presenza
+ * dei campi obbligatori prima di richiedere la registrazione tramite il {@link Controller}.
+ */
 public class RegistrazioneFrame extends JFrame {
 
     private JPanel mainPanel;
@@ -20,6 +26,11 @@ public class RegistrazioneFrame extends JFrame {
 
     private final Controller controller;
 
+    /**
+     * Inizializza la finestra di registrazione.
+     *
+     * @param controller il controller di sistema per gestire la persistenza del nuovo cliente
+     */
     public RegistrazioneFrame(Controller controller) {
         this.controller = controller;
 
@@ -36,6 +47,10 @@ public class RegistrazioneFrame extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Raccoglie i dati dai campi di input, crea un oggetto {@link Cliente}
+     * e invoca la logica di registrazione nel controller.
+     */
     private void registrazione() {
         try {
             String username = usernameField.getText().trim();
@@ -45,13 +60,12 @@ public class RegistrazioneFrame extends JFrame {
             String email = emailField.getText().trim();
             String patente = patenteField.getText().trim();
 
-
             if (username.isEmpty() || password.isEmpty() || patente.isEmpty() ||
                     nome.isEmpty() || cognome.isEmpty() || email.isEmpty()) {
                 throw new Exception("Tutti i campi sono obbligatori per procedere con la registrazione.");
             }
 
-
+            // Si utilizza 0 come ID provvisorio poiché assegnato dal Database
             Cliente cliente = new Cliente(
                     0,
                     username,
@@ -62,7 +76,6 @@ public class RegistrazioneFrame extends JFrame {
                     patente,
                     BigDecimal.ZERO
             );
-
 
             controller.registraCliente(cliente);
 
@@ -132,4 +145,5 @@ public class RegistrazioneFrame extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }

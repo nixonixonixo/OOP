@@ -6,6 +6,13 @@ import model.Utente;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Finestra di autenticazione dell'applicazione.
+ * <p>
+ * Fornisce i campi di input per le credenziali utente e gestisce il processo di
+ * login, interagendo con il {@link Controller} per verificare l'identità
+ * e avviare la {@link DashboardFrame}.
+ */
 public class LoginFrame extends JFrame {
 
     private JPanel mainPanel;
@@ -18,6 +25,11 @@ public class LoginFrame extends JFrame {
 
     private final Controller controller;
 
+    /**
+     * Inizializza la finestra di login.
+     *
+     * @param controller il controller di sistema per gestire la logica di autenticazione
+     */
     public LoginFrame(Controller controller) {
         this.controller = controller;
 
@@ -31,6 +43,10 @@ public class LoginFrame extends JFrame {
         registerButton.addActionListener(e -> openRegistration());
     }
 
+    /**
+     * Esegue la logica di autenticazione.
+     * In caso di successo, chiude la finestra di login e apre la dashboard.
+     */
     private void login() {
         try {
             String username = usernameField.getText().trim();
@@ -54,6 +70,9 @@ public class LoginFrame extends JFrame {
         }
     }
 
+    /**
+     * Apre la finestra di registrazione utente.
+     */
     private void openRegistration() {
         RegistrazioneFrame regFrame = new RegistrazioneFrame(controller);
         regFrame.setVisible(true);
@@ -103,4 +122,5 @@ public class LoginFrame extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }

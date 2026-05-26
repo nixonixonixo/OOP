@@ -9,6 +9,12 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Pannello dell'interfaccia grafica per la gestione dei pagamenti del cliente.
+ * <p>
+ * Consente al cliente di visualizzare la lista dei propri pagamenti (in attesa o completati)
+ * e di effettuare il saldo di quelli ancora in sospeso.
+ */
 public class PagamentoPanel extends JPanel {
     private JPanel mainPanel;
     private JTable tablePagamenti;
@@ -16,6 +22,11 @@ public class PagamentoPanel extends JPanel {
     private DefaultTableModel model;
     private final Controller controller;
 
+    /**
+     * Inizializza il pannello e configura la tabella di visualizzazione pagamenti.
+     *
+     * @param controller il controller di sistema
+     */
     public PagamentoPanel(Controller controller) {
         this.controller = controller;
         add(mainPanel);
@@ -26,6 +37,7 @@ public class PagamentoPanel extends JPanel {
 
         btnPaga.addActionListener(e -> pagaSelezionato());
 
+        // Listener per ricaricare i pagamenti quando il tab diventa visibile
         this.addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -42,6 +54,9 @@ public class PagamentoPanel extends JPanel {
         });
     }
 
+    /**
+     * Gestisce la conferma del pagamento per la transazione selezionata nella tabella.
+     */
     private void pagaSelezionato() {
         int row = tablePagamenti.getSelectedRow();
         if (row == -1) {
@@ -59,6 +74,10 @@ public class PagamentoPanel extends JPanel {
         }
     }
 
+    /**
+     * Recupera dal controller l'elenco dei pagamenti associati al cliente loggato
+     * e aggiorna la tabella.
+     */
     private void caricaPagamenti() {
         try {
             model.setRowCount(0);
@@ -112,4 +131,5 @@ public class PagamentoPanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }

@@ -9,6 +9,12 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Pannello dell'interfaccia grafica per la gestione dei noleggi attivi.
+ * <p>
+ * Permette agli operatori di visualizzare l'elenco dei veicoli attualmente in uso
+ * e di concludere formalmente il contratto di noleggio selezionato.
+ */
 public class NoleggioPanel extends JPanel {
     private JPanel mainPanel;
     private JTable tabellaNoleggi;
@@ -18,6 +24,12 @@ public class NoleggioPanel extends JPanel {
     private DefaultTableModel model;
     private final Controller controller;
 
+    /**
+     * Inizializza il pannello e carica l'elenco dei noleggi correnti.
+     *
+     * @param controller il controller di sistema
+     * @throws SQLException in caso di errore nel caricamento iniziale dei dati
+     */
     public NoleggioPanel(Controller controller) throws SQLException {
         this.controller = controller;
 
@@ -45,6 +57,11 @@ public class NoleggioPanel extends JPanel {
         caricaNoleggi();
     }
 
+    /**
+     * Aggiorna la tabella con i dati dei noleggi attualmente attivi recuperati dal controller.
+     *
+     * @throws SQLException se la comunicazione con il database fallisce
+     */
     private void caricaNoleggi() throws SQLException {
         model.setRowCount(0);
         List<Noleggio> lista = controller.getNoleggiAttivi();
@@ -58,6 +75,11 @@ public class NoleggioPanel extends JPanel {
         }
     }
 
+    /**
+     * Gestisce la terminazione di un noleggio selezionato nella tabella.
+     *
+     * @throws Exception se si verifica un errore durante l'aggiornamento dello stato nel DB
+     */
     private void chiudiNoleggio() throws Exception {
         int row = tabellaNoleggi.getSelectedRow();
         if (row != -1) {
@@ -108,4 +130,5 @@ public class NoleggioPanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }

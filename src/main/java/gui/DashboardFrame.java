@@ -7,6 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
+/**
+ * Finestra principale dell'applicazione che funge da Dashboard per l'utente autenticato.
+ * <p>
+ * Gestisce la visualizzazione dinamica dei tab di navigazione in base al ruolo
+ * dell'utente (Cliente vs Operatore) e fornisce le funzionalità di logout e gestione sessione.
+ */
 public class DashboardFrame extends JFrame {
 
     private JPanel mainPanel;
@@ -17,6 +23,12 @@ public class DashboardFrame extends JFrame {
 
     private final Controller controller;
 
+    /**
+     * Crea il frame della dashboard e inizializza la struttura dei tab.
+     *
+     * @param controller il controller di sistema per la logica di business
+     * @throws SQLException in caso di errori durante il caricamento iniziale dei dati
+     */
     public DashboardFrame(Controller controller) throws SQLException {
         this.controller = controller;
 
@@ -36,6 +48,12 @@ public class DashboardFrame extends JFrame {
         });
     }
 
+    /**
+     * Configura l'interfaccia utente popolando il {@link JTabbedPane} con i pannelli
+     * specifici per il ruolo dell'utente (Operatore o Cliente).
+     *
+     * @throws SQLException se si verifica un errore durante il recupero delle informazioni utente
+     */
     private void initDashboard() throws SQLException {
         Utente utente = controller.getUtenteLoggato();
         if (utente != null) {
@@ -46,6 +64,7 @@ public class DashboardFrame extends JFrame {
 
         tabbedPane.removeAll();
 
+        // Logica di autorizzazione: definisce quali tab mostrare in base al ruolo
         if (controller.isOperatoreLoggato()) {
             tabbedPane.addTab("Gestione Parco Auto", new AutoPanel(controller));
             tabbedPane.addTab("Prenotazioni", new PrenotazionePanel(controller));
@@ -94,4 +113,5 @@ public class DashboardFrame extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }

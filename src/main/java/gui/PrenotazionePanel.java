@@ -1,7 +1,6 @@
 package gui;
 
 import controller.Controller;
-import model.Cliente;
 import model.Prenotazione;
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -11,6 +10,12 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Pannello dell'interfaccia grafica per la gestione delle prenotazioni.
+ * <p>
+ * Mostra l'elenco delle prenotazioni: i clienti possono visualizzare il loro storico,
+ * mentre gli operatori possono confermare le prenotazioni in stato di attesa.
+ */
 public class PrenotazionePanel extends JPanel {
     private JPanel mainPanel;
     private JTable tabella;
@@ -18,29 +23,37 @@ public class PrenotazionePanel extends JPanel {
     private DefaultTableModel tableModel;
     private final Controller controller;
 
+    /**
+     * Inizializza il pannello, configura la tabella e la visibilità del pulsante di conferma
+     * basandosi sul ruolo dell'utente loggato.
+     *
+     * @param controller il controller di sistema
+     */
     public PrenotazionePanel(Controller controller) {
         this.controller = controller;
         add(mainPanel);
 
+        // Il pulsante di conferma è disponibile solo per gli operatori
         btnConferma.setVisible(controller.isOperatoreLoggato());
         btnConferma.addActionListener(e -> {
             try {
                 conferma();
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(this, "Errore nella conferma: " + ex.getMessage());
             }
         });
 
         tableModel = new DefaultTableModel(new String[]{"ID", "Data Inizio", "Data Fine", "Stato", "Auto"}, 0);
         tabella.setModel(tableModel);
 
+        // Listener per aggiornare automaticamente i dati quando il pannello viene aperto
         this.addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 try {
                     caricaDati();
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    JOptionPane.showMessageDialog(null, "Errore caricamento: " + e.getMessage());
                 }
             }
 
@@ -54,21 +67,42 @@ public class PrenotazionePanel extends JPanel {
         });
     }
 
+    /**
+     * Esegue la logica di conferma per la prenotazione selezionata nella tabella.
+     *
+     * @throws Exception in caso di errori durante la transazione sul database
+     */
     private void conferma() throws Exception {
         int row = tabella.getSelectedRow();
-        if (row == -1) return;
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Seleziona una prenotazione dalla tabella.");
+            return;
+        }
         int id = (int) tableModel.getValueAt(row, 0);
         controller.confermaPrenotazione(id);
         caricaDati();
+        JOptionPane.showMessageDialog(this, "Prenotazione confermata!");
     }
 
+    /**
+     * Recupera le prenotazioni dal controller (filtrate in base al ruolo) e aggiorna la tabella.
+     *
+     * @throws SQLException se si verifica un errore durante l'accesso ai dati
+     */
     private void caricaDati() throws SQLException {
         tableModel.setRowCount(0);
         List<Prenotazione> lista = controller.isOperatoreLoggato() ?
                 controller.getTuttePrenotazioni() :
                 controller.getPrenotazioniCliente(controller.getUtenteLoggato().getIdUtente());
+
         for (Prenotazione p : lista) {
-            tableModel.addRow(new Object[]{p.getIdPrenotazione(), p.getDataInizio(), p.getDataFine(), p.getStato(), p.getAuto().getModello()});
+            tableModel.addRow(new Object[]{
+                    p.getIdPrenotazione(),
+                    p.getDataInizio(),
+                    p.getDataFine(),
+                    p.getStato(),
+                    p.getAuto().getModello()
+            });
         }
     }
 
