@@ -10,10 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The type Imp cliente dao.
+ * Implementazione DAO per la persistenza dei dati relativi ai Clienti su database PostgreSQL.
+ * Gestisce l'interazione tra l'entità Cliente e le tabelle UTENTE e CLIENTE.
  */
 public class ImpClienteDAO implements ClienteDAO {
 
+    /**
+     * Salva i dati specifici del cliente nel database.
+     *
+     * @param cliente l'oggetto cliente contenente i dati da persistere
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void salvaCliente(Cliente cliente) throws SQLException {
         String sql = "INSERT INTO CLIENTE (idutente, patente, credito) VALUES (?, ?, ?)";
@@ -29,6 +36,13 @@ public class ImpClienteDAO implements ClienteDAO {
         }
     }
 
+    /**
+     * Recupera un cliente dal database tramite il suo ID utente, unendo i dati delle tabelle UTENTE e CLIENTE.
+     *
+     * @param idUtente l'ID univoco dell'utente
+     * @return l'oggetto Cliente popolato, o null se non trovato
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public Cliente trovaClientePerId(int idUtente) throws SQLException {
         String sql = """
@@ -53,6 +67,12 @@ public class ImpClienteDAO implements ClienteDAO {
         return null;
     }
 
+    /**
+     * Recupera l'elenco completo di tutti i clienti presenti nel sistema.
+     *
+     * @return una lista di oggetti Cliente
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public List<Cliente> trovaTuttiClienti() throws SQLException {
         List<Cliente> clienti = new ArrayList<>();
@@ -78,6 +98,12 @@ public class ImpClienteDAO implements ClienteDAO {
         return clienti;
     }
 
+    /**
+     * Aggiorna i dati anagrafici e finanziari del cliente.
+     *
+     * @param cliente l'oggetto Cliente con i dati aggiornati
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void aggiornaCliente(Cliente cliente) throws SQLException {
         String sql = """
@@ -97,6 +123,12 @@ public class ImpClienteDAO implements ClienteDAO {
         }
     }
 
+    /**
+     * Elimina i dati del cliente dal database.
+     *
+     * @param idUtente l'ID dell'utente da eliminare
+     * @throws SQLException se si verifica un errore durante l'esecuzione della query
+     */
     @Override
     public void eliminaCliente(int idUtente) throws SQLException {
         String sql = "DELETE FROM CLIENTE WHERE idutente = ?";
@@ -109,6 +141,13 @@ public class ImpClienteDAO implements ClienteDAO {
         }
     }
 
+    /**
+     * Aggiorna il credito disponibile del cliente.
+     *
+     * @param idUtente     l'ID dell'utente
+     * @param nuovoCredito il nuovo valore del credito
+     * @throws SQLException se l'utente non viene trovato o c'è un errore di database
+     */
     @Override
     public void aggiornaCredito(int idUtente, BigDecimal nuovoCredito) throws SQLException {
         String sql = "UPDATE CLIENTE SET credito = ? WHERE idutente = ?";
@@ -125,8 +164,32 @@ public class ImpClienteDAO implements ClienteDAO {
         }
     }
 
-    private Cliente mappaResultSetInCliente(ResultSet rs) throws SQLException {
+    /**
+     * Riduce il saldo del cliente in seguito a un pagamento effettuato.
+     *
+     * @param idCliente l'ID del cliente
+     * @param importo   l'importo da detrarre
+     * @throws SQLException se si verifica un errore durante l'operazione di aggiornamento
+     */
+    @Override
+    public void prelevaSaldo(int idCliente, BigDecimal importo) throws SQLException {
+        String sql = "UPDATE CLIENTE SET credito = credito - ? WHERE idutente = ?";
+        try (Connection conn = ConnessioneDatabase.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBigDecimal(1, importo);
+            ps.setInt(2, idCliente);
+            ps.executeUpdate();
+        }
+    }
 
+    /**
+     * Metodo di supporto per mappare una riga del ResultSet in un oggetto Cliente.
+     *
+     * @param rs il ResultSet corrente
+     * @return un'istanza di Cliente popolata
+     * @throws SQLException se si verifica un errore nella lettura delle colonne
+     */
+    private Cliente mappaResultSetInCliente(ResultSet rs) throws SQLException {
         BigDecimal credito = rs.getBigDecimal("credito");
         if (credito == null) {
             credito = BigDecimal.ZERO;
@@ -142,16 +205,5 @@ public class ImpClienteDAO implements ClienteDAO {
                 rs.getString("patente"),
                 credito
         );
-    }
-
-    @Override
-    public void prelevaSaldo(int idCliente, java.math.BigDecimal importo) throws SQLException {
-        String sql = "UPDATE CLIENTE SET credito = credito - ? WHERE idutente = ?";
-        try (Connection conn = ConnessioneDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setBigDecimal(1, importo);
-            ps.setInt(2, idCliente);
-            ps.executeUpdate();
-        }
     }
 }
