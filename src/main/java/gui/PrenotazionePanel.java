@@ -138,5 +138,4 @@ public class PrenotazionePanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

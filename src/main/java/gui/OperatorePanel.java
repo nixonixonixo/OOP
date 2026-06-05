@@ -180,5 +180,4 @@ public class OperatorePanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

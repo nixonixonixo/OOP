@@ -145,5 +145,4 @@ public class RegistrazioneFrame extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

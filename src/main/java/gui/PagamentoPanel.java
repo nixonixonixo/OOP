@@ -131,5 +131,4 @@ public class PagamentoPanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

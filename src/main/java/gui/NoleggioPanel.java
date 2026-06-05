@@ -130,5 +130,4 @@ public class NoleggioPanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

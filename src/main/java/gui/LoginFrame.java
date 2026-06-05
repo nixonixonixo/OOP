@@ -122,5 +122,4 @@ public class LoginFrame extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

@@ -113,5 +113,4 @@ public class DashboardFrame extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }

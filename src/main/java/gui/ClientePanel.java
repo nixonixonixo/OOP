@@ -149,5 +149,4 @@ public class ClientePanel extends JPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
-
 }
