@@ -11,7 +11,6 @@ import java.util.List;
 
 /**
  * Implementazione DAO per la persistenza dei dati relativi ai Clienti su database PostgreSQL.
- * Gestisce l'interazione tra l'entità Cliente e le tabelle UTENTE e CLIENTE.
  */
 public class ImpClienteDAO implements ClienteDAO {
 

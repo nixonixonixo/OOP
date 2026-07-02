@@ -6,9 +6,6 @@ import java.sql.SQLException;
 
 /**
  * Gestore della connessione al database PostgreSQL.
- * <p>
- * Fornisce un metodo statico per ottenere una {@link Connection} attiva
- * verso il database di sistema.
  */
 public class ConnessioneDatabase {
 

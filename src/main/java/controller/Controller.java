@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 /**
  * Controller principale dell'applicativo che funge da mediatore tra la GUI e il Data Access Layer.
- * Implementa la logica di business relativa alla gestione di utenti, noleggi, prenotazioni e pagamenti.
  */
 public class Controller {
 

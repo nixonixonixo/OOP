@@ -10,7 +10,6 @@ import java.util.List;
 
 /**
  * Implementazione DAO per la persistenza dei dati degli Operatori su database PostgreSQL.
- * Gestisce l'associazione tra l'entità Operatore e le tabelle UTENTE e OPERATORE.
  */
 public class ImpOperatoreDAO implements OperatoreDAO {
 
