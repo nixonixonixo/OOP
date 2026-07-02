@@ -11,9 +11,6 @@ import java.util.List;
 
 /**
  * Pannello dell'interfaccia grafica per la gestione dei noleggi attivi.
- * <p>
- * Permette agli operatori di visualizzare l'elenco dei veicoli attualmente in uso
- * e di concludere formalmente il contratto di noleggio selezionato.
  */
 public class NoleggioPanel extends JPanel {
     private JPanel mainPanel;
@@ -91,5 +88,7 @@ public class NoleggioPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Seleziona un noleggio dalla tabella.");
         }
     }
+
+
 
 }

@@ -9,9 +9,6 @@ import java.sql.SQLException;
 
 /**
  * Finestra principale dell'applicazione che funge da Dashboard per l'utente autenticato.
- * <p>
- * Gestisce la visualizzazione dinamica dei tab di navigazione in base al ruolo
- * dell'utente (Cliente vs Operatore) e fornisce le funzionalità di logout e gestione sessione.
  */
 public class DashboardFrame extends JFrame {
 
@@ -76,5 +73,4 @@ public class DashboardFrame extends JFrame {
             tabbedPane.addTab("Il mio Profilo", new ClientePanel(controller));
         }
     }
-
 }

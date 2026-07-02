@@ -8,10 +8,8 @@ import java.awt.*;
 
 /**
  * Finestra di autenticazione dell'applicazione.
- * <p>
  * Fornisce i campi di input per le credenziali utente e gestisce il processo di
- * login, interagendo con il {@link Controller} per verificare l'identità
- * e avviare la {@link DashboardFrame}.
+ * login.
  */
 public class LoginFrame extends JFrame {
 
@@ -77,5 +75,6 @@ public class LoginFrame extends JFrame {
         RegistrazioneFrame regFrame = new RegistrazioneFrame(controller);
         regFrame.setVisible(true);
     }
+
 
 }

@@ -9,9 +9,6 @@ import java.math.BigDecimal;
 
 /**
  * Finestra di registrazione per i nuovi clienti.
- * <p>
- * Gestisce l'input dei dati anagrafici e della patente, validando la presenza
- * dei campi obbligatori prima di richiedere la registrazione tramite il {@link Controller}.
  */
 public class RegistrazioneFrame extends JFrame {
 
@@ -86,5 +83,4 @@ public class RegistrazioneFrame extends JFrame {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }
-
 }

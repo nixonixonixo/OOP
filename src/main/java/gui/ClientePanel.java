@@ -12,9 +12,6 @@ import java.sql.SQLException;
 
 /**
  * Pannello dell'interfaccia grafica riservato alla gestione del profilo cliente.
- * <p>
- * Permette la visualizzazione delle informazioni anagrafiche, del saldo attuale
- * e consente al cliente di effettuare ricariche del proprio credito.
  */
 public class ClientePanel extends JPanel {
 
@@ -30,8 +27,8 @@ public class ClientePanel extends JPanel {
     private final Controller controller;
 
     /**
-     * Inizializza il pannello e registra un {@link AncestorListener} per
-     * aggiornare automaticamente i dati ogni volta che il pannello viene visualizzato.
+     * Inizializza il pannello e registra
+     * aggiorna automaticamente i dati ogni volta che il pannello viene visualizzato.
      *
      * @param controller il controller di sistema
      */
@@ -60,7 +57,7 @@ public class ClientePanel extends JPanel {
     }
 
     /**
-     * Recupera i dati aggiornati dal controller e refresha le label a schermo.
+     * Recupera i dati aggiornati dal controller e aggiorna le label a schermo.
      */
     private void aggiornaDati() {
         try {

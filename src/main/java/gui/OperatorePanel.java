@@ -14,9 +14,6 @@ import java.util.Locale;
 
 /**
  * Pannello dell'interfaccia grafica dedicato agli operatori.
- * <p>
- * Offre strumenti per monitorare il parco auto e modificarne lo stato operativo
- * (es. invio in manutenzione o ripristino della disponibilità).
  */
 public class OperatorePanel extends JPanel {
 
@@ -111,5 +108,6 @@ public class OperatorePanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
 }

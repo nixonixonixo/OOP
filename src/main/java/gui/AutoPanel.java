@@ -14,10 +14,6 @@ import java.util.List;
 
 /**
  * Pannello dell'interfaccia grafica dedicato alla gestione e visualizzazione delle auto.
- * <p>
- * Questa classe gestisce la visualizzazione del parco veicoli in una {@link JTable},
- * differenziando le funzionalità disponibili (prenotazione vs manutenzione)
- * in base al ruolo dell'utente loggato.
  */
 public class AutoPanel extends JPanel {
 
@@ -70,7 +66,7 @@ public class AutoPanel extends JPanel {
     }
 
     /**
-     * Adatta la visibilità dei pulsanti di controllo basandosi sul ruolo dell'utente (Cliente o Operatore).
+     * Adatta la visibilità dei pulsanti di controllo basandosi sul ruolo dell'utente.
      */
     private void configuraInterfacciaPerRuolo() {
         if (controller.isOperatoreLoggato()) {
@@ -187,5 +183,4 @@ public class AutoPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Errore durante la prenotazione: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }
-
 }

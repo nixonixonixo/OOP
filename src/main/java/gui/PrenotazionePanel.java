@@ -12,9 +12,7 @@ import java.util.List;
 
 /**
  * Pannello dell'interfaccia grafica per la gestione delle prenotazioni.
- * <p>
- * Mostra l'elenco delle prenotazioni: i clienti possono visualizzare il loro storico,
- * mentre gli operatori possono confermare le prenotazioni in stato di attesa.
+
  */
 public class PrenotazionePanel extends JPanel {
     private JPanel mainPanel;
@@ -105,5 +103,7 @@ public class PrenotazionePanel extends JPanel {
             });
         }
     }
+
+
 
 }

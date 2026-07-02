@@ -11,9 +11,6 @@ import java.util.List;
 
 /**
  * Pannello dell'interfaccia grafica per la gestione dei pagamenti del cliente.
- * <p>
- * Consente al cliente di visualizzare la lista dei propri pagamenti (in attesa o completati)
- * e di effettuare il saldo di quelli ancora in sospeso.
  */
 public class PagamentoPanel extends JPanel {
     private JPanel mainPanel;
@@ -95,5 +92,7 @@ public class PagamentoPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Errore caricamento pagamenti: " + e.getMessage());
         }
     }
+
+
 
 }
