@@ -4,8 +4,6 @@ import java.util.Date;
 
 /**
  * Rappresenta una richiesta di noleggio effettuata da un cliente per un veicolo.
- * Gestisce le date di validità, lo stato della richiesta e le associazioni
- * con {@link Cliente} e {@link Auto}.
  */
 public class Prenotazione {
 

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 /**
  * Rappresenta una transazione di pagamento associata a un contratto di {@link Noleggio}.
- * Gestisce l'importo della transazione e il suo ciclo di vita (Stato).
  */
 public class Pagamento {
 

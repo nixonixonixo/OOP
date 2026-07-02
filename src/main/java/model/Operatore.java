@@ -2,8 +2,6 @@ package model;
 
 /**
  * Rappresenta un operatore del sistema di noleggio.
- * Estende {@link Utente} e definisce il ruolo specifico ricoperto
- * all'interno dell'organizzazione (es. Admin, Addetto Noleggio, Manutentore).
  */
 public class Operatore extends Utente {
 

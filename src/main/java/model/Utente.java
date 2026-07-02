@@ -7,8 +7,6 @@ import java.util.Base64;
 
 /**
  * Rappresenta l'entità base di un utente nel sistema.
- * Gestisce le informazioni anagrafiche, le credenziali di accesso e la logica di sicurezza
- * relativa all'hashing delle password.
  */
 public class Utente {
 

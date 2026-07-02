@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 
 /**
  * Rappresenta un cliente del sistema.
- * Estende la classe {@link Utente} aggiungendo informazioni specifiche come
- * la patente di guida e il saldo del credito disponibile.
  */
 public class Cliente extends Utente {
 

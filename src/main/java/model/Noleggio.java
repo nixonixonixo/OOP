@@ -5,8 +5,6 @@ import java.util.Date;
 
 /**
  * Rappresenta un contratto di noleggio effettivo concluso tra il cliente e l'azienda.
- * Gestisce le date di ritiro e restituzione, il calcolo dei costi e il riferimento
- * alla {@link Prenotazione} originaria.
  */
 public class Noleggio {
 
