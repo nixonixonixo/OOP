@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Implementazione DAO per la gestione degli Utenti su database PostgreSQL.
- * Gestisce l'identificazione e il recupero polimorfico degli utenti,
+ * Gestisce l'identificazione e il recupero degli utenti,
  * distinguendo tra base Utente, Cliente o Operatore in base alle tabelle correlate.
  */
 public class ImpUtenteDAO implements UtenteDAO {
@@ -180,7 +180,7 @@ public class ImpUtenteDAO implements UtenteDAO {
 
     /**
      * Metodo privato di mapping che istanzia l'oggetto corretto (Utente, Cliente o Operatore)
-     * analizzando la presenza di dati nelle tabelle esterne (join).
+     * analizzando la presenza di dati nelle tabelle esterne.
      *
      * @param rs il ResultSet posizionato sulla riga corrente
      * @return un'istanza dell'oggetto specifico (Cliente/Operatore/Utente)

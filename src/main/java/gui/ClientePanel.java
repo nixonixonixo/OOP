@@ -39,7 +39,7 @@ public class ClientePanel extends JPanel {
         lblCredito.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnRicarica.addActionListener(e -> ricaricaCredito());
 
-        // Listener per ricaricare i dati quando il componente entra nello stage attivo
+        // Listener per ricaricare i dati
         this.addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
