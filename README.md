@@ -29,7 +29,7 @@ Le principali entità del sistema sono:
 
 ### Relazioni principali
 - Un cliente può effettuare più prenotazioni
-- Un’auto può essere prenotata più volte in tempi diversi
+- Un’auto può essere prenotata più volte
 - Una prenotazione genera un noleggio
 - Un noleggio può avere uno o più pagamenti
 
@@ -37,7 +37,6 @@ Le principali entità del sistema sono:
 - Java
 - PostgreSQL
 - JDBC
-- Maven
 
 ## Vincoli e regole di business
 Il sistema implementa diversi vincoli, tra cui:
