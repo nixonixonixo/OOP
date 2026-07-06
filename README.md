@@ -37,7 +37,6 @@ Le principali entità del sistema sono:
 - Java
 - PostgreSQL
 - JDBC
-- Maven
 
 ## Vincoli e regole di business
 Il sistema implementa diversi vincoli, tra cui:
